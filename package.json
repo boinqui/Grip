@@ -4,6 +4,10 @@
   "description": "A ordem do dia está na sua tela",
   "main": "script.js",
   "scripts": {
+    "build:css": "npx @tailwindcss/cli -i ./input.css -o ./style.css",
+    "dev:css": "npx @tailwindcss/cli -i ./input.css -o ./style.css --watch",
+    "dev:server": "npx serve . -l 5500",
+    "dev": "concurrently -k \"npm:dev:css\" \"npm:dev:server\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -20,6 +24,8 @@
   "homepage": "https://github.com/boinqui/Grip#readme",
   "dependencies": {
     "@tailwindcss/cli": "^4.2.1",
+    "concurrently": "^9.2.1",
+    "serve": "^14.2.4",
     "tailwindcss": "^4.2.1"
   }
 }
