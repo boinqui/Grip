@@ -27,7 +27,7 @@ templates = Jinja2Templates(directory="templates")
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "12345",  # botar senha do mysql
+    "password": "dudumysql",  # botar senha do mysql
     "database": "grip"
 }
 
