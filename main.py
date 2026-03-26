@@ -43,7 +43,7 @@ async def index(request: Request):
     show_login_modal = request.session.pop("show_login_modal", False)
     nome_usuario = request.session.get("nome_usuario", None)
 
-    return templates.TemplateResponse("index.html", {
+    return templates.TemplateResponse("login.html", {
         "request": request,
         "login_error": login_error,
         "show_login_modal": "block" if show_login_modal else "none",
@@ -90,39 +90,47 @@ async def logout(request: Request):
     request.session.clear()
     return RedirectResponse(url="/", status_code=303)
 
+@app.get("/cadastro", response_class=HTMLResponse)
+async def cadastro_page(request: Request):
+    mensagem = request.session.pop("mensagem", None)
+    return templates.TemplateResponse("cadastro.html", {"request": request, "mensagem": mensagem})
+
 @app.post("/cadastro", name="cadastro")
 async def cadastrar_usuario(
     request: Request,
     nome: str = Form(...),
-    cpf: str = Form(...),
-    data_nascimento: str = Form(...),
-    telefone: str = Form(...),
     email: str = Form(...),
     senha: str = Form(...),
+    confirmar_senha: str = Form(None),
+    cpf: str = Form(""),
+    data_nascimento: str = Form("2000-01-01"),
+    telefone: str = Form(""),
     db = Depends(get_db)
 ):
     try:
+        # Validação de senha
+        if confirmar_senha and senha != confirmar_senha:
+            request.session["mensagem"] = "Erro: As senhas não coincidem!"
+            return RedirectResponse(url="/cadastro", status_code=303)
+
         with db.cursor() as cursor:
             cursor.execute("SELECT id FROM Aluno WHERE email = %s", (email,))
             if cursor.fetchone():
-                request.session["mensagem_header"] = "Cadastro"
                 request.session["mensagem"] = "Erro: Este e-mail já está em uso!"
-                return RedirectResponse(url="/", status_code=303)
+                return RedirectResponse(url="/cadastro", status_code=303)
 
-            # Sem precisar passar o ID (Auto Increment faz o trabalho)
+            # Inserção no banco
             sql = """INSERT INTO Aluno (nome, cpf, data_nascimento, telefone, email, senha) 
                      VALUES (%s, %s, %s, %s, %s, %s)"""
             cursor.execute(sql, (nome, cpf, data_nascimento, telefone, email, senha))
             db.commit()
 
-            request.session["mensagem_header"] = "Cadastro"
             request.session["mensagem"] = "Aluno cadastrado com sucesso! Você já pode realizar login."
-            return RedirectResponse(url="/", status_code=303)
+            return RedirectResponse(url="/cadastro", status_code=303)
 
     except Exception as e:
-        request.session["mensagem_header"] = "Cadastro"
         request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
-        return RedirectResponse(url="/", status_code=303)
+        return RedirectResponse(url="/cadastro", status_code=303)
     finally:
         db.close()
 
