@@ -37,7 +37,7 @@ def get_db():
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
     if request.session.get("user_logged_in"):
-        return RedirectResponse(url="/profListar", status_code=303)
+        return RedirectResponse(url="/logado", status_code=303)
 
     login_error = request.session.pop("login_error", None)
     show_login_modal = request.session.pop("show_login_modal", False)
@@ -48,6 +48,16 @@ async def index(request: Request):
         "login_error": login_error,
         "show_login_modal": "block" if show_login_modal else "none",
         "nome_usuario": nome_usuario
+    })
+
+@app.get("/logado", response_class=HTMLResponse)
+async def usuario_logado(request: Request):
+    if not request.session.get("user_logged_in"):
+        return RedirectResponse(url="/", status_code=303)
+
+    return templates.TemplateResponse("logado.html", {
+        "request": request,
+        "nome_usuario": request.session.get("nome_usuario", None)
     })
 
 @app.post("/login")
@@ -67,7 +77,7 @@ async def login(
                 request.session["user_logged_in"] = True
                 request.session["nome_usuario"] = prof['nome']
                 request.session["perfil"] = "admin"
-                return RedirectResponse(url="/profListar", status_code=303)
+                return RedirectResponse(url="/logado", status_code=303)
             
             # Tenta logar como Aluno (Usuário normal)
             cursor.execute("SELECT * FROM Aluno WHERE email = %s AND senha = %s", (Email, Senha))
@@ -77,7 +87,7 @@ async def login(
                 request.session["user_logged_in"] = True
                 request.session["nome_usuario"] = aluno['nome']
                 request.session["perfil"] = "usuario"
-                return RedirectResponse(url="/profListar", status_code=303)
+                return RedirectResponse(url="/logado", status_code=303)
 
             request.session["login_error"] = "E-mail ou senha inválidos."
             request.session["show_login_modal"] = True
