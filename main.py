@@ -1,4 +1,8 @@
 import pymysql
+import base64
+import hashlib
+import hmac
+import secrets
 from mangum import Mangum
 from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -31,8 +35,48 @@ DB_CONFIG = {
     "database": "grip"
 }
 
+PASSWORD_ALGORITHM = "pbkdf2_sha256"
+PASSWORD_ITERATIONS = 390000
+
 def get_db():
     return pymysql.connect(**DB_CONFIG)
+
+def hash_password(password: str) -> str:
+    salt = secrets.token_hex(16)
+    password_hash = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode("utf-8"),
+        salt.encode("utf-8"),
+        PASSWORD_ITERATIONS
+    )
+    encoded_hash = base64.b64encode(password_hash).decode("utf-8")
+    return f"{PASSWORD_ALGORITHM}${PASSWORD_ITERATIONS}${salt}${encoded_hash}"
+
+def is_password_hashed(stored_password: str) -> bool:
+    return stored_password.startswith(f"{PASSWORD_ALGORITHM}$")
+
+def verify_password(plain_password: str, stored_password: str) -> bool:
+    if not stored_password:
+        return False
+
+    if is_password_hashed(stored_password):
+        try:
+            algorithm, iterations, salt, password_hash = stored_password.split("$", 3)
+            if algorithm != PASSWORD_ALGORITHM:
+                return False
+
+            derived_hash = hashlib.pbkdf2_hmac(
+                "sha256",
+                plain_password.encode("utf-8"),
+                salt.encode("utf-8"),
+                int(iterations)
+            )
+            encoded_derived_hash = base64.b64encode(derived_hash).decode("utf-8")
+            return hmac.compare_digest(encoded_derived_hash, password_hash)
+        except (ValueError, TypeError):
+            return False
+
+    return hmac.compare_digest(plain_password, stored_password)
 
 @app.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -70,20 +114,32 @@ async def login(
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             # Tenta logar como Professor (Admin)
-            cursor.execute("SELECT * FROM Professor WHERE email = %s AND senha = %s", (Email, Senha))
+            cursor.execute("SELECT * FROM Professor WHERE email = %s", (Email,))
             prof = cursor.fetchone()
 
-            if prof:
+            if prof and verify_password(Senha, prof["senha"]):
+                if not is_password_hashed(prof["senha"]):
+                    cursor.execute(
+                        "UPDATE Professor SET senha = %s WHERE id = %s",
+                        (hash_password(Senha), prof["id"])
+                    )
+                    db.commit()
                 request.session["user_logged_in"] = True
                 request.session["nome_usuario"] = prof['nome']
                 request.session["perfil"] = "admin"
                 return RedirectResponse(url="/logado", status_code=303)
             
             # Tenta logar como Aluno (Usuário normal)
-            cursor.execute("SELECT * FROM Aluno WHERE email = %s AND senha = %s", (Email, Senha))
+            cursor.execute("SELECT * FROM Aluno WHERE email = %s", (Email,))
             aluno = cursor.fetchone()
 
-            if aluno:
+            if aluno and verify_password(Senha, aluno["senha"]):
+                if not is_password_hashed(aluno["senha"]):
+                    cursor.execute(
+                        "UPDATE Aluno SET senha = %s WHERE id = %s",
+                        (hash_password(Senha), aluno["id"])
+                    )
+                    db.commit()
                 request.session["user_logged_in"] = True
                 request.session["nome_usuario"] = aluno['nome']
                 request.session["perfil"] = "usuario"
@@ -130,9 +186,10 @@ async def cadastrar_usuario(
                 return RedirectResponse(url="/cadastro", status_code=303)
 
             # Inserção no banco
+            senha_hash = hash_password(senha)
             sql = """INSERT INTO Aluno (nome, cpf, data_nascimento, telefone, email, senha) 
                      VALUES (%s, %s, %s, %s, %s, %s)"""
-            cursor.execute(sql, (nome, cpf, data_nascimento, telefone, email, senha))
+            cursor.execute(sql, (nome, cpf, data_nascimento, telefone, email, senha_hash))
             db.commit()
 
             request.session["mensagem"] = "Aluno cadastrado com sucesso! Você já pode realizar login."
@@ -222,9 +279,10 @@ async def prof_incluir_exe(
     try:
         with db.cursor() as cursor:
             # Deixando o MySQL cuidar do ID (Auto Increment)
+            senha_hash = hash_password(senha)
             sql = """INSERT INTO Professor (nome, registro_drt, cpf, data_nascimento, email, senha, fk_Aula_id)
                      VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-            cursor.execute(sql, (nome, registro_drt, cpf, data_nascimento, email, senha, fk_Aula_id))
+            cursor.execute(sql, (nome, registro_drt, cpf, data_nascimento, email, senha_hash, fk_Aula_id))
             db.commit()
 
         request.session["mensagem_header"] = "Inclusão de Professor"
@@ -338,10 +396,11 @@ async def prof_atualizar_exe(
 
     try:
         with db.cursor() as cursor:
+            senha_hash = hash_password(senha)
             sql = """UPDATE Professor 
                      SET nome=%s, registro_drt=%s, cpf=%s, data_nascimento=%s, email=%s, senha=%s, fk_Aula_id=%s
                      WHERE id=%s"""
-            cursor.execute(sql, (nome, registro_drt, cpf, data_nascimento, email, senha, fk_Aula_id, id))
+            cursor.execute(sql, (nome, registro_drt, cpf, data_nascimento, email, senha_hash, fk_Aula_id, id))
             db.commit()
 
         request.session["mensagem_header"] = "Atualização de Professor"
