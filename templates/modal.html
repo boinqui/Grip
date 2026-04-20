@@ -1,0 +1,31 @@
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal</title>
+</head>
+
+<body>
+    <div class="modal-overlay" id="globalModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="fecharModal()">&times;</button>
+
+            <div id="modalStatusContainer" class="msg-status">
+                <div class="msg-ic" id="modalIcon">!</div>
+                <div class="msg-txt">
+                    <!--DAL PRA-->
+                    <h4 id="modalTitle">Título da Mensagem</h4>
+                    <p id="modalDescription">Descrição detalhada da informação ou erro.</p>
+                </div>
+            </div>
+
+            <div class="confirmar" style="border-top: none; margin-top: 20px;">
+                <button class="btn btn-primary btn-block" id="modalActionButton"
+                    onclick="fecharModal()">Entendi</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
