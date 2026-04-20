@@ -1,15 +1,371 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Grip – Aprenda Ballet com Graça e Precisão</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<html lang="pt-br">
 
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grip Ballet — Aprenda com graça e precisão</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/templates/styles/styles.css" />
 </head>
 
 <body>
-    
+    <header class="topo">
+        <div class="container nav">
+            <a href="/templates/index.html" class="logo">
+                <img src="/static/images/logo_grip.svg" alt="logo grip">
+            </a>
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="#aulas">Aulas</a>
+                <a href="/templates/professores.html">Professores</a>
+                <a href="#planos">Planos</a>
+                <a href="#sobre">Sobre</a>
+            </nav>
+            <a href="/templates/login.html" class="btn btn-primary btn-sm">Entrar</a>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container hero-box">
+                <div class="hero-txt">
+                    <span class="eyebrow">★ Escola de Ballet de Excelência</span>
+                    <h1>
+                        Aprenda Ballet com<br />
+                        <em>Graça e Precisão</em>
+                    </h1>
+                    <p>
+                        Domine a arte do ballet de qualquer lugar do mundo. Treine com
+                        instrutores renomados através de aulas ao vivo e sessões gravadas
+                        abrangentes para todos os níveis de habilidade.
+                    </p>
+                    <div class="hero-btns">
+                        <a href="#planos" class="btn btn-primary">Começar a Aprender Ballet</a>
+                        <a href="#aulas" class="btn btn-ghost">▶ Assistir Introdução</a>
+                    </div>
+                    <div class="stats">
+                        <div class="stat">
+                            <span class="num">30+</span>
+                            <span class="leg">Anos de Experiência</span>
+                        </div>
+                        <div class="stat">
+                            <span class="num">50k+</span>
+                            <span class="leg">Alunos Formados</span>
+                        </div>
+                        <div class="stat">
+                            <span class="num">10k+</span>
+                            <span class="leg">Aulas Realizadas</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <section class="philosophy">
+            <div class="container fil-grid">
+                <div>
+                    <span class="eyebrow muted">NOSSA FILOSOFIA</span>
+                    <h2>
+                        Onde a disciplina<br />
+                        encontra<br />
+                        <em>a graça artística</em>
+                    </h2>
+                    <p>
+                        Na Escola Grip Ballet, acreditamos que o ballet é mais do que
+                        apenas técnica — é uma jornada de autodescoberta, disciplina e
+                        expressão criativa. Nossa abordagem combina tradição com
+                        metodologias modernas, permitindo que cada aluno desenvolva o
+                        seu pleno potencial em um ambiente acolhedor.
+                    </p>
+                </div>
+                <div class="pillars">
+                    <article class="pilar">
+                        <span class="pilar-ic">✦</span>
+                        <div>
+                            <h3>Expressão Artística</h3>
+                            <p>Descubra sua voz única através da linguagem atemporal do movimento clássico.</p>
+                        </div>
+                    </article>
+                    <article class="pilar">
+                        <span class="pilar-ic">◆</span>
+                        <div>
+                            <h3>Excelência Técnica</h3>
+                            <p>Construa uma base sólida em técnica clássica com acompanhamento individual.</p>
+                        </div>
+                    </article>
+                    <article class="pilar">
+                        <span class="pilar-ic">❀</span>
+                        <div>
+                            <h3>Comunidade Acolhedora</h3>
+                            <p>Junte-se a uma comunidade global de bailarinos compartilhando sua paixão.</p>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <section class="teachers" id="professores">
+            <div class="container sec-titulo center">
+                <span class="eyebrow muted">INSTRUTORES DE CLASSE MUNDIAL</span>
+                <h2>Conheça Seus <em>Professores</em></h2>
+                <p>Aprenda com profissionais renomados que já se apresentaram nos palcos mais prestigiados do mundo.</p>
+            </div>
+
+            <div class="carousel-container">
+                <div class="carousel-track">
+
+                    <a href="/templates/professor-perfil.html?id=cristina" class="card-home">
+                        <div class="foto-home"
+                            style="background-image: linear-gradient(160deg, #e8e0ff 0%, #d4c8ff 100%);"></div>
+                        <div class="info-home">
+                            <h3>Cristina</h3>
+                            <span class="cargo-home">Ballet Clássico</span>
+                            <p>Especialista no método Royal, foca na precisão e postura ideal.</p>
+                            <span class="nota-home">★ 4.9</span>
+                        </div>
+                    </a>
+
+                    <a href="/templates/professor-perfil.html?id=geucimar" class="card-home">
+                        <div class="foto-home"
+                            style="background-image: linear-gradient(160deg, #dce8f5 0%, #c8dcf0 100%);"></div>
+                        <div class="info-home">
+                            <h3>Geucimar</h3>
+                            <span class="cargo-home">Técnica Russa</span>
+                            <p>Mestre no método Vaganova, traz o rigor das grandes companhias.</p>
+                            <span class="nota-home">★ 5.0</span>
+                        </div>
+                    </a>
+
+                    <a href="/templates/professor-perfil.html?id=rafa-kelly" class="card-home">
+                        <div class="foto-home"
+                            style="background-image: linear-gradient(160deg, #f0e5fb 0%, #e2d0f8 100%);"></div>
+                        <div class="info-home">
+                            <h3>Rafa Kelly</h3>
+                            <span class="cargo-home">Ballet Contemporâneo</span>
+                            <p>Explora a fluidez e a conexão entre o clássico e o moderno.</p>
+                            <span class="nota-home">★ 4.8</span>
+                        </div>
+                    </a>
+
+                    <a href="/templates/professor-perfil.html?id=marina" class="card-home">
+                        <div class="foto-home"
+                            style="background-image: linear-gradient(160deg, #e8f5e8 0%, #d0edd0 100%);"></div>
+                        <div class="info-home">
+                            <h3>Marina</h3>
+                            <span class="cargo-home">Ballet Pas de Deux</span>
+                            <p>Mestra em parcerias, prepara casais para performances de elite.</p>
+                            <span class="nota-home">★ 4.9</span>
+                        </div>
+                    </a>
+
+                    <a href="/templates/professor-perfil.html?id=carla-ferraz" class="card-home">
+                        <div class="foto-home"
+                            style="background-image: linear-gradient(160deg, #f5e8f0 0%, #edcfdf 100%);"></div>
+                        <div class="info-home">
+                            <h3>Carla Ferraz</h3>
+                            <span class="cargo-home">Ballet Contemporâneo</span>
+                            <p>Focada em improvisação e na descoberta da identidade artística.</p>
+                            <span class="nota-home">★ 4.7</span>
+                        </div>
+                    </a>
+
+
+
+                </div>
+                <div class="carousel-footer">
+                    <a href="/templates/professores.html" class="btn btn-primary">Ver todos os professores</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="booking" id="aulas">
+            <div class="container sec-titulo center">
+                <span class="eyebrow muted">AULAS AO VIVO</span>
+                <h2>Agende uma Aula <em>ao Vivo</em></h2>
+                <p>Agende instrução personalizada com nossos professores especialistas para feedback e orientação em
+                    tempo real.</p>
+            </div>
+            <div class="container reserva">
+                <div class="field">
+                    <label class="rotulo">Tipo de Aula</label>
+                    <div class="tipos">
+                        <label class="opcao active">
+                            <input type="radio" name="class-type" checked />
+                            <span class="ic">◇</span>
+                            <span>Aula em Grupo</span>
+                        </label>
+                        <label class="opcao">
+                            <input type="radio" name="class-type" />
+                            <span class="ic">◆</span>
+                            <span>Aula Particular</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="rotulo">Selecione o Professor</label>
+                    <div class="abas">
+                        <button class="tab active">Isabella</button>
+                        <button class="tab">Alexander</button>
+                        <button class="tab">Sofia</button>
+                        <button class="tab">Elena</button>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="rotulo">Horários Disponíveis</label>
+                    <div class="grade-slots">
+                        <button class="slot active">9:30 - 10:30</button>
+                        <button class="slot">11:00 - 12:00</button>
+                        <button class="slot">14:00 - 15:00</button>
+                        <button class="slot">16:30 - 17:30</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-block">Reservar Horário</button>
+            </div>
+        </section>
+
+        <section class="booking" id="aulas">
+            <div class="container sec-titulo center">
+                <span class="eyebrow muted">AULAS AO VIVO</span>
+                <h2>Agende uma Aula <em>ao Vivo</em></h2>
+                <p>Agende instrução personalizada com nossos professores especialistas para feedback e orientação em
+                    tempo real.</p>
+            </div>
+            <div class="container reserva">
+                <div class="field">
+                    <label class="rotulo">Tipo de Aula</label>
+                    <div class="tipos">
+                        <label class="opcao active">
+                            <input type="radio" name="class-type" value="grupo" checked />
+                            <span class="ic">◇</span>
+                            <span>Aula em Grupo</span>
+                        </label>
+                        <label class="opcao">
+                            <input type="radio" name="class-type" value="particular" />
+                            <span class="ic">◆</span>
+                            <span>Aula Particular</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="rotulo">Selecione o Professor</label>
+                    <div class="abas" id="abas-professores">
+                        <button class="tab active" data-prof="cristina">Cristina</button>
+                        <button class="tab" data-prof="geucimar">Geucimar</button>
+                        <button class="tab" data-prof="rafa">Rafa Kelly</button>
+                        <button class="tab" data-prof="marina">Marina</button>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="rotulo">Horários Disponíveis</label>
+                    <div class="grade-slots" id="grade-horarios">
+                        <button class="slot active">9:30 - 10:30</button>
+                        <button class="slot">11:00 - 12:00</button>
+                        <button class="slot">14:00 - 15:00</button>
+                        <button class="slot">16:30 - 17:30</button>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-block" id="btn-reservar">Reservar Horário</button>
+            </div>
+        </section>
+
+        <section class="testimonials">
+            <div class="container sec-titulo center">
+                <span class="eyebrow muted">HISTÓRIAS DE ESTUDANTES</span>
+                <h2>Transformando vidas através do <em>balé</em></h2>
+            </div>
+            <div class="container depos">
+                <article class="depo">
+                    <div class="stars">★ ★ ★ ★ ★</div>
+                    <p>"O Grip Ballet transformou completamente minha técnica. É possível sentir o cuidado de cada
+                        professor em cada detalhe das aulas."</p>
+                    <div class="autor">
+                        <strong> Prof. Cristina</strong>
+                        <span>Aluna há 2 anos</span>
+                    </div>
+                </article>
+                <article class="depo">
+                    <div class="stars">★ ★ ★ ★ ★</div>
+                    <p>"Como retomei aos estudos, encontrei aqui a estrutura e o foco que precisava. Hoje danço com a
+                        confiança que sempre busquei."</p>
+                    <div class="autor">
+                        <strong>Prof. Geucimar</strong>
+                        <span>Aluno avançado</span>
+                    </div>
+                </article>
+                <article class="depo">
+                    <div class="stars">★ ★ ★ ★ ★</div>
+                    <p>"As professoras de técnica russa elevaram meu repertório a um novo patamar. Recomendo de olhos
+                        fechados a quem leva o ballet a sério."</p>
+                    <div class="autor">
+                        <strong>Carla Ferraz</strong>
+                        <span>Bailarina profissional</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <section class="cta">
+            <div class="container cta-box">
+                <h2>Comece sua jornada no <em>balé hoje</em></h2>
+                <p>Junte-se a milhares de bailarinos ao redor do mundo que estão descobrindo a sua graça e a arte do
+                    balé com nossos instrutores especializados.</p>
+                <div class="cta-btns">
+                    <a href="#" class="btn btn-light">Começar Teste Gratuito</a>
+                    <a href="#planos" class="btn btn-outline-light">Visualizar Planos</a>
+                </div>
+                <ul class="cta-lista">
+                    <li>✓ Teste de 14 dias</li>
+                    <li>✓ Sem cartão de crédito</li>
+                    <li>✓ Cancele a qualquer momento</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer class="rodape" id="sobre">
+        <div class="container rodape-in">
+            <div class="marca">
+                <img src="/static/images/logo_grip.svg" alt="logo grip">
+                <p>Ballet clássico ensinado com paixão, técnica e a tradição das maiores escolas do mundo.</p>
+                <div class="social"></div>
+            </div>
+            <div class="col">
+                <h4>O Grip</h4>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Aulas</a></li>
+                    <li><a href="#">Professores</a></li>
+                    <li><a href="#">Planos</a></li>
+                    <li><a href="#">Sobre</a></li>
+                </ul>
+            </div>
+            <div class="col">
+                <h4>Suporte</h4>
+                <ul>
+                    <li><a href="#">Ajuda</a></li>
+                    <li><a href="#">Contato</a></li>
+                    <li><a href="#">Termos de Serviço</a></li>
+                    <li><a href="#">Privacidade</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container rodape-base">
+            <p>© 2026 Grip. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="/templates/script/main.js"></script>
 </body>
+
 </html>

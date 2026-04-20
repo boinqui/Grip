@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const email = document.getElementById('email').value;
         const senha = document.getElementById('senha').value;
 
-        // Validação básica apenas para exemplo no console
+
         if (!email.includes('@')) {
             e.preventDefault();
             alert('Por favor, insira um email válido.');
@@ -15,7 +15,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Tentativa de login enviada para:', email);
     });
 
-    // Animação sutil ao focar nos inputs
     const inputs = document.querySelectorAll('input');
     inputs.forEach(input => {
         input.addEventListener('focus', () => {

@@ -4,14 +4,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmarSenha = document.getElementById('confirmar_senha');
 
     form.addEventListener('submit', (e) => {
-        // Validação simples de confirmação de senha
         if (senha.value !== confirmarSenha.value) {
             e.preventDefault();
             alert('As senhas não coincidem!');
             return;
         }
 
-        // Validação de comprimento da senha
         if (senha.value.length < 8) {
             e.preventDefault();
             alert('A senha deve ter pelo menos 8 caracteres.');
@@ -21,7 +19,6 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Formulário enviado com sucesso!');
     });
 
-    // Efeito suave de scroll para links internos
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {
             if (this.getAttribute('href') !== '#') {
