@@ -9,7 +9,7 @@ from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
-from datetime import date, datetime
+from datetime import datetime
 
 app = FastAPI()
 
@@ -23,23 +23,27 @@ app.add_middleware(
     https_only=False
 )
 
-# Configuração de arquivos estáticos e templates
+# Arquivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/templates/styles", StaticFiles(directory="templates/styles"), name="styles")
+app.mount("/templates/script", StaticFiles(directory="templates/script"), name="scripts")
 templates = Jinja2Templates(directory="templates")
 
-# Configuração do novo banco de dados
+# Banco de dados
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "dudumysql",  # botar senha do mysql
+    "password": "dudumysql",
     "database": "grip"
 }
 
 PASSWORD_ALGORITHM = "pbkdf2_sha256"
 PASSWORD_ITERATIONS = 390000
 
+
 def get_db():
     return pymysql.connect(**DB_CONFIG)
+
 
 def hash_password(password: str) -> str:
     salt = secrets.token_hex(16)
@@ -52,19 +56,19 @@ def hash_password(password: str) -> str:
     encoded_hash = base64.b64encode(password_hash).decode("utf-8")
     return f"{PASSWORD_ALGORITHM}${PASSWORD_ITERATIONS}${salt}${encoded_hash}"
 
+
 def is_password_hashed(stored_password: str) -> bool:
     return stored_password.startswith(f"{PASSWORD_ALGORITHM}$")
+
 
 def verify_password(plain_password: str, stored_password: str) -> bool:
     if not stored_password:
         return False
-
     if is_password_hashed(stored_password):
         try:
             algorithm, iterations, salt, password_hash = stored_password.split("$", 3)
             if algorithm != PASSWORD_ALGORITHM:
                 return False
-
             derived_hash = hashlib.pbkdf2_hmac(
                 "sha256",
                 plain_password.encode("utf-8"),
@@ -75,79 +79,107 @@ def verify_password(plain_password: str, stored_password: str) -> bool:
             return hmac.compare_digest(encoded_derived_hash, password_hash)
         except (ValueError, TypeError):
             return False
-
     return hmac.compare_digest(plain_password, stored_password)
 
+
+# ── Páginas públicas ──────────────────────────────────────────────────────────
+
 @app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
+async def home(request: Request):
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_get(request: Request):
     if request.session.get("user_logged_in"):
-        return RedirectResponse(url="/logado", status_code=303)
-
+        return RedirectResponse(url="/aulaListar", status_code=303)
+    
     login_error = request.session.pop("login_error", None)
-    show_login_modal = request.session.pop("show_login_modal", False)
-    nome_usuario = request.session.get("nome_usuario", None)
-
+    
     return templates.TemplateResponse("login.html", {
         "request": request,
-        "login_error": login_error,
-        "show_login_modal": "block" if show_login_modal else "none",
-        "nome_usuario": nome_usuario
+        "login_error": login_error
     })
 
-@app.get("/logado", response_class=HTMLResponse)
-async def usuario_logado(request: Request):
-    if not request.session.get("user_logged_in"):
-        return RedirectResponse(url="/", status_code=303)
-
-    return templates.TemplateResponse("logado.html", {
+@app.get("/aulas", response_class=HTMLResponse)
+async def aulas_page(request: Request):
+    return templates.TemplateResponse("aulas.html", {
         "request": request,
-        "nome_usuario": request.session.get("nome_usuario", None)
+        "nome_usuario": request.session.get("nome_usuario")
     })
+
+
+@app.get("/professores", response_class=HTMLResponse)
+async def professores_page(request: Request):
+    return templates.TemplateResponse("professores.html", {
+        "request": request,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+
+@app.get("/planos", response_class=HTMLResponse)
+async def planos_page(request: Request):
+    return templates.TemplateResponse("planos.html", {
+        "request": request,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+
+@app.get("/sobre", response_class=HTMLResponse)
+async def sobre_page(request: Request):
+    return templates.TemplateResponse("sobre.html", {
+        "request": request,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+
+@app.get("/professor-perfil", response_class=HTMLResponse)
+async def professor_perfil(request: Request):
+    return templates.TemplateResponse("professor-perfil.html", {
+        "request": request,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+
+# ── Autenticação ──────────────────────────────────────────────────────────────
 
 @app.post("/login")
 async def login(
     request: Request,
     Email: str = Form(...),
     Senha: str = Form(...),
-    db = Depends(get_db)
+    db=Depends(get_db)
 ):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            # Tenta logar como Professor (Admin)
-            cursor.execute("SELECT * FROM Professor WHERE email = %s", (Email,))
-            prof = cursor.fetchone()
-
-            if prof and verify_password(Senha, prof["senha"]):
-                if not is_password_hashed(prof["senha"]):
-                    cursor.execute(
-                        "UPDATE Professor SET senha = %s WHERE id = %s",
-                        (hash_password(Senha), prof["id"])
-                    )
-                    db.commit()
-                request.session["user_logged_in"] = True
-                request.session["nome_usuario"] = prof['nome']
-                request.session["perfil"] = "admin"
-                return RedirectResponse(url="/logado", status_code=303)
+            #Professor = Admin
+            cursor.execute("SELECT id, nome, senha FROM Professor WHERE email = %s", (Email,))
+            professor = cursor.fetchone()
             
-            # Tenta logar como Aluno (Usuário normal)
-            cursor.execute("SELECT * FROM Aluno WHERE email = %s", (Email,))
-            aluno = cursor.fetchone()
-
-            if aluno and verify_password(Senha, aluno["senha"]):
-                if not is_password_hashed(aluno["senha"]):
-                    cursor.execute(
-                        "UPDATE Aluno SET senha = %s WHERE id = %s",
-                        (hash_password(Senha), aluno["id"])
-                    )
-                    db.commit()
+            if professor and verify_password(Senha, professor["senha"]):
                 request.session["user_logged_in"] = True
-                request.session["nome_usuario"] = aluno['nome']
-                request.session["perfil"] = "usuario"
-                return RedirectResponse(url="/logado", status_code=303)
+                request.session["usuario_id"] = professor["id"]
+                request.session["nome_usuario"] = professor["nome"]
+                request.session["perfil"] = "admin" # <-- Define Professor como Admin
+                return RedirectResponse(url="/aulaListar", status_code=303)
 
-            request.session["login_error"] = "E-mail ou senha inválidos."
+            #Aluno = User
+            cursor.execute("SELECT id, nome, senha FROM Aluno WHERE email = %s", (Email,))
+            aluno = cursor.fetchone()
+            
+            if aluno and verify_password(Senha, aluno["senha"]):
+                request.session["user_logged_in"] = True
+                request.session["usuario_id"] = aluno["id"]
+                request.session["nome_usuario"] = aluno["nome"]
+                request.session["perfil"] = "user" # <-- Define Aluno como User
+                return RedirectResponse(url="/aulaListar", status_code=303)
+
+            request.session["login_error"] = "E-mail ou senha incorretos."
             request.session["show_login_modal"] = True
-            return RedirectResponse(url="/", status_code=303)
+            return RedirectResponse(url="/login", status_code=303)
+
     finally:
         db.close()
 
@@ -156,12 +188,28 @@ async def logout(request: Request):
     request.session.clear()
     return RedirectResponse(url="/", status_code=303)
 
+
+@app.get("/logado", response_class=HTMLResponse)
+async def usuario_logado(request: Request):
+    if not request.session.get("user_logged_in"):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse("logado.html", {
+        "request": request,
+        "nome_usuario": request.session.get("nome_usuario"),
+        "perfil": request.session.get("perfil")
+    })
+
+
 @app.get("/cadastro", response_class=HTMLResponse)
 async def cadastro_page(request: Request):
     mensagem = request.session.pop("mensagem", None)
-    return templates.TemplateResponse("cadastro.html", {"request": request, "mensagem": mensagem})
+    return templates.TemplateResponse("cadastro.html", {
+        "request": request,
+        "mensagem": mensagem
+    })
 
-@app.post("/cadastro", name="cadastro")
+
+@app.post("/cadastro")
 async def cadastrar_usuario(
     request: Request,
     nome: str = Form(...),
@@ -169,12 +217,10 @@ async def cadastrar_usuario(
     senha: str = Form(...),
     confirmar_senha: str = Form(None),
     cpf: str = Form(""),
-    data_nascimento: str = Form("2000-01-01"),
     telefone: str = Form(""),
-    db = Depends(get_db)
+    db=Depends(get_db)
 ):
     try:
-        # Validação de senha
         if confirmar_senha and senha != confirmar_senha:
             request.session["mensagem"] = "Erro: As senhas não coincidem!"
             return RedirectResponse(url="/cadastro", status_code=303)
@@ -185,13 +231,12 @@ async def cadastrar_usuario(
                 request.session["mensagem"] = "Erro: Este e-mail já está em uso!"
                 return RedirectResponse(url="/cadastro", status_code=303)
 
-            # Inserção no banco
             senha_hash = hash_password(senha)
-            sql = """INSERT INTO Aluno (nome, cpf, data_nascimento, telefone, email, senha) 
-                     VALUES (%s, %s, %s, %s, %s, %s)"""
-            cursor.execute(sql, (nome, cpf, data_nascimento, telefone, email, senha_hash))
+            cursor.execute(
+                "INSERT INTO Aluno (nome, cpf, telefone, email, senha) VALUES (%s, %s, %s, %s, %s)",
+                (nome, cpf, telefone, email, senha_hash)
+            )
             db.commit()
-
             request.session["mensagem"] = "Aluno cadastrado com sucesso! Você já pode realizar login."
             return RedirectResponse(url="/cadastro", status_code=303)
 
@@ -201,229 +246,566 @@ async def cadastrar_usuario(
     finally:
         db.close()
 
-@app.get("/profListar", name="profListar", response_class=HTMLResponse)
+
+
+
+
+
+
+
+
+
+
+# ── Professor CRUD ────────────────────────────────────────────────────────────
+
+@app.get("/profListar", response_class=HTMLResponse)
 async def listar_professores(request: Request, db=Depends(get_db)):
     if not request.session.get("user_logged_in"):
-        return RedirectResponse(url="/", status_code=303)
-
-    with db.cursor(pymysql.cursors.DictCursor) as cursor:
-        sql = """
-            SELECT P.id, P.nome, P.registro_drt, P.cpf, P.email, P.data_nascimento, A.nome AS aula_nome
-            FROM Professor P 
-            JOIN Aula A ON P.fk_Aula_id = A.id
-            ORDER BY P.nome
-        """
-        cursor.execute(sql)
-        professores = cursor.fetchall()
-
-    # Cálculo da idade devolvido para o código
-    hoje = date.today()
-    for prof in professores:
-        dt_nasc = prof["data_nascimento"]
-        if dt_nasc:
-            if isinstance(dt_nasc, str):
-                ano, mes, dia = map(int, dt_nasc.split("-"))
-                dt_nasc = date(ano, mes, dia)
-            idade = hoje.year - dt_nasc.year
-            if (dt_nasc.month, dt_nasc.day) > (hoje.month, hoje.day):
-                idade -= 1
-            prof["idade"] = idade
-        else:
-            prof["idade"] = "-"
-
-    nome_usuario = request.session.get("nome_usuario", None)
-    agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
+        return RedirectResponse(url="/login", status_code=303)
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor ORDER BY nome")
+            professores = cursor.fetchall()
+    finally:
+        db.close()
+        
+    mensagem = request.session.pop("mensagem", None)
+    
     return templates.TemplateResponse("profListar.html", {
         "request": request,
         "professores": professores,
-        "hoje": agora,
-        "nome_usuario": nome_usuario
+        "hoje": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        "nome_usuario": request.session.get("nome_usuario"),
+        "perfil": request.session.get("perfil"),
+        "mensagem": mensagem
     })
+
 
 @app.get("/profIncluir", response_class=HTMLResponse)
-async def prof_incluir(request: Request, db=Depends(get_db)):
+async def prof_incluir(request: Request):
     if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
         return RedirectResponse(url="/profListar", status_code=303)
-
-    with db.cursor(pymysql.cursors.DictCursor) as cursor:
-        cursor.execute("SELECT id, nome FROM Aula")
-        aulas = cursor.fetchall()
-    db.close()
-
-    nome_usuario = request.session.get("nome_usuario", None)
-    agora = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    
     return templates.TemplateResponse("profIncluir.html", {
         "request": request,
-        "aulas": aulas,
-        "hoje": agora,
-        "nome_usuario": nome_usuario
+        "nome_usuario": request.session.get("nome_usuario")
     })
 
-@app.post("/profIncluir_exe")
-async def prof_incluir_exe(
+
+@app.post("/profIncluir")
+async def prof_incluir_post(
     request: Request,
     nome: str = Form(...),
     registro_drt: str = Form(...),
-    cpf: str = Form(...),
-    data_nascimento: str = Form(None),
+    cpf: str = Form(""),
     email: str = Form(...),
     senha: str = Form(...),
-    fk_Aula_id: int = Form(...),
     db=Depends(get_db)
 ):
     if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
         return RedirectResponse(url="/profListar", status_code=303)
-
     try:
         with db.cursor() as cursor:
-            # Deixando o MySQL cuidar do ID (Auto Increment)
             senha_hash = hash_password(senha)
-            sql = """INSERT INTO Professor (nome, registro_drt, cpf, data_nascimento, email, senha, fk_Aula_id)
-                     VALUES (%s, %s, %s, %s, %s, %s, %s)"""
-            cursor.execute(sql, (nome, registro_drt, cpf, data_nascimento, email, senha_hash, fk_Aula_id))
+            cursor.execute(
+                "INSERT INTO Professor (nome, registro_drt, cpf, email, senha) VALUES (%s, %s, %s, %s, %s)",
+                (nome, registro_drt, cpf, email, senha_hash)
+            )
             db.commit()
-
-        request.session["mensagem_header"] = "Inclusão de Professor"
         request.session["mensagem"] = "Professor cadastrado com sucesso!"
     except Exception as e:
-        request.session["mensagem_header"] = "Erro ao cadastrar"
-        request.session["mensagem"] = str(e)
+        request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
     finally:
         db.close()
+    return RedirectResponse(url="/profListar", status_code=303)
 
-    return templates.TemplateResponse("profIncluir_exe.html", {
-        "request": request,
-        "mensagem_header": request.session.get("mensagem_header", ""),
-        "mensagem": request.session.get("mensagem", ""),
-        "hoje": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
-        "nome_usuario": request.session.get("nome_usuario", None)
-    })
 
 @app.get("/profExcluir", response_class=HTMLResponse)
 async def prof_excluir(request: Request, id: int, db=Depends(get_db)):
     if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
         return RedirectResponse(url="/profListar", status_code=303)
-
-    with db.cursor(pymysql.cursors.DictCursor) as cursor:
-        sql = ("SELECT P.id, P.nome, P.registro_drt, P.cpf, P.data_nascimento, A.nome as aula_nome "
-               "FROM Professor P JOIN Aula A ON P.fk_Aula_id = A.id "
-               "WHERE P.id = %s")
-        cursor.execute(sql, (id,))
-        professor = cursor.fetchone()
-    db.close()
-
-    # Formatar data de nascimento para exibição
-    data_formatada = "-"
-    if professor and professor["data_nascimento"]:
-        data_nasc = professor["data_nascimento"]
-        if isinstance(data_nasc, str):
-            ano, mes, dia = data_nasc.split("-")
-        else:
-            ano, mes, dia = data_nasc.year, f"{data_nasc.month:02d}", f"{data_nasc.day:02d}"
-        data_formatada = f"{dia}/{mes}/{ano}"
-
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor WHERE id = %s", (id,))
+            professor = cursor.fetchone()
+    finally:
+        db.close()
     return templates.TemplateResponse("profExcluir.html", {
         "request": request,
         "prof": professor,
-        "data_formatada": data_formatada,
-        "hoje": datetime.now().strftime("%d/%m/%Y %H:%M"),
-        "nome_usuario": request.session.get("nome_usuario", None)
+        "nome_usuario": request.session.get("nome_usuario")
     })
 
-@app.post("/profExcluir_exe")
-async def prof_excluir_exe(request: Request, id: int = Form(...), db=Depends(get_db)):
+
+@app.post("/profExcluir")
+async def prof_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db)):
     if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
         return RedirectResponse(url="/profListar", status_code=303)
-
     try:
         with db.cursor() as cursor:
-            sql_delete = "DELETE FROM Professor WHERE id = %s"
-            cursor.execute(sql_delete, (id,))
+            cursor.execute("DELETE FROM Professor WHERE id = %s", (id,))
             db.commit()
-
-            request.session["mensagem_header"] = "Exclusão de Professor"
-            request.session["mensagem"] = "Professor excluído com sucesso."
+        request.session["mensagem"] = "Professor excluído com sucesso."
     except Exception as e:
-        request.session["mensagem_header"] = "Erro ao excluir"
-        request.session["mensagem"] = str(e)
+        request.session["mensagem"] = f"Erro ao excluir: {str(e)}"
     finally:
         db.close()
+    return RedirectResponse(url="/profListar", status_code=303)
 
-    return templates.TemplateResponse("profExcluir_exe.html", {
-        "request": request,
-        "mensagem_header": request.session.get("mensagem_header", ""),
-        "mensagem": request.session.get("mensagem", ""),
-        "hoje": datetime.now().strftime("%d/%m/%Y %H:%M"),
-        "nome_usuario": request.session.get("nome_usuario", None)
-    })
 
 @app.get("/profAtualizar", response_class=HTMLResponse)
 async def prof_atualizar(request: Request, id: int, db=Depends(get_db)):
     if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
         return RedirectResponse(url="/profListar", status_code=303)
-
-    with db.cursor(pymysql.cursors.DictCursor) as cursor:
-        cursor.execute("SELECT * FROM Professor WHERE id = %s", (id,))
-        professor = cursor.fetchone()
-        cursor.execute("SELECT id, nome FROM Aula")
-        aulas = cursor.fetchall()
-    db.close()
-
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor WHERE id = %s", (id,))
+            professor = cursor.fetchone()
+    finally:
+        db.close()
     return templates.TemplateResponse("profAtualizar.html", {
         "request": request,
         "prof": professor,
-        "aulas": aulas,
-        "hoje": datetime.now().strftime("%d/%m/%Y %H:%M")
+        "nome_usuario": request.session.get("nome_usuario")
     })
 
-@app.post("/profAtualizar_exe")
-async def prof_atualizar_exe(
+
+@app.post("/profAtualizar")
+async def prof_atualizar_post(
     request: Request,
     id: int = Form(...),
     nome: str = Form(...),
-    registro_drt: str = Form(...),
-    cpf: str = Form(...),
-    data_nascimento: str = Form(None),
     email: str = Form(...),
-    senha: str = Form(...),
-    fk_Aula_id: int = Form(...),
     db=Depends(get_db)
 ):
     if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
         return RedirectResponse(url="/profListar", status_code=303)
+    try:
+        with db.cursor() as cursor:
+            # Não atualizamos registro_drt, cpf e senha aqui
+            cursor.execute(
+                "UPDATE Professor SET nome=%s, email=%s WHERE id=%s",
+                (nome, email, id)
+            )
+            db.commit()
+        request.session["mensagem"] = "Cadastro do professor atualizado com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
+    finally:
+        db.close()
+    return RedirectResponse(url="/profListar", status_code=303)
 
+@app.get("/profSenha", response_class=HTMLResponse)
+async def prof_senha(request: Request, id: int, db=Depends(get_db)):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/profListar", status_code=303)
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome FROM Professor WHERE id = %s", (id,))
+            professor = cursor.fetchone()
+    finally:
+        db.close()
+    return templates.TemplateResponse("profSenha.html", {
+        "request": request,
+        "prof": professor,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+@app.post("/profSenha")
+async def prof_senha_post(
+    request: Request,
+    id: int = Form(...),
+    nova_senha: str = Form(...),
+    db=Depends(get_db)
+):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/profListar", status_code=303)
+    try:
+        with db.cursor() as cursor:
+            senha_hash = hash_password(nova_senha)
+            cursor.execute("UPDATE Professor SET senha=%s WHERE id=%s", (senha_hash, id))
+            db.commit()
+        request.session["mensagem"] = "Senha do professor atualizada com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao atualizar senha: {str(e)}"
+    finally:
+        db.close()
+    return RedirectResponse(url="/profListar", status_code=303)
+
+
+
+
+
+
+
+
+
+
+
+
+# ── Aluno CRUD ────────────────────────────────────────────────────────────────
+
+@app.get("/alunoListar", response_class=HTMLResponse)
+async def listar_alunos(request: Request, db=Depends(get_db)):
+    if not request.session.get("user_logged_in"):
+        return RedirectResponse(url="/login", status_code=303)
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno ORDER BY nome")
+            alunos = cursor.fetchall()
+    finally:
+        db.close()
+        
+    mensagem = request.session.pop("mensagem", None)
+    
+    return templates.TemplateResponse("alunoListar.html", {
+        "request": request,
+        "alunos": alunos,
+        "hoje": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        "nome_usuario": request.session.get("nome_usuario"),
+        "perfil": request.session.get("perfil"),
+        "mensagem": mensagem
+    })
+
+
+@app.get("/alunoIncluir", response_class=HTMLResponse)
+async def aluno_incluir(request: Request):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/alunoListar", status_code=303)
+    return templates.TemplateResponse("alunoIncluir.html", {
+        "request": request,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+
+@app.post("/alunoIncluir")
+async def aluno_incluir_post(
+    request: Request,
+    nome: str = Form(...),
+    cpf: str = Form(""),
+    telefone: str = Form(""),
+    email: str = Form(...),
+    senha: str = Form(...),
+    db=Depends(get_db)
+):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/alunoListar", status_code=303)
     try:
         with db.cursor() as cursor:
             senha_hash = hash_password(senha)
-            sql = """UPDATE Professor 
-                     SET nome=%s, registro_drt=%s, cpf=%s, data_nascimento=%s, email=%s, senha=%s, fk_Aula_id=%s
-                     WHERE id=%s"""
-            cursor.execute(sql, (nome, registro_drt, cpf, data_nascimento, email, senha_hash, fk_Aula_id, id))
+            cursor.execute(
+                "INSERT INTO Aluno (nome, cpf, telefone, email, senha) VALUES (%s, %s, %s, %s, %s)",
+                (nome, cpf, telefone, email, senha_hash)
+            )
             db.commit()
-
-        request.session["mensagem_header"] = "Atualização de Professor"
-        request.session["mensagem"] = "Registro atualizado com sucesso!"
-
+        request.session["mensagem"] = "Aluno cadastrado com sucesso!"
     except Exception as e:
-        request.session["mensagem_header"] = "Erro ao atualizar"
-        request.session["mensagem"] = str(e)
+        request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
     finally:
         db.close()
+    return RedirectResponse(url="/alunoListar", status_code=303)
 
-    return templates.TemplateResponse("profAtualizar_exe.html", {
+
+@app.get("/alunoExcluir", response_class=HTMLResponse)
+async def aluno_excluir(request: Request, id: int, db=Depends(get_db)):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/alunoListar", status_code=303)
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno WHERE id = %s", (id,))
+            aluno = cursor.fetchone()
+    finally:
+        db.close()
+    return templates.TemplateResponse("alunoExcluir.html", {
         "request": request,
-        "mensagem_header": request.session.get("mensagem_header", ""),
-        "mensagem": request.session.get("mensagem", ""),
-        "hoje": datetime.now().strftime("%d/%m/%Y %H:%M"),
-        "nome_usuario": request.session.get("nome_usuario", None)
+        "aluno": aluno,
+        "nome_usuario": request.session.get("nome_usuario")
     })
+
+
+@app.post("/alunoExcluir")
+async def aluno_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db)):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/alunoListar", status_code=303)
+    try:
+        with db.cursor() as cursor:
+            cursor.execute("DELETE FROM Aluno WHERE id = %s", (id,))
+            db.commit()
+        request.session["mensagem"] = "Aluno excluído com sucesso."
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao excluir: {str(e)}"
+    finally:
+        db.close()
+    return RedirectResponse(url="/alunoListar", status_code=303)
+
+
+@app.get("/alunoAtualizar", response_class=HTMLResponse)
+async def aluno_atualizar(request: Request, id: int, db=Depends(get_db)):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/alunoListar", status_code=303)
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno WHERE id = %s", (id,))
+            aluno = cursor.fetchone()
+    finally:
+        db.close()
+    return templates.TemplateResponse("alunoAtualizar.html", {
+        "request": request,
+        "aluno": aluno,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+
+@app.post("/alunoAtualizar")
+async def aluno_atualizar_post(
+    request: Request,
+    id: int = Form(...),
+    nome: str = Form(...),
+    telefone: str = Form(""),
+    email: str = Form(...),
+    db=Depends(get_db)
+):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/alunoListar", status_code=303)
+    try:
+        with db.cursor() as cursor:
+            # Não atualizamos cpf e senha aqui
+            cursor.execute(
+                "UPDATE Aluno SET nome=%s, telefone=%s, email=%s WHERE id=%s",
+                (nome, telefone, email, id)
+            )
+            db.commit()
+        request.session["mensagem"] = "Cadastro do aluno atualizado com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
+    finally:
+        db.close()
+    return RedirectResponse(url="/alunoListar", status_code=303)
+
+@app.get("/alunoSenha", response_class=HTMLResponse)
+async def aluno_senha(request: Request, id: int, db=Depends(get_db)):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/alunoListar", status_code=303)
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome FROM Aluno WHERE id = %s", (id,))
+            aluno = cursor.fetchone()
+    finally:
+        db.close()
+    return templates.TemplateResponse("alunoSenha.html", {
+        "request": request,
+        "aluno": aluno,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+@app.post("/alunoSenha")
+async def aluno_senha_post(
+    request: Request,
+    id: int = Form(...),
+    nova_senha: str = Form(...),
+    db=Depends(get_db)
+):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/alunoListar", status_code=303)
+    try:
+        with db.cursor() as cursor:
+            senha_hash = hash_password(nova_senha)
+            cursor.execute("UPDATE Aluno SET senha=%s WHERE id=%s", (senha_hash, id))
+            db.commit()
+        request.session["mensagem"] = "Senha do aluno atualizada com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao atualizar senha: {str(e)}"
+    finally:
+        db.close()
+    return RedirectResponse(url="/alunoListar", status_code=303)
+
+
+
+
+
+
+
+
+
+
+# ── Aula CRUD ────────────────────────────────────────────────────────────────
+
+@app.get("/aulaListar", response_class=HTMLResponse)
+async def listar_aulas(request: Request, db=Depends(get_db)):
+    if not request.session.get("user_logged_in"):
+        return RedirectResponse(url="/login", status_code=303)
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("""
+                SELECT A.id, A.nome, A.data, A.descricao, P.nome AS professor_nome
+                FROM Aula A
+                LEFT JOIN Professor P ON A.fk_Professor_id = P.id
+                ORDER BY A.data DESC
+            """)
+            aulas = cursor.fetchall()
+    finally:
+        db.close()
+        
+    for aula in aulas:
+        if aula["data"]:
+            d = aula["data"]
+            aula["data_fmt"] = d.strftime("%d/%m/%Y") if hasattr(d, "strftime") else str(d)
+        else:
+            aula["data_fmt"] = "-"
+            
+    mensagem = request.session.pop("mensagem", None)
+    
+    return templates.TemplateResponse("aulaListar.html", {
+        "request": request,
+        "aulas": aulas,
+        "hoje": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
+        "nome_usuario": request.session.get("nome_usuario"),
+        "perfil": request.session.get("perfil"),
+        "mensagem": mensagem
+    })
+
+
+@app.get("/aulaIncluir", response_class=HTMLResponse)
+async def aula_incluir(request: Request, db=Depends(get_db)):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/aulaListar", status_code=303)
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome FROM Professor ORDER BY nome")
+            professores = cursor.fetchall()
+    finally:
+        db.close()
+    return templates.TemplateResponse("aulaIncluir.html", {
+        "request": request,
+        "professores": professores,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+
+@app.post("/aulaIncluir")
+async def aula_incluir_post(
+    request: Request,
+    nome: str = Form(...),
+    data: str = Form(...),
+    descricao: str = Form(""),
+    fk_Professor_id: int = Form(...),
+    db=Depends(get_db)
+):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/aulaListar", status_code=303)
+    try:
+        with db.cursor() as cursor:
+            cursor.execute(
+                "INSERT INTO Aula (nome, data, descricao, fk_Professor_id) VALUES (%s, %s, %s, %s)",
+                (nome, data, descricao, fk_Professor_id)
+            )
+            db.commit()
+        request.session["mensagem"] = "Aula cadastrada com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
+    finally:
+        db.close()
+    return RedirectResponse(url="/aulaListar", status_code=303)
+
+
+@app.get("/aulaExcluir", response_class=HTMLResponse)
+async def aula_excluir(request: Request, id: int, db=Depends(get_db)):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/aulaListar", status_code=303)
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("""
+                SELECT A.id, A.nome, A.data, A.descricao, P.nome AS professor_nome
+                FROM Aula A
+                LEFT JOIN Professor P ON A.fk_Professor_id = P.id
+                WHERE A.id = %s
+            """, (id,))
+            aula = cursor.fetchone()
+    finally:
+        db.close()
+    return templates.TemplateResponse("aulaExcluir.html", {
+        "request": request,
+        "aula": aula,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+
+@app.post("/aulaExcluir")
+async def aula_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db)):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/aulaListar", status_code=303)
+    try:
+        with db.cursor() as cursor:
+            cursor.execute("DELETE FROM Aula WHERE id = %s", (id,))
+            db.commit()
+        request.session["mensagem"] = "Aula excluída com sucesso."
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao excluir: {str(e)}"
+    finally:
+        db.close()
+    return RedirectResponse(url="/aulaListar", status_code=303)
+
+
+@app.get("/aulaAtualizar", response_class=HTMLResponse)
+async def aula_atualizar(request: Request, id: int, db=Depends(get_db)):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/aulaListar", status_code=303)
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome, data, descricao, fk_Professor_id FROM Aula WHERE id = %s", (id,))
+            aula = cursor.fetchone()
+            cursor.execute("SELECT id, nome FROM Professor ORDER BY nome")
+            professores = cursor.fetchall()
+    finally:
+        db.close()
+    if aula and aula["data"]:
+        d = aula["data"]
+        aula["data_fmt"] = d.strftime("%Y-%m-%d") if hasattr(d, "strftime") else str(d)
+    return templates.TemplateResponse("aulaAtualizar.html", {
+        "request": request,
+        "aula": aula,
+        "professores": professores,
+        "nome_usuario": request.session.get("nome_usuario")
+    })
+
+
+@app.post("/aulaAtualizar")
+async def aula_atualizar_post(
+    request: Request,
+    id: int = Form(...),
+    nome: str = Form(...),
+    data: str = Form(...),
+    descricao: str = Form(""),
+    fk_Professor_id: int = Form(...),
+    db=Depends(get_db)
+):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/aulaListar", status_code=303)
+    try:
+        with db.cursor() as cursor:
+            cursor.execute(
+                "UPDATE Aula SET nome=%s, data=%s, descricao=%s, fk_Professor_id=%s WHERE id=%s",
+                (nome, data, descricao, fk_Professor_id, id)
+            )
+            db.commit()
+        request.session["mensagem"] = "Aula atualizada com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
+    finally:
+        db.close()
+    return RedirectResponse(url="/aulaListar", status_code=303)
+
+
+
+
+
+
+
 
 @app.post("/reset_session")
 async def reset_session(request: Request):
     request.session.pop("mensagem_header", None)
     request.session.pop("mensagem", None)
     return {"status": "ok"}
+
 
 Mangum(app)

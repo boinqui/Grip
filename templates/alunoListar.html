@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Professores — Grip</title>
+    <title>Alunos — Grip</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 <body class="min-h-screen bg-zinc-100 px-4 py-10">
@@ -12,15 +12,15 @@
         <div class="flex items-center justify-between mb-6">
             <div>
                 <nav class="text-sm text-zinc-400 mb-1">
-                    <a href="/logado" class="hover:text-indigo-500">Painel</a> / Professores
+                    <a href="/logado" class="hover:text-indigo-500">Painel</a> / Alunos
                 </nav>
-                <h1 class="text-2xl font-bold text-zinc-900">Professores</h1>
+                <h1 class="text-2xl font-bold text-zinc-900">Alunos</h1>
                 <p class="text-xs text-zinc-400 mt-0.5">{{ hoje }}</p>
             </div>
             <div class="flex items-center gap-3">
                 <span class="text-sm text-zinc-500">{{ nome_usuario }}</span>
                 {% if perfil == "admin" %}
-                <a href="/profIncluir" class="bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium py-2 px-4 rounded-lg">+ Novo</a>
+                <a href="/alunoIncluir" class="bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium py-2 px-4 rounded-lg">+ Novo</a>
                 {% endif %}
                 <a href="/logout" class="text-sm text-red-500 hover:underline">Sair</a>
             </div>
@@ -35,8 +35,8 @@
                 <thead class="bg-zinc-50 border-b border-zinc-200">
                     <tr>
                         <th class="text-left px-4 py-3 font-medium text-zinc-600">Nome</th>
-                        <th class="text-left px-4 py-3 font-medium text-zinc-600">DRT</th>
                         <th class="text-left px-4 py-3 font-medium text-zinc-600">CPF</th>
+                        <th class="text-left px-4 py-3 font-medium text-zinc-600">Telefone</th>
                         <th class="text-left px-4 py-3 font-medium text-zinc-600">E-mail</th>
                         {% if perfil == "admin" %}
                         <th class="text-center px-4 py-3 font-medium text-zinc-600">Ações</th>
@@ -44,23 +44,23 @@
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-zinc-100">
-                    {% for prof in professores %}
+                    {% for aluno in alunos %}
                     <tr class="hover:bg-zinc-50">
-                        <td class="px-4 py-3 font-medium text-zinc-800">{{ prof.nome }}</td>
-                        <td class="px-4 py-3 text-zinc-600">{{ prof.registro_drt }}</td>
-                        <td class="px-4 py-3 text-zinc-600">{{ prof.cpf }}</td>
-                        <td class="px-4 py-3 text-zinc-600">{{ prof.email }}</td>
+                        <td class="px-4 py-3 font-medium text-zinc-800">{{ aluno.nome }}</td>
+                        <td class="px-4 py-3 text-zinc-600">{{ aluno.cpf }}</td>
+                        <td class="px-4 py-3 text-zinc-600">{{ aluno.telefone }}</td>
+                        <td class="px-4 py-3 text-zinc-600">{{ aluno.email }}</td>
                         {% if perfil == "admin" %}
                         <td class="px-4 py-3 text-center">
-                            <a href="/profAtualizar?id={{ prof.id }}" class="text-indigo-500 hover:underline mr-3">Editar</a>
-                            <a href="/profSenha?id={{ prof.id }}" class="text-emerald-500 hover:underline mr-3">Senha</a>
-                            <a href="/profExcluir?id={{ prof.id }}" class="text-red-500 hover:underline">Excluir</a>
+                            <a href="/alunoAtualizar?id={{ aluno.id }}" class="text-indigo-500 hover:underline mr-3">Editar</a>
+                            <a href="/alunoSenha?id={{ aluno.id }}" class="text-emerald-500 hover:underline mr-3">Senha</a>
+                            <a href="/alunoExcluir?id={{ aluno.id }}" class="text-red-500 hover:underline">Excluir</a>
                         </td>
                         {% endif %}
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" class="px-4 py-8 text-center text-zinc-400">Nenhum professor cadastrado.</td>
+                        <td colspan="5" class="px-4 py-8 text-center text-zinc-400">Nenhum aluno cadastrado.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

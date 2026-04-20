@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Aula — Grip</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+</head>
+<body class="min-h-screen bg-zinc-100 px-4 py-10">
+    <div class="max-w-xl mx-auto">
+
+        <div class="mb-6">
+            <nav class="text-sm text-zinc-400 mb-1">
+                <a href="/logado" class="hover:text-indigo-500">Painel</a> /
+                <a href="/aulaListar" class="hover:text-indigo-500">Aulas</a> / Editar
+            </nav>
+            <h1 class="text-2xl font-bold text-zinc-900">Editar Aula</h1>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+            <form action="/aulaAtualizar" method="POST" class="space-y-4">
+                <input type="hidden" name="id" value="{{ aula.id }}">
+
+                <div>
+                    <label class="block text-sm font-medium text-zinc-700 mb-1">Nome da Aula</label>
+                    <input type="text" name="nome" value="{{ aula.nome }}" required
+                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-zinc-700 mb-1">Data</label>
+                    <input type="date" name="data" value="{{ aula.data_fmt }}" required
+                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-zinc-700 mb-1">Professor Responsável</label>
+                    <select name="fk_Professor_id" required
+                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        {% for prof in professores %}
+                        <option value="{{ prof.id }}" {% if prof.id == aula.fk_Professor_id %}selected{% endif %}>
+                            {{ prof.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-zinc-700 mb-1">Descrição</label>
+                    <textarea name="descricao" rows="3"
+                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none">{{ aula.descricao }}</textarea>
+                </div>
+
+                <div class="flex gap-3 pt-2">
+                    <button type="submit"
+                        class="flex-1 bg-indigo-500 hover:bg-indigo-400 text-white font-medium py-2 rounded-lg text-sm">
+                        Salvar
+                    </button>
+                    <a href="/aulaListar"
+                        class="flex-1 text-center border border-zinc-300 text-zinc-600 hover:bg-zinc-50 font-medium py-2 rounded-lg text-sm">
+                        Cancelar
+                    </a>
+                </div>
+
+            </form>
+        </div>
+
+    </div>
+</body>
+</html>
