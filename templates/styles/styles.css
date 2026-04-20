@@ -184,6 +184,34 @@ p { margin: 0; color: #4a4761; }
     margin-top: 8px;
 }
 
+.menu a.ativo {
+    color: #5b36e0;
+    font-weight: 500;
+}
+
+.lista-hero {
+    padding: 80px 0 60px;
+}
+
+.lista-hero-in {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 16px;
+}
+
+.lista-hero-in h1 {
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    margin-top: 12px;
+}
+
+.lista-hero-in > p {
+    color: #8b8aa1;
+    max-width: 520px;
+    font-size: 16px;
+}
+
 .stats {
     display: flex;
     gap: 38px;
@@ -648,3 +676,4 @@ p { margin: 0; color: #4a4761; }
     .grade-slots { grid-template-columns: 1fr; }
     .rodape-base { flex-direction: column; gap: 8px; }
 }
+

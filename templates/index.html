@@ -20,10 +20,11 @@
                 <img src="/static/images/logo_grip.svg" alt="logo grip">
             </a>
             <nav class="menu" aria-label="Navegação principal">
-                <a href="#aulas">Aulas</a>
+                <a href="/templates/index.html">Home</a>
+                <a href="/templates/aulas.html">Aulas</a>
                 <a href="/templates/professores.html">Professores</a>
-                <a href="#planos">Planos</a>
-                <a href="#sobre">Sobre</a>
+                <a href="/templates/planos.html">Planos</a>
+                <a href="/templates/sobre.html">Sobre</a>
             </nav>
             <a href="/templates/login.html" class="btn btn-primary btn-sm">Entrar</a>
         </div>
@@ -177,9 +178,7 @@
 
 
                 </div>
-                <div class="carousel-footer">
-                    <a href="/templates/professores.html" class="btn btn-primary">Ver todos os professores</a>
-                </div>
+
             </div>
         </section>
 
@@ -231,51 +230,61 @@
             </div>
         </section>
 
-        <section class="booking" id="aulas">
+        <section class="pricing" id="planos">
             <div class="container sec-titulo center">
-                <span class="eyebrow muted">AULAS AO VIVO</span>
-                <h2>Agende uma Aula <em>ao Vivo</em></h2>
-                <p>Agende instrução personalizada com nossos professores especialistas para feedback e orientação em
-                    tempo real.</p>
+                <span class="eyebrow muted">NOSSOS PLANOS</span>
+                <h2>Escolha sua Jornada <em>de Ballet</em></h2>
+                <p>Opções flexíveis para apoiar a caminhada de todos os tipos de bailarinos até a excelência.</p>
             </div>
-            <div class="container reserva">
-                <div class="field">
-                    <label class="rotulo">Tipo de Aula</label>
-                    <div class="tipos">
-                        <label class="opcao active">
-                            <input type="radio" name="class-type" value="grupo" checked />
-                            <span class="ic">◇</span>
-                            <span>Aula em Grupo</span>
-                        </label>
-                        <label class="opcao">
-                            <input type="radio" name="class-type" value="particular" />
-                            <span class="ic">◆</span>
-                            <span>Aula Particular</span>
-                        </label>
+            <div class="container grade-planos">
+                <article class="plano">
+                    <h3>Inicial</h3>
+                    <p class="plano-sub">Para quem está começando</p>
+                    <div class="preco">
+                        <span class="price">R$<em>29</em></span>
+                        <span class="per">/ mês</span>
                     </div>
-                </div>
-
-                <div class="field">
-                    <label class="rotulo">Selecione o Professor</label>
-                    <div class="abas" id="abas-professores">
-                        <button class="tab active" data-prof="cristina">Cristina</button>
-                        <button class="tab" data-prof="geucimar">Geucimar</button>
-                        <button class="tab" data-prof="rafa">Rafa Kelly</button>
-                        <button class="tab" data-prof="marina">Marina</button>
+                    <a href="#" class="btn btn-outline btn-block">Começar Teste Gratuito</a>
+                    <ul class="itens">
+                        <li>✓ Acesso a 100+ aulas gravadas</li>
+                        <li>✓ Exercícios básicos de técnica</li>
+                        <li>✓ Guia de início de jornada</li>
+                        <li>✓ Acompanhamento de progresso</li>
+                    </ul>
+                </article>
+                <article class="plano plano-dest">
+                    <span class="selo">Mais Escolhido</span>
+                    <h3>Profissional</h3>
+                    <p class="plano-sub">Para alunos em evolução</p>
+                    <div class="preco">
+                        <span class="price">R$<em>79</em></span>
+                        <span class="per">/ mês</span>
                     </div>
-                </div>
-
-                <div class="field">
-                    <label class="rotulo">Horários Disponíveis</label>
-                    <div class="grade-slots" id="grade-horarios">
-                        <button class="slot active">9:30 - 10:30</button>
-                        <button class="slot">11:00 - 12:00</button>
-                        <button class="slot">14:00 - 15:00</button>
-                        <button class="slot">16:30 - 17:30</button>
+                    <a href="#" class="btn btn-primary btn-block">Começar Teste Gratuito</a>
+                    <ul class="itens">
+                        <li>✓ Acesso a todas as aulas gravadas</li>
+                        <li>✓ Mestre-classe ao vivo semanal</li>
+                        <li>✓ Sessões de feedback individuais</li>
+                        <li>✓ Plano de prática personalizado</li>
+                        <li>✓ Preparação para audições</li>
+                    </ul>
+                </article>
+                <article class="plano">
+                    <h3>Elite</h3>
+                    <p class="plano-sub">Para bailarinos avançados</p>
+                    <div class="preco">
+                        <span class="price">R$<em>149</em></span>
+                        <span class="per">/ mês</span>
                     </div>
-                </div>
-
-                <button class="btn btn-primary btn-block" id="btn-reservar">Reservar Horário</button>
+                    <a href="#" class="btn btn-outline btn-block">Começar Teste Gratuito</a>
+                    <ul class="itens">
+                        <li>✓ Acesso ilimitado e mentoria 1:1</li>
+                        <li>✓ Aulas privadas semanais</li>
+                        <li>✓ Plano de carreira personalizado</li>
+                        <li>✓ Análise de vídeo profissional</li>
+                        <li>✓ Conexões com companhias</li>
+                    </ul>
+                </article>
             </div>
         </section>
 
@@ -321,8 +330,8 @@
                 <p>Junte-se a milhares de bailarinos ao redor do mundo que estão descobrindo a sua graça e a arte do
                     balé com nossos instrutores especializados.</p>
                 <div class="cta-btns">
-                    <a href="#" class="btn btn-light">Começar Teste Gratuito</a>
-                    <a href="#planos" class="btn btn-outline-light">Visualizar Planos</a>
+                    <a href="/templates/cadastro.html" class="btn btn-light">Começar Teste Gratuito</a>
+                    <a href="/templates/planos.html" class="btn btn-outline-light">Visualizar Planos</a>
                 </div>
                 <ul class="cta-lista">
                     <li>✓ Teste de 14 dias</li>
@@ -343,11 +352,11 @@
             <div class="col">
                 <h4>O Grip</h4>
                 <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#">Aulas</a></li>
-                    <li><a href="#">Professores</a></li>
-                    <li><a href="#">Planos</a></li>
-                    <li><a href="#">Sobre</a></li>
+                    <li><a href="/templates/index.html">Home</a></li>
+                    <li><a href="/templates/aulas.html">Aulas</a></li>
+                    <li><a href="/templates/professores.html">Professores</a></li>
+                    <li><a href="/templates/planos.html">Planos</a></li>
+                    <li><a href="/templates/sobre.html">Sobre</a></li>
                 </ul>
             </div>
             <div class="col">
