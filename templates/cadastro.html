@@ -20,22 +20,26 @@
 
     <header class="topo">
         <div class="container nav">
-            <a href="/" class="logo">
+            <a href="/templates/index.html" class="logo">
                 <img src="/static/images/logo_grip.svg" alt="logo grip">
             </a>
             <nav class="menu" aria-label="Navegação principal">
-                <a href="/">Home</a>
-                <a href="/aulas">Aulas</a>
-                <a href="/professores">Professores</a>
-                <a href="/planos">Planos</a>
-                <a href="/sobre">Sobre</a>
+                <a href="/templates/index.html">Home</a>
+                <a href="/templates/aulas.html">Aulas</a>
+                <a href="/templates/professores.html">Professores</a>
+                <a href="/templates/planos.html">Planos</a>
+                <a href="/templates/sobre.html">Sobre</a>
             </nav>
             <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
                 <span></span>
                 <span></span>
                 <span></span>
             </button>
+            {% if nome_usuario %}
+            <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
+            {% else %}
             <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
+            {% endif %}
         </div>
     </header>
 
@@ -125,11 +129,11 @@
             <div class="col">
                 <h4>O Grip</h4>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/aulas">Aulas</a></li>
-                    <li><a href="/professores">Professores</a></li>
-                    <li><a href="/planos">Planos</a></li>
-                    <li><a href="/sobre">Sobre</a></li>
+                    <li><a href="/templates/index.html">Home</a></li>
+                    <li><a href="/templates/aulas.html">Aulas</a></li>
+                    <li><a href="/templates/professores.html">Professores</a></li>
+                    <li><a href="/templates/planos.html">Planos</a></li>
+                    <li><a href="/templates/sobre.html">Sobre</a></li>
                 </ul>
             </div>
             <div class="col">

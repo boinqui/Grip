@@ -173,6 +173,7 @@ async def login(
                 request.session["user_logged_in"] = True
                 request.session["usuario_id"] = aluno["id"]
                 request.session["nome_usuario"] = aluno["nome"]
+                request.session["email_usuario"] = Email
                 request.session["perfil"] = "user" # <-- Define Aluno como User
                 return RedirectResponse(url="/aulaListar", status_code=303)
 
@@ -197,6 +198,64 @@ async def usuario_logado(request: Request):
         "request": request,
         "nome_usuario": request.session.get("nome_usuario"),
         "perfil": request.session.get("perfil")
+    })
+
+
+@app.get("/alunoPerfil", response_class=HTMLResponse)
+async def aluno_perfil(request: Request):
+    if not request.session.get("user_logged_in"):
+        return RedirectResponse(url="/login", status_code=303)
+    return templates.TemplateResponse("alunoPerfil.html", {
+        "request": request,
+        "nome_usuario": request.session.get("nome_usuario"),
+        "email_usuario": request.session.get("email_usuario"),
+    })
+
+
+@app.get("/profPerfil", response_class=HTMLResponse)
+async def prof_perfil(request: Request, db=Depends(get_db)):
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/login", status_code=303)
+    usuario_id = request.session.get("usuario_id")
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor WHERE id = %s", (usuario_id,))
+            professor = cursor.fetchone()
+            cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno ORDER BY nome")
+            alunos = cursor.fetchall()
+            cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor ORDER BY nome")
+            professores = cursor.fetchall()
+            cursor.execute("""
+                SELECT A.id, A.nome, A.data, A.descricao, P.nome AS professor_nome
+                FROM Aula A
+                LEFT JOIN Professor P ON A.fk_Professor_id = P.id
+                ORDER BY A.data DESC
+            """)
+            aulas = cursor.fetchall()
+    finally:
+        db.close()
+
+    for aula in aulas:
+        if aula["data"]:
+            d = aula["data"]
+            aula["data_fmt"] = d.strftime("%d/%m/%Y") if hasattr(d, "strftime") else str(d)
+        else:
+            aula["data_fmt"] = "-"
+
+    mensagem = request.session.pop("mensagem", None)
+
+    return templates.TemplateResponse("profPerfil.html", {
+        "request": request,
+        "nome_usuario": request.session.get("nome_usuario"),
+        "perfil": request.session.get("perfil"),
+        "professor": professor,
+        "alunos": alunos,
+        "professores": professores,
+        "aulas": aulas,
+        "total_alunos": len(alunos),
+        "total_professores": len(professores),
+        "total_aulas": len(aulas),
+        "mensagem": mensagem,
     })
 
 

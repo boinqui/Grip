@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Admin — Grip Ballet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/templates/styles/styles.css" />
+    <link rel="stylesheet" href="/templates/styles/stylealunoperfil.css" />
+    <link rel="stylesheet" href="/templates/styles/styleadmin.css" />
+</head>
+
+<body>
+    <header class="topo">
+        <div class="container nav">
+            <a href="/templates/index.html" class="logo">
+                <img src="/static/images/logo_grip.svg" alt="logo grip">
+            </a>
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="/templates/index.html">Home</a>
+                <a href="/templates/aulas.html">Aulas</a>
+                <a href="/templates/professores.html">Professores</a>
+                <a href="/templates/planos.html">Planos</a>
+                <a href="/templates/sobre.html">Sobre</a>
+            </nav>
+            <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            {% if nome_usuario %}
+            <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
+            {% else %}
+            <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+
+        <div class="container caminho">
+            <a href="/logado">Painel</a>
+            <span>/</span>
+            <span>Meu Perfil</span>
+        </div>
+
+        <section class="perfil-hero">
+            <div class="container perfil-in">
+
+                <div class="avatar-wrap">
+                    <div class="avatar" id="avatarEl">
+                        <span id="avatarIniciais">{{ nome_usuario[0] | upper if nome_usuario else 'P' }}</span>
+                    </div>
+                    <span class="plano-badge admin">Admin</span>
+                </div>
+
+                <div class="perfil-info">
+                    <span class="eyebrow muted">PROFESSOR — GRIP BALLET</span>
+                    {% if nome_usuario and ' ' in nome_usuario %}
+                    {% set partes = nome_usuario.split(' ', 1) %}
+                    <h1>{{ partes[0] }} <em>{{ partes[1] }}</em></h1>
+                    {% else %}
+                    <h1>{{ nome_usuario | default('Professor') }}</h1>
+                    {% endif %}
+                    <div class="perfil-meta">
+                        <span>{{ professor.email if professor else '' }}</span>
+                        {% if professor and professor.registro_drt %}
+                        <span>· DRT {{ professor.registro_drt }}</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="numeros-perfil">
+                        <div class="numero-perfil">
+                            <strong>{{ total_professores | default(0) }}</strong>
+                            <span>Professores</span>
+                        </div>
+                        <div class="numero-perfil">
+                            <strong>{{ total_alunos | default(0) }}</strong>
+                            <span>Alunos</span>
+                        </div>
+                        <div class="numero-perfil">
+                            <strong>{{ total_aulas | default(0) }}</strong>
+                            <span>Aulas</span>
+                        </div>
+                    </div>
+
+                    <div class="acoes-perfil">
+                        <a href="/alunoIncluir" class="btn btn-primary btn-sm">+ Novo Aluno</a>
+                        <a href="/profIncluir" class="btn btn-outline btn-sm">+ Novo Professor</a>
+                        <a href="/aulaIncluir" class="btn btn-outline btn-sm">+ Nova Aula</a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="tabs-wrap">
+            <div class="container">
+                <nav class="tabs-nav" role="tablist">
+                    <button class="tab-btn active" onclick="abrirTab('visao-geral')" role="tab">Visão Geral</button>
+                    <button class="tab-btn" onclick="abrirTab('alunos')" role="tab">Alunos</button>
+                    <button class="tab-btn" onclick="abrirTab('professores')" role="tab">Professores</button>
+                    <button class="tab-btn" onclick="abrirTab('aulas')" role="tab">Aulas</button>
+                    <button class="tab-btn" onclick="abrirTab('configuracoes')" role="tab">Configurações</button>
+                </nav>
+            </div>
+        </div>
+
+        <div class="tab-painel active" id="tab-visao-geral">
+            <div class="container">
+
+                <div class="sec-titulo-sm">
+                    <span class="eyebrow muted">PAINEL</span>
+                    <h2>Visão <em>Geral</em></h2>
+                    <p>Resumo do sistema e atalhos rápidos para as principais ações.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <p class="stat-eyebrow">Total</p>
+                        <p class="stat-valor">{{ total_alunos | default(0) }}</p>
+                        <p class="stat-label">Alunos cadastrados</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="stat-eyebrow">Total</p>
+                        <p class="stat-valor">{{ total_professores | default(0) }}</p>
+                        <p class="stat-label">Professores ativos</p>
+                    </div>
+                    <div class="stat-card">
+                        <p class="stat-eyebrow">Total</p>
+                        <p class="stat-valor">{{ total_aulas | default(0) }}</p>
+                        <p class="stat-label">Aulas registradas</p>
+                    </div>
+                </div>
+
+                <div class="sec-titulo-sm">
+                    <span class="eyebrow muted">ATALHOS</span>
+                    <h2>Ações <em>Rápidas</em></h2>
+                </div>
+
+                <div class="atalhos-grid">
+                    <a href="/alunoListar" class="atalho-card">
+                        <span class="atalho-titulo">Listar Alunos</span>
+                        <span class="atalho-desc">Ver todos os alunos cadastrados</span>
+                    </a>
+                    <a href="/alunoIncluir" class="atalho-card">
+                        <span class="atalho-titulo">Novo Aluno</span>
+                        <span class="atalho-desc">Cadastrar um novo aluno</span>
+                    </a>
+                    <a href="/profListar" class="atalho-card">
+                        <span class="atalho-titulo">Listar Professores</span>
+                        <span class="atalho-desc">Ver todos os professores</span>
+                    </a>
+                    <a href="/profIncluir" class="atalho-card">
+                        <span class="atalho-titulo">Novo Professor</span>
+                        <span class="atalho-desc">Cadastrar um novo professor</span>
+                    </a>
+                    <a href="/aulaListar" class="atalho-card">
+                        <span class="atalho-titulo">Listar Aulas</span>
+                        <span class="atalho-desc">Ver todas as aulas registradas</span>
+                    </a>
+                    <a href="/aulaIncluir" class="atalho-card">
+                        <span class="atalho-titulo">Nova Aula</span>
+                        <span class="atalho-desc">Criar uma nova aula</span>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-painel" id="tab-alunos">
+            <div class="container">
+
+                <div class="admin-header">
+                    <div class="sec-titulo-sm" style="margin-bottom:0">
+                        <span class="eyebrow muted">GESTÃO</span>
+                        <h2>Alunos <em>Cadastrados</em></h2>
+                    </div>
+                    <div class="admin-search">
+                        <input type="text" id="buscaAluno" placeholder="Buscar por nome ou e-mail…" oninput="filtrarTabela('tabelaAlunos', this.value)" />
+                        <a href="/alunoIncluir" class="btn btn-primary btn-sm">+ Novo Aluno</a>
+                    </div>
+                </div>
+
+                {% if mensagem %}
+                <div id="flashMsg" class="flash sucesso visivel">{{ mensagem }}</div>
+                {% endif %}
+
+                <div class="table-wrap">
+                    <table id="tabelaAlunos">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Telefone</th>
+                                <th>E-mail</th>
+                                <th class="center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for aluno in alunos %}
+                            <tr>
+                                <td class="nome-cell">{{ aluno.nome }}</td>
+                                <td>{{ aluno.cpf }}</td>
+                                <td>{{ aluno.telefone }}</td>
+                                <td>{{ aluno.email }}</td>
+                                <td class="center">
+                                    <div class="acoes-gap">
+                                        <a href="/alunoAtualizar?id={{ aluno.id }}" class="acao-btn acao-editar">Editar</a>
+                                        <a href="/alunoSenha?id={{ aluno.id }}" class="acao-btn acao-senha">Senha</a>
+                                        <a href="/alunoExcluir?id={{ aluno.id }}" class="acao-btn acao-excluir" onclick="return confirmarExclusao('{{ aluno.nome }}')">Excluir</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="vazia">Nenhum aluno cadastrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-painel" id="tab-professores">
+            <div class="container">
+
+                <div class="admin-header">
+                    <div class="sec-titulo-sm" style="margin-bottom:0">
+                        <span class="eyebrow muted">GESTÃO</span>
+                        <h2>Professores <em>Cadastrados</em></h2>
+                    </div>
+                    <div class="admin-search">
+                        <input type="text" id="buscaProf" placeholder="Buscar por nome ou e-mail…" oninput="filtrarTabela('tabelaProfessores', this.value)" />
+                        <a href="/profIncluir" class="btn btn-primary btn-sm">+ Novo Professor</a>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="tabelaProfessores">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>DRT</th>
+                                <th>CPF</th>
+                                <th>E-mail</th>
+                                <th class="center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for prof in professores %}
+                            <tr>
+                                <td class="nome-cell">{{ prof.nome }}</td>
+                                <td>{{ prof.registro_drt }}</td>
+                                <td>{{ prof.cpf }}</td>
+                                <td>{{ prof.email }}</td>
+                                <td class="center">
+                                    <div class="acoes-gap">
+                                        <a href="/profAtualizar?id={{ prof.id }}" class="acao-btn acao-editar">Editar</a>
+                                        <a href="/profSenha?id={{ prof.id }}" class="acao-btn acao-senha">Senha</a>
+                                        <a href="/profExcluir?id={{ prof.id }}" class="acao-btn acao-excluir" onclick="return confirmarExclusao('{{ prof.nome }}')">Excluir</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="vazia">Nenhum professor cadastrado.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-painel" id="tab-aulas">
+            <div class="container">
+
+                <div class="admin-header">
+                    <div class="sec-titulo-sm" style="margin-bottom:0">
+                        <span class="eyebrow muted">GESTÃO</span>
+                        <h2>Aulas <em>Registradas</em></h2>
+                    </div>
+                    <div class="admin-search">
+                        <input type="text" id="buscaAula" placeholder="Buscar por nome ou professor…" oninput="filtrarTabela('tabelaAulas', this.value)" />
+                        <a href="/aulaIncluir" class="btn btn-primary btn-sm">+ Nova Aula</a>
+                    </div>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="tabelaAulas">
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>Data</th>
+                                <th>Professor</th>
+                                <th>Descrição</th>
+                                <th class="center">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for aula in aulas %}
+                            <tr>
+                                <td class="nome-cell">{{ aula.nome }}</td>
+                                <td>{{ aula.data_fmt }}</td>
+                                <td>{{ aula.professor_nome or '—' }}</td>
+                                <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ aula.descricao }}</td>
+                                <td class="center">
+                                    <div class="acoes-gap">
+                                        <a href="/aulaAtualizar?id={{ aula.id }}" class="acao-btn acao-editar">Editar</a>
+                                        <a href="/aulaExcluir?id={{ aula.id }}" class="acao-btn acao-excluir" onclick="return confirmarExclusao('{{ aula.nome }}')">Excluir</a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="vazia">Nenhuma aula cadastrada.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="tab-painel" id="tab-configuracoes">
+            <div class="container">
+
+                <div class="sec-titulo-sm">
+                    <span class="eyebrow muted">CONTA</span>
+                    <h2>Configurações de <em>Perfil</em></h2>
+                    <p>Atualize seus dados pessoais e credenciais de acesso.</p>
+                </div>
+
+                <div id="flashMsg" class="flash"></div>
+
+                <form action="/profAtualizar" method="post">
+                    <input type="hidden" name="id" value="{{ professor.id if professor else '' }}" />
+
+                    <div class="card-perfil card-mb">
+                        <h3 class="card-titulo">Dados Pessoais</h3>
+                        <div class="form-grid">
+                            <div class="form-campo">
+                                <label for="nome">Nome completo</label>
+                                <input type="text" id="nome" name="nome"
+                                    value="{{ professor.nome if professor else '' }}"
+                                    placeholder="Seu nome completo" />
+                            </div>
+                            <div class="form-campo">
+                                <label for="email">E-mail</label>
+                                <input type="email" id="email" name="email"
+                                    value="{{ professor.email if professor else '' }}"
+                                    placeholder="seu@email.com" />
+                            </div>
+                            <div class="form-campo">
+                                <label for="drt">Registro DRT</label>
+                                <input type="text" id="drt"
+                                    value="{{ professor.registro_drt if professor else '' }}"
+                                    placeholder="Número DRT" disabled />
+                            </div>
+                            <div class="form-campo">
+                                <label for="cpf">CPF</label>
+                                <input type="text" id="cpf"
+                                    value="{{ professor.cpf if professor else '' }}"
+                                    placeholder="000.000.000-00" disabled />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-rodape">
+                        <p>As alterações serão salvas imediatamente.</p>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+
+                <div class="card-perfil card-mb" style="margin-top: 28px;">
+                    <h3 class="card-titulo">Alterar Senha</h3>
+                    <p class="card-desc">Acesse a página de alteração de senha do seu perfil.</p>
+                    <a href="/profSenha?id={{ professor.id if professor else '' }}" class="btn btn-outline btn-sm">Alterar Senha</a>
+                </div>
+
+                <div class="zona-perigo">
+                    <h3>Zona de Perigo</h3>
+                    <p>A exclusão da conta é permanente e não pode ser desfeita. Todos os dados do professor serão removidos do sistema.</p>
+                    <a href="/profExcluir?id={{ professor.id if professor else '' }}"
+                       class="btn-danger"
+                       onclick="return confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')">
+                        Excluir minha conta
+                    </a>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="rodape" id="sobre">
+        <div class="container rodape-in">
+            <div class="marca">
+                <img src="/static/images/logo_grip.svg" alt="logo grip">
+                <p>Ballet clássico ensinado com paixão, técnica e a tradição das maiores escolas do mundo.</p>
+                <div class="social"></div>
+            </div>
+            <div class="col">
+                <h4>O Grip</h4>
+                <ul>
+                    <li><a href="/templates/index.html">Home</a></li>
+                    <li><a href="/templates/aulas.html">Aulas</a></li>
+                    <li><a href="/templates/professores.html">Professores</a></li>
+                    <li><a href="/templates/planos.html">Planos</a></li>
+                    <li><a href="/templates/sobre.html">Sobre</a></li>
+                </ul>
+            </div>
+            <div class="col">
+                <h4>Suporte</h4>
+                <ul>
+                    <li><a href="#">Ajuda</a></li>
+                    <li><a href="#">Contato</a></li>
+                    <li><a href="#">Termos de Serviço</a></li>
+                    <li><a href="#">Privacidade</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container rodape-base">
+            <p>© 2026 Grip. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="/templates/script/main.js"></script>
+    <script>
+        function abrirTab(id) {
+            document.querySelectorAll('.tab-painel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            const painel = document.getElementById('tab-' + id);
+            if (painel) painel.classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(id)) {
+                    b.classList.add('active');
+                }
+            });
+            document.querySelector('.tabs-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function filtrarTabela(tabelaId, termo) {
+            const tabela = document.getElementById(tabelaId);
+            if (!tabela) return;
+            const linhas = tabela.querySelectorAll('tbody tr');
+            const t = termo.toLowerCase().trim();
+            linhas.forEach(tr => {
+                const texto = tr.textContent.toLowerCase();
+                tr.style.display = !t || texto.includes(t) ? '' : 'none';
+            });
+        }
+
+        function confirmarExclusao(nome) {
+            return confirm(`Tem certeza que deseja excluir "${nome}"? Esta ação não pode ser desfeita.`);
+        }
+
+        (function () {
+            const nome = document.getElementById('avatarIniciais');
+            if (nome && nome.textContent.trim() === '') {
+                nome.textContent = 'P';
+            }
+        })();
+
+        (function () {
+            const hash = window.location.hash.replace('#', '');
+            const validos = ['visao-geral', 'alunos', 'professores', 'aulas', 'configuracoes'];
+            if (validos.includes(hash)) abrirTab(hash);
+        })();
+    </script>
+
+</body>
+</html>
