@@ -26,6 +26,11 @@
                 <a href="/planos">Planos</a>
                 <a href="/sobre">Sobre</a>
             </nav>
+            <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
             {% if nome_usuario %}
             <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
             {% else %}
