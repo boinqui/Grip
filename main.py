@@ -105,7 +105,9 @@ async def home(request: Request):
 @app.get("/login", response_class=HTMLResponse)
 async def login_get(request: Request):
     if request.session.get("user_logged_in"):
-        return RedirectResponse(url="/aulaListar", status_code=303)
+        if request.session.get("perfil") == "admin":
+            return RedirectResponse(url="/profPerfil", status_code=303)
+        return RedirectResponse(url="/alunoPerfil", status_code=303)
     
     login_error = request.session.pop("login_error", None)
     
@@ -174,19 +176,19 @@ async def login(
                 request.session["usuario_id"] = professor["id"]
                 request.session["nome_usuario"] = professor["nome"]
                 request.session["perfil"] = "admin" # <-- Define Professor como Admin
-                return RedirectResponse(url="/aulaListar", status_code=303)
+                return RedirectResponse(url="/profPerfil", status_code=303)
 
             #Aluno = User
             cursor.execute("SELECT id, nome, senha FROM Aluno WHERE email = %s", (Email,))
             aluno = cursor.fetchone()
-            
+
             if aluno and verify_password(Senha, aluno["senha"]):
                 request.session["user_logged_in"] = True
                 request.session["usuario_id"] = aluno["id"]
                 request.session["nome_usuario"] = aluno["nome"]
                 request.session["email_usuario"] = Email
                 request.session["perfil"] = "user" # <-- Define Aluno como User
-                return RedirectResponse(url="/aulaListar", status_code=303)
+                return RedirectResponse(url="/alunoPerfil", status_code=303)
 
             request.session["login_error"] = "E-mail ou senha incorretos."
             request.session["show_login_modal"] = True
@@ -201,25 +203,30 @@ async def logout(request: Request):
     return RedirectResponse(url="/", status_code=303)
 
 
-@app.get("/logado", response_class=HTMLResponse)
+@app.get("/logado")
 async def usuario_logado(request: Request):
     if not request.session.get("user_logged_in"):
         return RedirectResponse(url="/login", status_code=303)
-    return templates.TemplateResponse("logado.html", {
-        "request": request,
-        "nome_usuario": request.session.get("nome_usuario"),
-        "perfil": request.session.get("perfil")
-    })
+    if request.session.get("perfil") == "admin":
+        return RedirectResponse(url="/profPerfil", status_code=303)
+    return RedirectResponse(url="/alunoPerfil", status_code=303)
 
 
 @app.get("/alunoPerfil", response_class=HTMLResponse)
-async def aluno_perfil(request: Request):
+async def aluno_perfil(request: Request, db=Depends(get_db)):
     if not request.session.get("user_logged_in"):
         return RedirectResponse(url="/login", status_code=303)
+    usuario_id = request.session.get("usuario_id")
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno WHERE id = %s", (usuario_id,))
+            aluno = cursor.fetchone()
+    finally:
+        db.close()
     return templates.TemplateResponse("alunoPerfil.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario"),
-        "email_usuario": request.session.get("email_usuario"),
+        "aluno": aluno,
     })
 
 
@@ -834,8 +841,3 @@ async def aula_atualizar_post(
 
 
 
-@app.post("/reset_session")
-async def reset_session(request: Request):
-    request.session.pop("mensagem_header", None)
-    request.session.pop("mensagem", None)
-    return {"status": "ok"}

@@ -17,15 +17,15 @@
 <body>
     <header class="topo">
         <div class="container nav">
-            <a href="/templates/index.html" class="logo">
+            <a href="/" class="logo">
                 <img src="/static/images/logo_grip.svg" alt="logo grip">
             </a>
             <nav class="menu" aria-label="Navegação principal">
-                <a href="/templates/index.html">Home</a>
-                <a href="/templates/aulas.html">Aulas</a>
-                <a href="/templates/professores.html">Professores</a>
-                <a href="/templates/planos.html">Planos</a>
-                <a href="/templates/sobre.html">Sobre</a>
+                <a href="/">Home</a>
+                <a href="/aulas">Aulas</a>
+                <a href="/professores">Professores</a>
+                <a href="/planos">Planos</a>
+                <a href="/sobre">Sobre</a>
             </nav>
             <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
                 <span></span>
@@ -33,7 +33,10 @@
                 <span></span>
             </button>
             {% if nome_usuario %}
-            <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
+            <div class="nav-acoes">
+                <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
+                <a href="/logout" class="btn btn-outline btn-sm">Sair</a>
+            </div>
             {% else %}
             <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
             {% endif %}
@@ -43,7 +46,7 @@
     <main>
 
         <div class="container caminho">
-            <a href="/logado">Painel</a>
+            <a href="/">Home</a>
             <span>/</span>
             <span>Meu Perfil</span>
         </div>
@@ -53,19 +56,21 @@
 
                 <div class="avatar-wrap">
                     <div class="avatar" id="avatarEl">
-                        <span id="avatarIniciais">A</span>
+                        <span id="avatarIniciais">{{ nome_usuario[0] | upper if nome_usuario else 'A' }}</span>
                     </div>
-                    <span class="plano-badge profissional">Profissional</span>
                 </div>
 
                 <div class="perfil-info">
-                    <span class="eyebrow muted">ALUNA GRIP BALLET</span>
-                    <!--DAL PRA-->
-                    <h1>Ana <em>Silva</em></h1>
+                    <span class="eyebrow muted">ALUNO — GRIP BALLET</span>
+                    {% if nome_usuario and ' ' in nome_usuario %}
+                    {% set partes = nome_usuario.split(' ', 1) %}
+                    <h1>{{ partes[0] }} <em>{{ partes[1] }}</em></h1>
+                    {% else %}
+                    <h1>{{ nome_usuario | default('Aluno') }}</h1>
+                    {% endif %}
 
                     <div class="perfil-meta">
-                        <!--DAL PRA-->
-                        <span>ana.silva@email.com</span>
+                        <span>{{ aluno.email if aluno else '' }}</span>
                     </div>
                 </div>
 
@@ -163,13 +168,13 @@
                                 <li class="plano-item"><span class="plano-check">✓</span> 4 aulas particulares / mês</li>
                                 <li class="plano-item"><span class="plano-check">✓</span> Acesso ao material online</li>
                             </ul>
-                            <a href="/templates/planos.html" class="btn btn-outline btn-sm btn-block">Ver outros planos</a>
+                            <a href="/planos" class="btn btn-outline btn-sm btn-block">Ver outros planos</a>
                         </div>
 
                         <div class="card-perfil">
                             <h3 class="card-titulo">Agendar Nova Aula</h3>
                             <p class="card-desc">Escolha uma professora e reserve seu horário.</p>
-                            <a href="/templates/professores.html" class="btn btn-primary btn-sm btn-block">Escolher Professora</a>
+                            <a href="/professores" class="btn btn-primary btn-sm btn-block">Escolher Professora</a>
                         </div>
                     </div>
 
@@ -197,23 +202,25 @@
                             <div class="form-campo">
                                 <label for="nome">Nome completo</label>
                                 <input type="text" id="nome" name="nome"
-                                    value="Ana Silva"
+                                    value="{{ aluno.nome if aluno else '' }}"
                                     placeholder="Seu nome completo" />
                             </div>
                             <div class="form-campo">
                                 <label for="email">E-mail</label>
                                 <input type="email" id="email" name="email"
-                                    value="ana.silva@email.com"
+                                    value="{{ aluno.email if aluno else '' }}"
                                     placeholder="seu@email.com" />
                             </div>
                             <div class="form-campo">
                                 <label for="telefone">Telefone</label>
                                 <input type="tel" id="telefone" name="telefone"
+                                    value="{{ aluno.telefone if aluno else '' }}"
                                     placeholder="(11) 99999-9999" />
                             </div>
                             <div class="form-campo">
                                 <label for="cpf">CPF</label>
                                 <input type="text" id="cpf" name="cpf"
+                                    value="{{ aluno.cpf if aluno else '' }}"
                                     placeholder="000.000.000-00" disabled />
                             </div>
                             <div class="form-campo full">
@@ -294,11 +301,11 @@
             <div class="col">
                 <h4>O Grip</h4>
                 <ul>
-                    <li><a href="/templates/index.html">Home</a></li>
-                    <li><a href="/templates/aulas.html">Aulas</a></li>
-                    <li><a href="/templates/professores.html">Professores</a></li>
-                    <li><a href="/templates/planos.html">Planos</a></li>
-                    <li><a href="/templates/sobre.html">Sobre</a></li>
+                    <li><a href="/">Home</a></li>
+                    <li><a href="/aulas">Aulas</a></li>
+                    <li><a href="/professores">Professores</a></li>
+                    <li><a href="/planos">Planos</a></li>
+                    <li><a href="/sobre">Sobre</a></li>
                 </ul>
             </div>
             <div class="col">
