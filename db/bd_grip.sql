@@ -3,7 +3,7 @@ CREATE DATABASE grip;
 USE grip;
 
 CREATE TABLE Professor (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(50),
     registro_drt VARCHAR(50),
     cpf VARCHAR(15),
@@ -15,13 +15,13 @@ CREATE TABLE Aluno (
     nome VARCHAR(50),
     cpf VARCHAR(15),
     telefone VARCHAR(50),
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
     email VARCHAR(50),
     senha VARCHAR(255)
 );
 
 CREATE TABLE Aula (
-    id INTEGER PRIMARY KEY,
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
     nome VARCHAR(50),
     data DATE,
     descricao VARCHAR(255),
@@ -32,7 +32,8 @@ CREATE TABLE Professor_Aluno (
     fk_Professor_id INTEGER,
     fk_Aluno_id INTEGER
 );
- 
+
+
 ALTER TABLE Aula ADD CONSTRAINT FK_Aula_2
     FOREIGN KEY (fk_Professor_id)
     REFERENCES Professor (id);
