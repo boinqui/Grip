@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meu Perfil — Grip Ballet</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/templates/styles/styles.css" />
+    <link rel="stylesheet" href="/templates/styles/stylealunoperfil.css" />
+</head>
+
+<body>
+    <header class="topo">
+        <div class="container nav">
+            <a href="/templates/index.html" class="logo">
+                <img src="/static/images/logo_grip.svg" alt="logo grip">
+            </a>
+            <nav class="menu" aria-label="Navegação principal">
+                <a href="/templates/index.html">Home</a>
+                <a href="/templates/aulas.html">Aulas</a>
+                <a href="/templates/professores.html">Professores</a>
+                <a href="/templates/planos.html">Planos</a>
+                <a href="/templates/sobre.html">Sobre</a>
+            </nav>
+            <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            {% if nome_usuario %}
+            <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
+            {% else %}
+            <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <main>
+
+        <div class="container caminho">
+            <a href="/logado">Painel</a>
+            <span>/</span>
+            <span>Meu Perfil</span>
+        </div>
+
+        <section class="perfil-hero">
+            <div class="container perfil-in">
+
+                <div class="avatar-wrap">
+                    <div class="avatar" id="avatarEl">
+                        <span id="avatarIniciais">A</span>
+                    </div>
+                    <span class="plano-badge profissional">Profissional</span>
+                </div>
+
+                <div class="perfil-info">
+                    <span class="eyebrow muted">ALUNA GRIP BALLET</span>
+                    <!--DAL PRA-->
+                    <h1>Ana <em>Silva</em></h1>
+
+                    <div class="perfil-meta">
+                        <!--DAL PRA-->
+                        <span>ana.silva@email.com</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <div class="tabs-wrap">
+            <div class="container">
+                <nav class="tabs-nav" role="tablist">
+                    <button class="tab-btn active" onclick="abrirTab('visao-geral')" role="tab">Visão Geral</button>
+                    <button class="tab-btn" onclick="abrirTab('configuracoes')" role="tab">Configurações</button>
+                </nav>
+            </div>
+        </div>
+
+        <div class="tab-painel active" id="tab-visao-geral">
+            <div class="container">
+                <div class="grade-2">
+
+                    <div>
+                        <div class="sec-titulo-sm">
+                            <span class="eyebrow muted">AGENDA</span>
+                            <h2>Próximas <em>Aulas</em></h2>
+                            <p>Suas aulas agendadas para os próximos dias.</p>
+                        </div>
+                        <!--DAL PRA-->
+                        <div class="lista-aulas">
+                            <div class="item-aula">
+                                <div class="aula-ic">G</div>
+                                <div class="aula-info">
+                                    <h4>Ballet Clássico — Intermediário</h4>
+                                    <p>Seg, 28 Abr · 19h00 · Prof.ª Isabella Laurent</p>
+                                </div>
+                                <span class="aula-badge confirmada">Confirmada</span>
+                            </div>
+                            <div class="item-aula">
+                                <div class="aula-ic">G</div>
+                                <div class="aula-info">
+                                    <h4>Pontas & Técnica</h4>
+                                    <p>Qua, 30 Abr · 18h30 · Prof.ª Carla Ferraz</p>
+                                </div>
+                                <span class="aula-badge confirmada">Confirmada</span>
+                            </div>
+                            <div class="item-aula">
+                                <div class="aula-ic">P</div>
+                                <div class="aula-info">
+                                    <h4>Aula Particular Variações</h4>
+                                    <p>Sex, 02 Mai · 10h00 · Prof.º Geucimar Silva</p>
+                                </div>
+                                <span class="aula-badge pendente">Pendente</span>
+                            </div>
+                            <div class="item-aula">
+                                <div class="aula-ic">G</div>
+                                <div class="aula-info">
+                                    <h4>Ballet Clássico — Intermediário</h4>
+                                    <p>Seg, 05 Mai · 19h00 · Prof.ª Isabella Laurent</p>
+                                </div>
+                                <span class="aula-badge confirmada">Confirmada</span>
+                            </div>
+                            <div class="item-aula">
+                                <div class="aula-ic">G</div>
+                                <div class="aula-info">
+                                    <h4>Pontas & Técnica</h4>
+                                    <p>Qua, 07 Mai · 18h30 · Prof.ª Carla Ferraz</p>
+                                </div>
+                                <span class="aula-badge confirmada">Confirmada</span>
+                            </div>
+                            <div class="item-aula">
+                                <div class="aula-ic">P</div>
+                                <div class="aula-info">
+                                    <h4>Aula Particular — Técnica de Pontas</h4>
+                                    <p>Sex, 09 Mai · 10h00 · Prof.º Geucimar Silva</p>
+                                </div>
+                                <span class="aula-badge confirmada">Confirmada</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="sec-titulo-sm">
+                            <span class="eyebrow muted">PLANO</span>
+                            <h2>Meu <em>Plano</em></h2>
+                            <p>Detalhes da sua assinatura atual.</p>
+                        </div>
+                        <!--DAL PRA-->
+                        <div class="card-perfil card-mb">
+                            <div class="plano-header">
+                                <span class="plano-label">Plano Atual</span>
+                                <span class="plano-status">Ativo</span>
+                            </div>
+                            <h3 class="plano-nome">Profissional</h3>
+                            <p class="plano-renovacao">Renovação em 15 de Maio de 2026</p>
+                            <ul class="plano-itens">
+                                <li class="plano-item"><span class="plano-check">✓</span> Aulas ilimitadas em grupo</li>
+                                <li class="plano-item"><span class="plano-check">✓</span> 4 aulas particulares / mês</li>
+                                <li class="plano-item"><span class="plano-check">✓</span> Acesso ao material online</li>
+                            </ul>
+                            <a href="/templates/planos.html" class="btn btn-outline btn-sm btn-block">Ver outros planos</a>
+                        </div>
+
+                        <div class="card-perfil">
+                            <h3 class="card-titulo">Agendar Nova Aula</h3>
+                            <p class="card-desc">Escolha uma professora e reserve seu horário.</p>
+                            <a href="/templates/professores.html" class="btn btn-primary btn-sm btn-block">Escolher Professora</a>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ── TAB: Configurações ────────────────────────────────────────── -->
+        <!--DALPRA: ARRUMAR TAB CONFIGURACOES COM SCRIPT PRA APARECER AS INFOS-->
+        <div class="tab-painel" id="tab-configuracoes">
+            <div class="container">
+
+                <div class="sec-titulo-sm">
+                    <span class="eyebrow muted">CONTA</span>
+                    <h2>Configurações de <em>Perfil</em></h2>
+                    <p>Atualize seus dados pessoais e preferências.</p>
+                </div>
+
+                <div id="flashMsg" class="flash"></div>
+
+                <form onsubmit="salvarPerfil(event)">
+                    <div class="card-perfil card-mb">
+                        <h3 class="card-titulo">Dados Pessoais</h3>
+                        <div class="form-grid">
+                            <div class="form-campo">
+                                <label for="nome">Nome completo</label>
+                                <input type="text" id="nome" name="nome"
+                                    value="Ana Silva"
+                                    placeholder="Seu nome completo" />
+                            </div>
+                            <div class="form-campo">
+                                <label for="email">E-mail</label>
+                                <input type="email" id="email" name="email"
+                                    value="ana.silva@email.com"
+                                    placeholder="seu@email.com" />
+                            </div>
+                            <div class="form-campo">
+                                <label for="telefone">Telefone</label>
+                                <input type="tel" id="telefone" name="telefone"
+                                    placeholder="(11) 99999-9999" />
+                            </div>
+                            <div class="form-campo">
+                                <label for="cpf">CPF</label>
+                                <input type="text" id="cpf" name="cpf"
+                                    placeholder="000.000.000-00" disabled />
+                            </div>
+                            <div class="form-campo full">
+                                <label for="bio">Sobre mim <span class="label-opcional">(opcional)</span></label>
+                                <textarea id="bio" name="bio" placeholder="Conte um pouco sobre sua relação com o ballet…"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-perfil card-mb">
+                        <h3 class="card-titulo">Preferências</h3>
+                        <div class="form-grid">
+                            <div class="form-campo">
+                                <label for="nivel">Nível atual</label>
+                                <select id="nivel" name="nivel">
+                                    <option value="iniciante">Iniciante</option>
+                                    <option value="intermediario" selected>Intermediário</option>
+                                    <option value="avancado">Avançado</option>
+                                </select>
+                            </div>
+                            <div class="form-campo">
+                                <label for="objetivo">Objetivo principal</label>
+                                <select id="objetivo" name="objetivo">
+                                    <option value="saude">Saúde &amp; bem-estar</option>
+                                    <option value="tecnica" selected>Aprimorar técnica</option>
+                                    <option value="profissional">Carreira profissional</option>
+                                    <option value="hobby">Hobby</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-perfil card-mb">
+                        <h3 class="card-titulo">Alterar Senha</h3>
+                        <div class="form-grid">
+                            <div class="form-campo">
+                                <label for="senhaAtual">Senha atual</label>
+                                <input type="password" id="senhaAtual" name="senhaAtual"
+                                    placeholder="••••••••" />
+                            </div>
+                            <div class="form-campo form-campo-col1">
+                                <label for="novaSenha">Nova senha</label>
+                                <input type="password" id="novaSenha" name="novaSenha"
+                                    placeholder="Mínimo 8 caracteres" />
+                            </div>
+                            <div class="form-campo">
+                                <label for="confirmarSenha">Confirmar nova senha</label>
+                                <input type="password" id="confirmarSenha" name="confirmarSenha"
+                                    placeholder="Repita a nova senha" />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-rodape">
+                        <p>As alterações serão salvas imediatamente.</p>
+                        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+
+                <div class="zona-perigo">
+                    <h3>Zona de Perigo</h3>
+                    <p>A exclusão da conta é permanente e não pode ser desfeita. Todos os seus dados, histórico de aulas e conquistas serão removidos.</p>
+                    <button class="btn-danger" onclick="confirmarExclusao()">Excluir minha conta</button>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="rodape" id="sobre">
+        <div class="container rodape-in">
+            <div class="marca">
+                <img src="/static/images/logo_grip.svg" alt="logo grip">
+                <p>Ballet clássico ensinado com paixão, técnica e a tradição das maiores escolas do mundo.</p>
+                <div class="social"></div>
+            </div>
+            <div class="col">
+                <h4>O Grip</h4>
+                <ul>
+                    <li><a href="/templates/index.html">Home</a></li>
+                    <li><a href="/templates/aulas.html">Aulas</a></li>
+                    <li><a href="/templates/professores.html">Professores</a></li>
+                    <li><a href="/templates/planos.html">Planos</a></li>
+                    <li><a href="/templates/sobre.html">Sobre</a></li>
+                </ul>
+            </div>
+            <div class="col">
+                <h4>Suporte</h4>
+                <ul>
+                    <li><a href="#">Ajuda</a></li>
+                    <li><a href="#">Contato</a></li>
+                    <li><a href="#">Termos de Serviço</a></li>
+                    <li><a href="#">Privacidade</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container rodape-base">
+            <p>© 2026 Grip. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script src="/templates/script/main.js"></script>
+    <script>
+        function abrirTab(id) {
+            document.querySelectorAll('.tab-painel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            const painel = document.getElementById('tab-' + id);
+            if (painel) painel.classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => {
+                if (b.getAttribute('onclick') && b.getAttribute('onclick').includes(id)) {
+                    b.classList.add('active');
+                }
+            });
+            document.querySelector('.tabs-wrap').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function salvarPerfil(e) {
+            e.preventDefault();
+            const flash = document.getElementById('flashMsg');
+            flash.textContent = 'Perfil atualizado com sucesso!';
+            flash.className = 'flash sucesso visivel';
+            setTimeout(() => { flash.classList.remove('visivel'); }, 4000);
+        }
+
+        function confirmarExclusao() {
+            if (confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')) {
+                alert('Funcionalidade disponível em breve.');
+            }
+        }
+    </script>
+
+</body>
+</html>
