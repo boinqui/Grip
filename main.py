@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import secrets
 from mangum import Mangum
-from fastapi import FastAPI, Request, Form, Depends
+from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -20,7 +20,7 @@ app.add_middleware(
     session_cookie="grip_session",
     max_age=3600,
     same_site="lax",
-    https_only=False
+    https_only=True
 )
 
 # Arquivos estáticos
@@ -44,6 +44,17 @@ PASSWORD_ITERATIONS = 390000
 def get_db():
     return pymysql.connect(**DB_CONFIG)
 
+def verify_logged_in(request: Request):
+    if not request.session.get("user_logged_in"):
+        #se nao estiver logado, vai para /login
+        raise HTTPException(status_code=303, headers={"Location": "/login"})
+
+def verify_admin(request: Request):
+    if not request.session.get("user_logged_in"):
+        raise HTTPException(status_code=303, headers={"Location": "/login"})
+    if request.session.get("perfil") != "admin":
+        #se nao for admin, vai para /login
+        raise HTTPException(status_code=303, headers={"Location": "/aulaListar"})
 
 def hash_password(password: str) -> str:
     salt = secrets.token_hex(16)
@@ -260,8 +271,9 @@ async def cadastrar_usuario(
 
 @app.get("/profListar", response_class=HTMLResponse)
 async def listar_professores(request: Request, db=Depends(get_db)):
-    if not request.session.get("user_logged_in"):
-        return RedirectResponse(url="/login", status_code=303)
+    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
+        return RedirectResponse(url="/aulaListar", status_code=303)
+    
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor ORDER BY nome")
@@ -282,7 +294,7 @@ async def listar_professores(request: Request, db=Depends(get_db)):
 
 
 @app.get("/profIncluir", response_class=HTMLResponse)
-async def prof_incluir(request: Request):
+async def prof_incluir(request: Request, auth=Depends(verify_admin)):
     if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
         return RedirectResponse(url="/profListar", status_code=303)
     return templates.TemplateResponse("profIncluir.html", {
@@ -299,10 +311,9 @@ async def prof_incluir_post(
     cpf: str = Form(""),
     email: str = Form(...),
     senha: str = Form(...),
-    db=Depends(get_db)
+    db=Depends(get_db),
+    auth=Depends(verify_admin)
 ):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/profListar", status_code=303)
     try:
         with db.cursor() as cursor:
             senha_hash = hash_password(senha)
@@ -320,9 +331,7 @@ async def prof_incluir_post(
 
 
 @app.get("/profExcluir", response_class=HTMLResponse)
-async def prof_excluir(request: Request, id: int, db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/profListar", status_code=303)
+async def prof_excluir(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor WHERE id = %s", (id,))
@@ -337,9 +346,7 @@ async def prof_excluir(request: Request, id: int, db=Depends(get_db)):
 
 
 @app.post("/profExcluir")
-async def prof_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/profListar", status_code=303)
+async def prof_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor() as cursor:
             cursor.execute("DELETE FROM Professor WHERE id = %s", (id,))
@@ -353,9 +360,7 @@ async def prof_excluir_post(request: Request, id: int = Form(...), db=Depends(ge
 
 
 @app.get("/profAtualizar", response_class=HTMLResponse)
-async def prof_atualizar(request: Request, id: int, db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/profListar", status_code=303)
+async def prof_atualizar(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor WHERE id = %s", (id,))
@@ -375,10 +380,9 @@ async def prof_atualizar_post(
     id: int = Form(...),
     nome: str = Form(...),
     email: str = Form(...),
-    db=Depends(get_db)
+    db=Depends(get_db),
+    auth=Depends(verify_admin)
 ):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/profListar", status_code=303)
     try:
         with db.cursor() as cursor:
             # Não atualizamos registro_drt, cpf e senha aqui
@@ -395,9 +399,7 @@ async def prof_atualizar_post(
     return RedirectResponse(url="/profListar", status_code=303)
 
 @app.get("/profSenha", response_class=HTMLResponse)
-async def prof_senha(request: Request, id: int, db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/profListar", status_code=303)
+async def prof_senha(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome FROM Professor WHERE id = %s", (id,))
@@ -415,10 +417,9 @@ async def prof_senha_post(
     request: Request,
     id: int = Form(...),
     nova_senha: str = Form(...),
-    db=Depends(get_db)
+    db=Depends(get_db),
+    auth=Depends(verify_admin)
 ):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/profListar", status_code=303)
     try:
         with db.cursor() as cursor:
             senha_hash = hash_password(nova_senha)
@@ -445,9 +446,7 @@ async def prof_senha_post(
 # ── Aluno CRUD ────────────────────────────────────────────────────────────────
 
 @app.get("/alunoListar", response_class=HTMLResponse)
-async def listar_alunos(request: Request, db=Depends(get_db)):
-    if not request.session.get("user_logged_in"):
-        return RedirectResponse(url="/login", status_code=303)
+async def listar_alunos(request: Request, db=Depends(get_db), auth=Depends(verify_logged_in)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno ORDER BY nome")
@@ -468,9 +467,7 @@ async def listar_alunos(request: Request, db=Depends(get_db)):
 
 
 @app.get("/alunoIncluir", response_class=HTMLResponse)
-async def aluno_incluir(request: Request):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/alunoListar", status_code=303)
+async def aluno_incluir(request: Request, auth=Depends(verify_admin)):
     return templates.TemplateResponse("alunoIncluir.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario")
@@ -485,10 +482,9 @@ async def aluno_incluir_post(
     telefone: str = Form(""),
     email: str = Form(...),
     senha: str = Form(...),
-    db=Depends(get_db)
+    db=Depends(get_db),
+    auth=Depends(verify_admin)
 ):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/alunoListar", status_code=303)
     try:
         with db.cursor() as cursor:
             senha_hash = hash_password(senha)
@@ -506,9 +502,7 @@ async def aluno_incluir_post(
 
 
 @app.get("/alunoExcluir", response_class=HTMLResponse)
-async def aluno_excluir(request: Request, id: int, db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/alunoListar", status_code=303)
+async def aluno_excluir(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno WHERE id = %s", (id,))
@@ -523,9 +517,7 @@ async def aluno_excluir(request: Request, id: int, db=Depends(get_db)):
 
 
 @app.post("/alunoExcluir")
-async def aluno_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/alunoListar", status_code=303)
+async def aluno_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor() as cursor:
             cursor.execute("DELETE FROM Aluno WHERE id = %s", (id,))
@@ -539,9 +531,7 @@ async def aluno_excluir_post(request: Request, id: int = Form(...), db=Depends(g
 
 
 @app.get("/alunoAtualizar", response_class=HTMLResponse)
-async def aluno_atualizar(request: Request, id: int, db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/alunoListar", status_code=303)
+async def aluno_atualizar(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno WHERE id = %s", (id,))
@@ -562,13 +552,12 @@ async def aluno_atualizar_post(
     nome: str = Form(...),
     telefone: str = Form(""),
     email: str = Form(...),
-    db=Depends(get_db)
+    db=Depends(get_db),
+    auth=Depends(verify_admin)
 ):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/alunoListar", status_code=303)
     try:
         with db.cursor() as cursor:
-            # Não atualizamos cpf e senha aqui
+            #att cpf e senha nao é aqui
             cursor.execute(
                 "UPDATE Aluno SET nome=%s, telefone=%s, email=%s WHERE id=%s",
                 (nome, telefone, email, id)
@@ -582,9 +571,7 @@ async def aluno_atualizar_post(
     return RedirectResponse(url="/alunoListar", status_code=303)
 
 @app.get("/alunoSenha", response_class=HTMLResponse)
-async def aluno_senha(request: Request, id: int, db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/alunoListar", status_code=303)
+async def aluno_senha(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome FROM Aluno WHERE id = %s", (id,))
@@ -602,10 +589,9 @@ async def aluno_senha_post(
     request: Request,
     id: int = Form(...),
     nova_senha: str = Form(...),
-    db=Depends(get_db)
+    db=Depends(get_db),
+    auth=Depends(verify_admin)
 ):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/alunoListar", status_code=303)
     try:
         with db.cursor() as cursor:
             senha_hash = hash_password(nova_senha)
@@ -630,9 +616,7 @@ async def aluno_senha_post(
 # ── Aula CRUD ────────────────────────────────────────────────────────────────
 
 @app.get("/aulaListar", response_class=HTMLResponse)
-async def listar_aulas(request: Request, db=Depends(get_db)):
-    if not request.session.get("user_logged_in"):
-        return RedirectResponse(url="/login", status_code=303)
+async def listar_aulas(request: Request, db=Depends(get_db), auth=Depends(verify_logged_in)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("""
@@ -665,9 +649,7 @@ async def listar_aulas(request: Request, db=Depends(get_db)):
 
 
 @app.get("/aulaIncluir", response_class=HTMLResponse)
-async def aula_incluir(request: Request, db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/aulaListar", status_code=303)
+async def aula_incluir(request: Request, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome FROM Professor ORDER BY nome")
@@ -688,10 +670,9 @@ async def aula_incluir_post(
     data: str = Form(...),
     descricao: str = Form(""),
     fk_Professor_id: int = Form(...),
-    db=Depends(get_db)
+    db=Depends(get_db),
+    auth=Depends(verify_admin)
 ):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/aulaListar", status_code=303)
     try:
         with db.cursor() as cursor:
             cursor.execute(
@@ -708,9 +689,7 @@ async def aula_incluir_post(
 
 
 @app.get("/aulaExcluir", response_class=HTMLResponse)
-async def aula_excluir(request: Request, id: int, db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/aulaListar", status_code=303)
+async def aula_excluir(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("""
@@ -730,9 +709,7 @@ async def aula_excluir(request: Request, id: int, db=Depends(get_db)):
 
 
 @app.post("/aulaExcluir")
-async def aula_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/aulaListar", status_code=303)
+async def aula_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor() as cursor:
             cursor.execute("DELETE FROM Aula WHERE id = %s", (id,))
@@ -746,9 +723,7 @@ async def aula_excluir_post(request: Request, id: int = Form(...), db=Depends(ge
 
 
 @app.get("/aulaAtualizar", response_class=HTMLResponse)
-async def aula_atualizar(request: Request, id: int, db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/aulaListar", status_code=303)
+async def aula_atualizar(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, data, descricao, fk_Professor_id FROM Aula WHERE id = %s", (id,))
@@ -776,10 +751,9 @@ async def aula_atualizar_post(
     data: str = Form(...),
     descricao: str = Form(""),
     fk_Professor_id: int = Form(...),
-    db=Depends(get_db)
+    db=Depends(get_db),
+    auth=Depends(verify_admin)
 ):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/aulaListar", status_code=303)
     try:
         with db.cursor() as cursor:
             cursor.execute(
@@ -806,6 +780,3 @@ async def reset_session(request: Request):
     request.session.pop("mensagem_header", None)
     request.session.pop("mensagem", None)
     return {"status": "ok"}
-
-
-Mangum(app)
