@@ -55,8 +55,9 @@
 
                 <div>
                     <label class="block text-sm font-medium text-zinc-700 mb-1">Registro DRT</label>
-                    <input type="text" name="registro_drt" required
-                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                    <input type="text" name="registro_drt" placeholder="DRT-0000" 
+                           pattern="DRT-\d+" title="O registro deve seguir o formato DRT-1234" required
+                           class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 </div>
 
                 <div>

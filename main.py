@@ -14,6 +14,12 @@ def validate_cpf(cpf: str) -> bool:
 def validate_phone(phone: str) -> bool:
     return bool(re.match(r"^\(?\d{2}\)?\s?9?\d{4}-?\d{4}$", phone))
 
+def validate_password(password: str) -> bool:
+    return bool(re.match(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$", password))
+
+def validate_drt(drt: str) -> bool:
+    return bool(re.match(r"^DRT-\d+$", drt))
+
 from mangum import Mangum
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -313,10 +319,10 @@ async def cadastrar_usuario(
     telefone: str = Form(""),
     db=Depends(get_db)
 ):
-    if not validate_email(email) or not validate_cpf(cpf) or not validate_phone(telefone) or not validate_password(senha):
+    if not validate_name(nome) or not validate_email(email) or not validate_cpf(cpf) or not validate_phone(telefone) or not validate_password(senha):
         return templates.TemplateResponse("cadastro.html", {
             "request": request,
-            "error": "Dados inválidos ou senha muito fraca (mínimo 8 caracteres, com letra e número)"
+            "error": "Dados inválidos ou formato de nome/e-mail/cpf/telefone/senha incorreto"
         })
 
     if senha != confirmar_senha:
@@ -403,6 +409,9 @@ async def prof_incluir_post(
     db=Depends(get_db),
     auth=Depends(verify_admin)
 ):
+    if not validate_email(email) or not validate_drt(registro_drt):
+        request.session["mensagem"] = "Dados inválidos (E-mail ou DRT)"
+        return RedirectResponse(url="/profListar", status_code=303)
     try:
         with db.cursor() as cursor:
             senha_hash = hash_password(senha)
@@ -856,6 +865,24 @@ async def aula_atualizar_post(
     finally:
         db.close()
     return RedirectResponse(url="/aulaListar", status_code=303)
+
+
+
+
+
+
+
+
+ulaListar", status_code=303)
+
+
+
+
+
+
+
+
+sponse(url="/aulaListar", status_code=303)
 
 
 
