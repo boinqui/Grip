@@ -81,7 +81,8 @@
                 <div style="display: flex; gap: 14px;">
                     <div class="campo" style="flex: 1;">
                         <label for="telefone">Telefone</label>
-                        <input type="tel" id="telefone" name="telefone" placeholder="(41) 99999-9999" required>
+                        <input type="tel" id="telefone" name="telefone" placeholder="(41) 99999-9999" 
+                               pattern="\(?\d{2}\)?\s?9?\d{4}-?\d{4}" required>
                     </div>
                     <div class="campo" style="flex: 1;">
                         <label for="cpf">CPF</label>
@@ -93,7 +94,9 @@
                 <div style="display: flex; gap: 14px;">
                     <div class="campo" style="flex: 1;">
                         <label for="senha">Senha</label>
-                        <input type="password" id="senha" name="senha" placeholder="••••••••" required>
+                        <input type="password" id="senha" name="senha" placeholder="••••••••" 
+                               pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$"
+                               title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número." required>
                     </div>
                     <div class="campo" style="flex: 1;">
                         <label for="confirmar_senha">Confirmar senha</label>

@@ -11,6 +11,9 @@ def validate_email(email: str) -> bool:
 def validate_cpf(cpf: str) -> bool:
     return bool(re.match(r"^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$", cpf))
 
+def validate_phone(phone: str) -> bool:
+    return bool(re.match(r"^\(?\d{2}\)?\s?9?\d{4}-?\d{4}$", phone))
+
 from mangum import Mangum
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -310,10 +313,10 @@ async def cadastrar_usuario(
     telefone: str = Form(""),
     db=Depends(get_db)
 ):
-    if not validate_email(email) or not validate_cpf(cpf):
+    if not validate_email(email) or not validate_cpf(cpf) or not validate_phone(telefone) or not validate_password(senha):
         return templates.TemplateResponse("cadastro.html", {
             "request": request,
-            "error": "Dados inválidos"
+            "error": "Dados inválidos ou senha muito fraca (mínimo 8 caracteres, com letra e número)"
         })
 
     if senha != confirmar_senha:
@@ -853,6 +856,15 @@ async def aula_atualizar_post(
     finally:
         db.close()
     return RedirectResponse(url="/aulaListar", status_code=303)
+
+
+
+
+
+
+
+
+ulaListar", status_code=303)
 
 
 
