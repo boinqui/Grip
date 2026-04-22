@@ -1,8 +1,13 @@
 import pymysql
+import re
 import base64
 import hashlib
 import hmac
 import secrets
+
+def validate_email(email: str) -> bool:
+    return bool(re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email))
+
 from mangum import Mangum
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -165,6 +170,11 @@ async def login(
     Senha: str = Form(...),
     db=Depends(get_db)
 ):
+    if not validate_email(Email):
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "error": "E-mail inválido"
+        })
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             #Professor = Admin
