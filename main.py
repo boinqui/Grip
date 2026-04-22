@@ -4,6 +4,13 @@ import base64
 import hashlib
 import hmac
 import secrets
+from mangum import Mangum
+from fastapi import FastAPI, Request, Form, Depends, HTTPException
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+from starlette.middleware.sessions import SessionMiddleware
+from datetime import datetime
 
 def validate_email(email: str) -> bool:
     return bool(re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email))
@@ -20,13 +27,8 @@ def validate_password(password: str) -> bool:
 def validate_drt(drt: str) -> bool:
     return bool(re.match(r"^DRT-\d+$", drt))
 
-from mangum import Mangum
-from fastapi import FastAPI, Request, Form, Depends, HTTPException
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.staticfiles import StaticFiles
-from fastapi.templating import Jinja2Templates
-from starlette.middleware.sessions import SessionMiddleware
-from datetime import datetime
+def validate_name(name: str) -> bool:
+    return bool(re.match(r"^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$", name))
 
 app = FastAPI()
 
@@ -63,14 +65,12 @@ def get_db():
 
 def verify_logged_in(request: Request):
     if not request.session.get("user_logged_in"):
-        #se nao estiver logado, vai para /login
         raise HTTPException(status_code=303, headers={"Location": "/login"})
 
 def verify_admin(request: Request):
     if not request.session.get("user_logged_in"):
         raise HTTPException(status_code=303, headers={"Location": "/login"})
     if request.session.get("perfil") != "admin":
-        #se nao for admin, vai para /login
         raise HTTPException(status_code=303, headers={"Location": "/aulaListar"})
 
 def hash_password(password: str) -> str:
@@ -189,7 +189,6 @@ async def login(
         })
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            #Professor = Admin
             cursor.execute("SELECT id, nome, senha FROM Professor WHERE email = %s", (Email,))
             professor = cursor.fetchone()
             
@@ -197,10 +196,9 @@ async def login(
                 request.session["user_logged_in"] = True
                 request.session["usuario_id"] = professor["id"]
                 request.session["nome_usuario"] = professor["nome"]
-                request.session["perfil"] = "admin" # <-- Define Professor como Admin
+                request.session["perfil"] = "admin"
                 return RedirectResponse(url="/profPerfil", status_code=303)
 
-            #Aluno = User
             cursor.execute("SELECT id, nome, senha FROM Aluno WHERE email = %s", (Email,))
             aluno = cursor.fetchone()
 
@@ -209,13 +207,12 @@ async def login(
                 request.session["usuario_id"] = aluno["id"]
                 request.session["nome_usuario"] = aluno["nome"]
                 request.session["email_usuario"] = Email
-                request.session["perfil"] = "user" # <-- Define Aluno como User
+                request.session["perfil"] = "user"
                 return RedirectResponse(url="/alunoPerfil", status_code=303)
 
             request.session["login_error"] = "E-mail ou senha incorretos."
             request.session["show_login_modal"] = True
             return RedirectResponse(url="/login", status_code=303)
-
     finally:
         db.close()
 
@@ -326,11 +323,10 @@ async def cadastrar_usuario(
         })
 
     if senha != confirmar_senha:
+        request.session["mensagem"] = "Erro: As senhas não coincidem!"
+        return RedirectResponse(url="/cadastro", status_code=303)
 
-        if confirmar_senha and senha != confirmar_senha:
-            request.session["mensagem"] = "Erro: As senhas não coincidem!"
-            return RedirectResponse(url="/cadastro", status_code=303)
-
+    try:
         with db.cursor() as cursor:
             cursor.execute("SELECT id FROM Aluno WHERE email = %s", (email,))
             if cursor.fetchone():
@@ -345,22 +341,11 @@ async def cadastrar_usuario(
             db.commit()
             request.session["mensagem"] = "Aluno cadastrado com sucesso! Você já pode realizar login."
             return RedirectResponse(url="/cadastro", status_code=303)
-
     except Exception as e:
         request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
         return RedirectResponse(url="/cadastro", status_code=303)
     finally:
         db.close()
-
-
-
-
-
-
-
-
-
-
 
 # ── Professor CRUD ────────────────────────────────────────────────────────────
 
@@ -368,16 +353,13 @@ async def cadastrar_usuario(
 async def listar_professores(request: Request, db=Depends(get_db)):
     if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
         return RedirectResponse(url="/aulaListar", status_code=303)
-    
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor ORDER BY nome")
             professores = cursor.fetchall()
     finally:
         db.close()
-        
     mensagem = request.session.pop("mensagem", None)
-    
     return templates.TemplateResponse("profListar.html", {
         "request": request,
         "professores": professores,
@@ -387,16 +369,12 @@ async def listar_professores(request: Request, db=Depends(get_db)):
         "mensagem": mensagem
     })
 
-
 @app.get("/profIncluir", response_class=HTMLResponse)
 async def prof_incluir(request: Request, auth=Depends(verify_admin)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/profListar", status_code=303)
     return templates.TemplateResponse("profIncluir.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario")
     })
-
 
 @app.post("/profIncluir")
 async def prof_incluir_post(
@@ -409,8 +387,8 @@ async def prof_incluir_post(
     db=Depends(get_db),
     auth=Depends(verify_admin)
 ):
-    if not validate_email(email) or not validate_drt(registro_drt):
-        request.session["mensagem"] = "Dados inválidos (E-mail ou DRT)"
+    if not validate_email(email) or not validate_drt(registro_drt) or not validate_name(nome):
+        request.session["mensagem"] = "Dados inválidos (Nome, E-mail ou DRT)"
         return RedirectResponse(url="/profListar", status_code=303)
     try:
         with db.cursor() as cursor:
@@ -427,7 +405,6 @@ async def prof_incluir_post(
         db.close()
     return RedirectResponse(url="/profListar", status_code=303)
 
-
 @app.get("/profExcluir", response_class=HTMLResponse)
 async def prof_excluir(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
@@ -442,7 +419,6 @@ async def prof_excluir(request: Request, id: int, db=Depends(get_db), auth=Depen
         "nome_usuario": request.session.get("nome_usuario")
     })
 
-
 @app.post("/profExcluir")
 async def prof_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db), auth=Depends(verify_admin)):
     try:
@@ -455,7 +431,6 @@ async def prof_excluir_post(request: Request, id: int = Form(...), db=Depends(ge
     finally:
         db.close()
     return RedirectResponse(url="/profListar", status_code=303)
-
 
 @app.get("/profAtualizar", response_class=HTMLResponse)
 async def prof_atualizar(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
@@ -471,7 +446,6 @@ async def prof_atualizar(request: Request, id: int, db=Depends(get_db), auth=Dep
         "nome_usuario": request.session.get("nome_usuario")
     })
 
-
 @app.post("/profAtualizar")
 async def prof_atualizar_post(
     request: Request,
@@ -483,11 +457,7 @@ async def prof_atualizar_post(
 ):
     try:
         with db.cursor() as cursor:
-            # Não atualizamos registro_drt, cpf e senha aqui
-            cursor.execute(
-                "UPDATE Professor SET nome=%s, email=%s WHERE id=%s",
-                (nome, email, id)
-            )
+            cursor.execute("UPDATE Professor SET nome=%s, email=%s WHERE id=%s", (nome, email, id))
             db.commit()
         request.session["mensagem"] = "Cadastro do professor atualizado com sucesso!"
     except Exception as e:
@@ -530,17 +500,6 @@ async def prof_senha_post(
         db.close()
     return RedirectResponse(url="/profListar", status_code=303)
 
-
-
-
-
-
-
-
-
-
-
-
 # ── Aluno CRUD ────────────────────────────────────────────────────────────────
 
 @app.get("/alunoListar", response_class=HTMLResponse)
@@ -551,9 +510,7 @@ async def listar_alunos(request: Request, db=Depends(get_db), auth=Depends(verif
             alunos = cursor.fetchall()
     finally:
         db.close()
-        
     mensagem = request.session.pop("mensagem", None)
-    
     return templates.TemplateResponse("alunoListar.html", {
         "request": request,
         "alunos": alunos,
@@ -563,14 +520,12 @@ async def listar_alunos(request: Request, db=Depends(get_db), auth=Depends(verif
         "mensagem": mensagem
     })
 
-
 @app.get("/alunoIncluir", response_class=HTMLResponse)
 async def aluno_incluir(request: Request, auth=Depends(verify_admin)):
     return templates.TemplateResponse("alunoIncluir.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario")
     })
-
 
 @app.post("/alunoIncluir")
 async def aluno_incluir_post(
@@ -598,7 +553,6 @@ async def aluno_incluir_post(
         db.close()
     return RedirectResponse(url="/alunoListar", status_code=303)
 
-
 @app.get("/alunoExcluir", response_class=HTMLResponse)
 async def aluno_excluir(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
@@ -613,7 +567,6 @@ async def aluno_excluir(request: Request, id: int, db=Depends(get_db), auth=Depe
         "nome_usuario": request.session.get("nome_usuario")
     })
 
-
 @app.post("/alunoExcluir")
 async def aluno_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db), auth=Depends(verify_admin)):
     try:
@@ -626,7 +579,6 @@ async def aluno_excluir_post(request: Request, id: int = Form(...), db=Depends(g
     finally:
         db.close()
     return RedirectResponse(url="/alunoListar", status_code=303)
-
 
 @app.get("/alunoAtualizar", response_class=HTMLResponse)
 async def aluno_atualizar(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
@@ -642,7 +594,6 @@ async def aluno_atualizar(request: Request, id: int, db=Depends(get_db), auth=De
         "nome_usuario": request.session.get("nome_usuario")
     })
 
-
 @app.post("/alunoAtualizar")
 async def aluno_atualizar_post(
     request: Request,
@@ -655,11 +606,7 @@ async def aluno_atualizar_post(
 ):
     try:
         with db.cursor() as cursor:
-            #att cpf e senha nao é aqui
-            cursor.execute(
-                "UPDATE Aluno SET nome=%s, telefone=%s, email=%s WHERE id=%s",
-                (nome, telefone, email, id)
-            )
+            cursor.execute("UPDATE Aluno SET nome=%s, telefone=%s, email=%s WHERE id=%s", (nome, telefone, email, id))
             db.commit()
         request.session["mensagem"] = "Cadastro do aluno atualizado com sucesso!"
     except Exception as e:
@@ -702,15 +649,6 @@ async def aluno_senha_post(
         db.close()
     return RedirectResponse(url="/alunoListar", status_code=303)
 
-
-
-
-
-
-
-
-
-
 # ── Aula CRUD ────────────────────────────────────────────────────────────────
 
 @app.get("/aulaListar", response_class=HTMLResponse)
@@ -726,16 +664,13 @@ async def listar_aulas(request: Request, db=Depends(get_db), auth=Depends(verify
             aulas = cursor.fetchall()
     finally:
         db.close()
-        
     for aula in aulas:
         if aula["data"]:
             d = aula["data"]
             aula["data_fmt"] = d.strftime("%d/%m/%Y") if hasattr(d, "strftime") else str(d)
         else:
             aula["data_fmt"] = "-"
-            
     mensagem = request.session.pop("mensagem", None)
-    
     return templates.TemplateResponse("aulaListar.html", {
         "request": request,
         "aulas": aulas,
@@ -744,7 +679,6 @@ async def listar_aulas(request: Request, db=Depends(get_db), auth=Depends(verify
         "perfil": request.session.get("perfil"),
         "mensagem": mensagem
     })
-
 
 @app.get("/aulaIncluir", response_class=HTMLResponse)
 async def aula_incluir(request: Request, db=Depends(get_db), auth=Depends(verify_admin)):
@@ -759,7 +693,6 @@ async def aula_incluir(request: Request, db=Depends(get_db), auth=Depends(verify
         "professores": professores,
         "nome_usuario": request.session.get("nome_usuario")
     })
-
 
 @app.post("/aulaIncluir")
 async def aula_incluir_post(
@@ -785,7 +718,6 @@ async def aula_incluir_post(
         db.close()
     return RedirectResponse(url="/aulaListar", status_code=303)
 
-
 @app.get("/aulaExcluir", response_class=HTMLResponse)
 async def aula_excluir(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
@@ -805,7 +737,6 @@ async def aula_excluir(request: Request, id: int, db=Depends(get_db), auth=Depen
         "nome_usuario": request.session.get("nome_usuario")
     })
 
-
 @app.post("/aulaExcluir")
 async def aula_excluir_post(request: Request, id: int = Form(...), db=Depends(get_db), auth=Depends(verify_admin)):
     try:
@@ -818,7 +749,6 @@ async def aula_excluir_post(request: Request, id: int = Form(...), db=Depends(ge
     finally:
         db.close()
     return RedirectResponse(url="/aulaListar", status_code=303)
-
 
 @app.get("/aulaAtualizar", response_class=HTMLResponse)
 async def aula_atualizar(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
@@ -839,7 +769,6 @@ async def aula_atualizar(request: Request, id: int, db=Depends(get_db), auth=Dep
         "professores": professores,
         "nome_usuario": request.session.get("nome_usuario")
     })
-
 
 @app.post("/aulaAtualizar")
 async def aula_atualizar_post(
@@ -865,38 +794,3 @@ async def aula_atualizar_post(
     finally:
         db.close()
     return RedirectResponse(url="/aulaListar", status_code=303)
-
-
-
-
-
-
-
-
-ulaListar", status_code=303)
-
-
-
-
-
-
-
-
-sponse(url="/aulaListar", status_code=303)
-
-
-
-
-
-
-
-
-ulaListar", status_code=303)
-
-
-
-
-
-
-
-
