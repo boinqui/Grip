@@ -18,8 +18,8 @@
                 <div class="msg-ic" id="modalIcon">!</div>
                 <div class="msg-txt">
                     <!--DAL PRA-->
-                    <h4 id="modalTitle">Título da Mensagem</h4>
-                    <p id="modalDescription">Descrição detalhada da informação ou erro.</p>
+                    <h4 id="modalTitle">{% if 'Erro' in mensagem or 'inválido' in mensagem %}Erro{% else %}Sucesso{% endif %}</h4>
+                    <p id="modalDescription">{{ mensagem }}</p>
                 </div>
             </div>
 

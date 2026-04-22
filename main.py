@@ -637,6 +637,9 @@ async def aluno_senha_post(
     db=Depends(get_db),
     auth=Depends(verify_admin)
 ):
+    if not validate_password(nova_senha):
+        request.session["mensagem"] = "Erro: Senha muito fraca"
+        return RedirectResponse(url="/alunoListar", status_code=303)
     try:
         with db.cursor() as cursor:
             senha_hash = hash_password(nova_senha)
