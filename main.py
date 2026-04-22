@@ -8,6 +8,9 @@ import secrets
 def validate_email(email: str) -> bool:
     return bool(re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email))
 
+def validate_cpf(cpf: str) -> bool:
+    return bool(re.match(r"^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$", cpf))
+
 from mangum import Mangum
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -307,7 +310,14 @@ async def cadastrar_usuario(
     telefone: str = Form(""),
     db=Depends(get_db)
 ):
-    try:
+    if not validate_email(email) or not validate_cpf(cpf):
+        return templates.TemplateResponse("cadastro.html", {
+            "request": request,
+            "error": "Dados inválidos"
+        })
+
+    if senha != confirmar_senha:
+
         if confirmar_senha and senha != confirmar_senha:
             request.session["mensagem"] = "Erro: As senhas não coincidem!"
             return RedirectResponse(url="/cadastro", status_code=303)
