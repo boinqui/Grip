@@ -126,11 +126,11 @@ async def login_get(request: Request):
             return RedirectResponse(url="/profPerfil", status_code=303)
         return RedirectResponse(url="/alunoPerfil", status_code=303)
     
-    login_error = request.session.pop("login_error", None)
+    mensagem = request.session.pop("mensagem", None)
     
     return templates.TemplateResponse("login.html", {
         "request": request,
-        "login_error": login_error
+        "mensagem": mensagem
     })
 
 @app.get("/aulas", response_class=HTMLResponse)
@@ -185,13 +185,13 @@ async def login(
     if not validate_email(Email):
         return templates.TemplateResponse("login.html", {
             "request": request,
-            "error": "E-mail inválido"
+            "mensagem": "Erro: E-mail inválido"
         })
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, senha FROM Professor WHERE email = %s", (Email,))
             professor = cursor.fetchone()
-            
+
             if professor and verify_password(Senha, professor["senha"]):
                 request.session["user_logged_in"] = True
                 request.session["usuario_id"] = professor["id"]
@@ -210,10 +210,8 @@ async def login(
                 request.session["perfil"] = "user"
                 return RedirectResponse(url="/alunoPerfil", status_code=303)
 
-            request.session["login_error"] = "E-mail ou senha incorretos."
-            request.session["show_login_modal"] = True
-            return RedirectResponse(url="/login", status_code=303)
-    finally:
+            request.session["mensagem"] = "Erro: E-mail ou senha incorretos."
+            return RedirectResponse(url="/login", status_code=303)    finally:
         db.close()
 
 @app.get("/logout")
@@ -319,7 +317,7 @@ async def cadastrar_usuario(
     if not validate_name(nome) or not validate_email(email) or not validate_cpf(cpf) or not validate_phone(telefone) or not validate_password(senha):
         return templates.TemplateResponse("cadastro.html", {
             "request": request,
-            "error": "Dados inválidos ou formato de nome/e-mail/cpf/telefone/senha incorreto"
+            "mensagem": "Erro: Dados inválidos! Verifique o formato do Nome, E-mail, CPF, Telefone e Senha (mínimo 8 caracteres com letra e número)."
         })
 
     if senha != confirmar_senha:

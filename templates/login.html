@@ -12,6 +12,7 @@
         rel="stylesheet" />
     <link rel="stylesheet" href="/templates/styles/styles.css">
     <link rel="stylesheet" href="/templates/styles/stylecadastro.css">
+    <link rel="stylesheet" href="/templates/styles/stylemensagens.css">
 </head>
 
 <body class="auth-page">
@@ -59,10 +60,6 @@
                 <h2>Bem-vindo de volta</h2>
                 <p class="sub">Entre para continuar sua jornada no ballet</p>
             </div>
-
-            {% if login_error %}
-            <div class="aviso aviso-erro">{{ login_error }}</div>
-            {% endif %}
 
             <form id="loginForm" action="/login" method="POST" class="form">
                 <div class="campo">
@@ -130,6 +127,7 @@
         </div>
     </footer>
 
+    {% include 'modal.html' %}
     <script src="/templates/script/scriptlogin.js"></script>
     <script src="/templates/script/main.js"></script>
 </body>
