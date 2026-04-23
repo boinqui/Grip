@@ -98,56 +98,32 @@
                             <h2>Próximas <em>Aulas</em></h2>
                             <p>Suas aulas agendadas para os próximos dias.</p>
                         </div>
-                        <!--DAL PRA-->
                         <div class="lista-aulas">
+                            {% if aulas %}
+                            {% for aula in aulas %}
                             <div class="item-aula">
-                                <div class="aula-ic">G</div>
+                                <div class="aula-ic">{{ aula.nome[0] | upper if aula.nome else 'A' }}</div>
                                 <div class="aula-info">
-                                    <h4>Ballet Clássico — Intermediário</h4>
-                                    <p>Seg, 28 Abr · 19h00 · Prof.ª Isabella Laurent</p>
+                                    <h4>{{ aula.nome }}</h4>
+                                    <p>
+                                        {{ aula.data_fmt }}
+                                        {% if aula.professor_nome %} · Prof. {{ aula.professor_nome }}{% endif %}
+                                        {% if aula.descricao %} · {{ aula.descricao }}{% endif %}
+                                    </p>
                                 </div>
-                                <span class="aula-badge confirmada">Confirmada</span>
+                                <span class="aula-badge confirmada">Agendada</span>
                             </div>
+                            {% endfor %}
+                            {% else %}
                             <div class="item-aula">
-                                <div class="aula-ic">G</div>
+                                <div class="aula-ic">!</div>
                                 <div class="aula-info">
-                                    <h4>Pontas & Técnica</h4>
-                                    <p>Qua, 30 Abr · 18h30 · Prof.ª Carla Ferraz</p>
+                                    <h4>Nenhuma aula agendada</h4>
+                                    <p>Você ainda não possui aulas futuras cadastradas.</p>
                                 </div>
-                                <span class="aula-badge confirmada">Confirmada</span>
+                                <span class="aula-badge pendente">Sem agenda</span>
                             </div>
-                            <div class="item-aula">
-                                <div class="aula-ic">P</div>
-                                <div class="aula-info">
-                                    <h4>Aula Particular Variações</h4>
-                                    <p>Sex, 02 Mai · 10h00 · Prof.º Geucimar Silva</p>
-                                </div>
-                                <span class="aula-badge pendente">Pendente</span>
-                            </div>
-                            <div class="item-aula">
-                                <div class="aula-ic">G</div>
-                                <div class="aula-info">
-                                    <h4>Ballet Clássico — Intermediário</h4>
-                                    <p>Seg, 05 Mai · 19h00 · Prof.ª Isabella Laurent</p>
-                                </div>
-                                <span class="aula-badge confirmada">Confirmada</span>
-                            </div>
-                            <div class="item-aula">
-                                <div class="aula-ic">G</div>
-                                <div class="aula-info">
-                                    <h4>Pontas & Técnica</h4>
-                                    <p>Qua, 07 Mai · 18h30 · Prof.ª Carla Ferraz</p>
-                                </div>
-                                <span class="aula-badge confirmada">Confirmada</span>
-                            </div>
-                            <div class="item-aula">
-                                <div class="aula-ic">P</div>
-                                <div class="aula-info">
-                                    <h4>Aula Particular — Técnica de Pontas</h4>
-                                    <p>Sex, 09 Mai · 10h00 · Prof.º Geucimar Silva</p>
-                                </div>
-                                <span class="aula-badge confirmada">Confirmada</span>
-                            </div>
+                            {% endif %}
                         </div>
                     </div>
 
@@ -157,20 +133,29 @@
                             <h2>Meu <em>Plano</em></h2>
                             <p>Detalhes da sua assinatura atual.</p>
                         </div>
-                        <!--DAL PRA-->
                         <div class="card-perfil card-mb">
+                            {% if plano_status == 'sem_plano' %}
                             <div class="plano-header">
-                                <span class="plano-label">Plano Atual</span>
+                                <span class="plano-label">Plano</span>
+                                <span class="plano-status">Inativo</span>
+                            </div>
+                            <h3 class="plano-nome">Sem plano cadastrado</h3>
+                            <p class="plano-renovacao">Você ainda não possui um plano ativo vinculado à sua conta.</p>
+                            <ul class="plano-itens">
+                                <li class="plano-item"><span class="plano-check">•</span> Consulte os planos disponíveis</li>
+                                <li class="plano-item"><span class="plano-check">•</span> Escolha a opção ideal para seu ritmo</li>
+                                <li class="plano-item"><span class="plano-check">•</span> Ative seu plano para liberar recursos</li>
+                            </ul>
+                            <a href="/planos" class="btn btn-outline btn-sm btn-block">Ver planos disponíveis</a>
+                            {% else %}
+                            <div class="plano-header">
+                                <span class="plano-label">Plano</span>
                                 <span class="plano-status">Ativo</span>
                             </div>
-                            <h3 class="plano-nome">Profissional</h3>
-                            <p class="plano-renovacao">Renovação em 15 de Maio de 2026</p>
-                            <ul class="plano-itens">
-                                <li class="plano-item"><span class="plano-check">✓</span> Aulas ilimitadas em grupo</li>
-                                <li class="plano-item"><span class="plano-check">✓</span> 4 aulas particulares / mês</li>
-                                <li class="plano-item"><span class="plano-check">✓</span> Acesso ao material online</li>
-                            </ul>
-                            <a href="/planos" class="btn btn-outline btn-sm btn-block">Ver outros planos</a>
+                            <h3 class="plano-nome">Plano ativo</h3>
+                            <p class="plano-renovacao">As informações do plano serão exibidas aqui.</p>
+                            <a href="/planos" class="btn btn-outline btn-sm btn-block">Ver detalhes</a>
+                            {% endif %}
                         </div>
 
                         <div class="card-perfil">

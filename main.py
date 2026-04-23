@@ -33,7 +33,7 @@ templates = Jinja2Templates(directory="templates")
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "dudumysql",
+    "password": "dalpramysql",
     "database": "grip"
 }
 
@@ -108,12 +108,16 @@ async def login_get(request: Request):
         if request.session.get("perfil") == "admin":
             return RedirectResponse(url="/profPerfil", status_code=303)
         return RedirectResponse(url="/alunoPerfil", status_code=303)
-    
+
+    mensagem = request.session.pop("mensagem", None)
     login_error = request.session.pop("login_error", None)
-    
+    if not mensagem and login_error:
+        mensagem = login_error if login_error.startswith("Erro:") else f"Erro: {login_error}"
+
     return templates.TemplateResponse("login.html", {
         "request": request,
-        "login_error": login_error
+        "mensagem": mensagem,
+        "status": "erro" if mensagem else None
     })
 
 @app.get("/aulas", response_class=HTMLResponse)
@@ -190,8 +194,10 @@ async def login(
                 request.session["perfil"] = "user" # <-- Define Aluno como User
                 return RedirectResponse(url="/alunoPerfil", status_code=303)
 
-            request.session["login_error"] = "E-mail ou senha incorretos."
-            request.session["show_login_modal"] = True
+            if not professor and not aluno:
+                request.session["mensagem"] = "Erro: Conta não encontrada."
+            else:
+                request.session["mensagem"] = "Erro: E-mail ou senha incorretos."
             return RedirectResponse(url="/login", status_code=303)
 
     finally:
@@ -217,16 +223,38 @@ async def aluno_perfil(request: Request, db=Depends(get_db)):
     if not request.session.get("user_logged_in"):
         return RedirectResponse(url="/login", status_code=303)
     usuario_id = request.session.get("usuario_id")
+    aulas = []
+    plano_status = "sem_plano"
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno WHERE id = %s", (usuario_id,))
             aluno = cursor.fetchone()
+            cursor.execute("""
+                SELECT A.id, A.nome, A.data, A.descricao, P.nome AS professor_nome
+                FROM Professor_Aluno PA
+                INNER JOIN Aula A ON A.fk_Professor_id = PA.fk_Professor_id
+                LEFT JOIN Professor P ON P.id = A.fk_Professor_id
+                WHERE PA.fk_Aluno_id = %s AND A.data >= CURDATE()
+                ORDER BY A.data ASC, A.id ASC
+                LIMIT 6
+            """, (usuario_id,))
+            aulas = cursor.fetchall()
     finally:
         db.close()
+
+    for aula in aulas:
+        if aula["data"]:
+            d = aula["data"]
+            aula["data_fmt"] = d.strftime("%d/%m/%Y") if hasattr(d, "strftime") else str(d)
+        else:
+            aula["data_fmt"] = "Data não informada"
+
     return templates.TemplateResponse("alunoPerfil.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario"),
         "aluno": aluno,
+        "aulas": aulas,
+        "plano_status": plano_status,
     })
 
 
@@ -851,8 +879,6 @@ def validate_drt(drt: str) -> bool:
 
 def validate_name(name: str) -> bool:
     return bool(re.match(r"^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$", name))
-
-
 
 
 
