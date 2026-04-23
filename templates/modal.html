@@ -1,41 +1,34 @@
-{% if mensagem %}
-<div class="modal-overlay aberto" id="globalModal">
-    <div class="modal-card">
-        <button class="modal-close" onclick="fecharModal()">&times;</button>
+<html lang="pt-br">
 
-        <div id="modalStatusContainer" class="msg-status {% if 'Erro' in mensagem or 'inválido' in mensagem or 'erro' == status %}msg-error{% else %}msg-info{% endif %}">
-            <div class="msg-ic" id="modalIcon">{% if 'Erro' in mensagem or 'inválido' in mensagem or 'erro' == status %}!{% else %}✓{% endif %}</div>
-            <div class="msg-txt">
-                <h4 id="modalTitle">{% if 'Erro' in mensagem or 'inválido' in mensagem or 'erro' == status %}Erro{% else %}Sucesso{% endif %}</h4>
-                <p id="modalDescription">{{ mensagem }}</p>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modal</title>
+    <link rel="stylesheet" href="/templates/styles/styles.css" />
+    <link rel="stylesheet" href="/templates/styles/stylemensagens.css" />
+</head>
+
+<body>
+    
+    <div class="modal-overlay" id="globalModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="fecharModal()">&times;</button>
+
+            <div id="modalStatusContainer" class="msg-status">
+                <div class="msg-ic" id="modalIcon">!</div>
+                <div class="msg-txt">
+                    <!--DAL PRA-->
+                    <h4 id="modalTitle">{% if 'Erro' in mensagem or 'inválido' in mensagem %}Erro{% else %}Sucesso{% endif %}</h4>
+                    <p id="modalDescription">{{ mensagem }}</p>
+                </div>
+            </div>
+
+            <div class="confirmar" style="border-top: none; margin-top: 20px;">
+                <button class="btn btn-primary btn-block" id="modalActionButton"
+                    onclick="fecharModal()">Entendi</button>
             </div>
         </div>
-
-        <div class="confirmar" style="border-top: none; margin-top: 20px;">
-            <button class="btn btn-primary btn-block" id="modalActionButton"
-                onclick="fecharModal()">Entendi</button>
-        </div>
     </div>
-</div>
+</body>
 
-<script>
-    function fecharModal() {
-        const modal = document.getElementById('globalModal');
-        if (modal) {
-            modal.classList.remove('aberto');
-            // Opcional: remover da DOM após a animação se necessário
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
-        }
-    }
-
-    // Fecha o modal se clicar fora do card
-    window.onclick = function(event) {
-        const modal = document.getElementById('globalModal');
-        if (event.target == modal) {
-            fecharModal();
-        }
-    }
-</script>
-{% endif %}
+</html>
