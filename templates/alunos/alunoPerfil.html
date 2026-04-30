@@ -37,7 +37,7 @@
             {% if nome_usuario %}
             <div class="nav-acoes">
                 <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
-                <a href="/logout" class="btn btn-outline btn-sm">Sair</a>
+                <a href="/logout" class="btn btn-secondary btn-sm">Sair</a>
             </div>
             {% else %}
             <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
@@ -146,7 +146,7 @@
                                 <li class="plano-item"><span class="plano-check">•</span> Escolha a opção ideal para seu ritmo</li>
                                 <li class="plano-item"><span class="plano-check">•</span> Ative seu plano para liberar recursos</li>
                             </ul>
-                            <a href="/planos" class="btn btn-outline btn-sm btn-block">Ver planos disponíveis</a>
+                            <a href="/planos" class="btn btn-secondary btn-sm btn-block">Ver planos disponíveis</a>
                             {% else %}
                             <div class="plano-header">
                                 <span class="plano-label">Plano</span>
@@ -154,7 +154,7 @@
                             </div>
                             <h3 class="plano-nome">Plano ativo</h3>
                             <p class="plano-renovacao">As informações do plano serão exibidas aqui.</p>
-                            <a href="/planos" class="btn btn-outline btn-sm btn-block">Ver detalhes</a>
+                            <a href="/planos" class="btn btn-secondary btn-sm btn-block">Ver detalhes</a>
                             {% endif %}
                         </div>
 
