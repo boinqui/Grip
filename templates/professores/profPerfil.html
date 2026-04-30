@@ -38,7 +38,7 @@
             {% if nome_usuario %}
             <div class="nav-acoes">
                 <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
-                <a href="/logout" class="btn btn-outline btn-sm">Sair</a>
+                <a href="/logout" class="btn btn-secondary btn-sm">Sair</a>
             </div>
             {% else %}
             <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
@@ -96,8 +96,8 @@
 
                     <div class="acoes-perfil">
                         <a href="/alunoIncluir" class="btn btn-primary btn-sm">+ Novo Aluno</a>
-                        <a href="/profIncluir" class="btn btn-outline btn-sm">+ Novo Professor</a>
-                        <a href="/aulaIncluir" class="btn btn-outline btn-sm">+ Nova Aula</a>
+                        <a href="/profIncluir" class="btn btn-secondary btn-sm">+ Novo Professor</a>
+                        <a href="/aulaIncluir" class="btn btn-secondary btn-sm">+ Nova Aula</a>
                     </div>
                 </div>
 
@@ -390,7 +390,7 @@
                 <div class="card-perfil card-mb" style="margin-top: 28px;">
                     <h3 class="card-titulo">Alterar Senha</h3>
                     <p class="card-desc">Acesse a página de alteração de senha do seu perfil.</p>
-                    <a href="/profSenha?id={{ professor.id if professor else '' }}" class="btn btn-outline btn-sm">Alterar Senha</a>
+                    <a href="/profSenha?id={{ professor.id if professor else '' }}" class="btn btn-secondary btn-sm">Alterar Senha</a>
                 </div>
 
                 <div class="zona-perigo">

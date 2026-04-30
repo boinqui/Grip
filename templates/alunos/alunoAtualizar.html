@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Professor — Grip</title>
+    <title>Editar Aluno — Grip</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 <body class="min-h-screen bg-zinc-100 px-4 py-10">
-    <header class="topo">
+        <header class="topo">
         <div class="container nav">
             <a href="/" class="logo">
                 <img src="/static/images/logo_grip.svg" alt="logo grip">
@@ -27,7 +27,7 @@
             {% if nome_usuario %}
             <div class="nav-acoes">
                 <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
-                <a href="/logout" class="btn btn-outline btn-sm">Sair</a>
+                <a href="/logout" class="btn btn-secondary btn-sm">Sair</a>
             </div>
             {% else %}
             <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
@@ -39,38 +39,42 @@
         <div class="mb-6">
             <nav class="text-sm text-zinc-400 mb-1">
                 <a href="/" class="hover:text-indigo-500">Home</a> /
-                <a href="/profListar" class="hover:text-indigo-500">Professores</a> / Editar
+                <a href="/alunoListar" class="hover:text-indigo-500">Alunos</a> / Editar
             </nav>
-            <h1 class="text-2xl font-bold text-zinc-900">Editar Professor</h1>
+            <h1 class="text-2xl font-bold text-zinc-900">Editar Aluno</h1>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm p-6">
-            <form action="/profAtualizar" method="POST" class="space-y-4">
-                <input type="hidden" name="id" value="{{ prof.id }}">
+            <form action="/alunoAtualizar" method="POST" class="space-y-4">
+                <input type="hidden" name="id" value="{{ aluno.id }}">
+<div>
+    <label class="block text-sm font-medium text-zinc-700 mb-1">Nome completo</label>
+    <input type="text" name="nome" value="{{ aluno.nome }}" required
+        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" title="O nome deve conter apenas letras."
+        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+</div>
 
-                <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">Nome</label>
-                    <input type="text" name="nome" value="{{ prof.nome }}" required
-                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                </div>
+<div class="grid grid-cols-2 gap-4">
+    <div>
+        <label class="block text-sm font-medium text-zinc-700 mb-1">CPF</label>
+        <input type="text" value="{{ aluno.cpf }}" disabled
+            class="w-full bg-zinc-50 border border-zinc-300 rounded-lg px-3 py-2 text-sm text-zinc-500 cursor-not-allowed">
+    </div>
+    <div>
+        <label class="block text-sm font-medium text-zinc-700 mb-1">Telefone</label>
+        <input type="tel" name="telefone" value="{{ aluno.telefone }}" required
+            pattern="\(?\d{2}\)?\s?9?\d{4}-?\d{4}"
+            class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+    </div>
+</div>
 
-                <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">Registro DRT</label>
-                    <input type="text" name="registro_drt" value="{{ prof.registro_drt }}" required
-                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                </div>
+<div>
+    <label class="block text-sm font-medium text-zinc-700 mb-1">E-mail</label>
+    <input type="email" name="email" value="{{ aluno.email }}" required
+        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+</div>
 
-                <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">CPF</label>
-                    <input type="text" name="cpf" value="{{ prof.cpf }}"
-                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">E-mail</label>
-                    <input type="email" name="email" value="{{ prof.email }}" required
-                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                </div>
 
                 <div>
                     <label class="block text-sm font-medium text-zinc-700 mb-1">Nova Senha <span class="text-zinc-400 font-normal">(deixe em branco para manter)</span></label>
@@ -83,7 +87,7 @@
                         class="flex-1 bg-indigo-500 hover:bg-indigo-400 text-white font-medium py-2 rounded-lg text-sm">
                         Salvar
                     </button>
-                    <a href="/profListar"
+                    <a href="/alunoListar"
                         class="flex-1 text-center border border-zinc-300 text-zinc-600 hover:bg-zinc-50 font-medium py-2 rounded-lg text-sm">
                         Cancelar
                     </a>
@@ -93,7 +97,6 @@
         </div>
 
     </div>
-
     <footer class="rodape" id="sobre">
         <div class="container rodape-in">
             <div class="marca">

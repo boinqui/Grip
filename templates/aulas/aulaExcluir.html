@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trocar Senha Professor — Grip</title>
+    <title>Excluir Aula — Grip</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
-<body class="min-h-screen bg-zinc-100 flex items-center justify-center py-10">
+<body class="min-h-screen bg-zinc-100 px-4 py-10">
     <header class="topo">
         <div class="container nav">
             <a href="/" class="logo">
@@ -27,38 +27,48 @@
             {% if nome_usuario %}
             <div class="nav-acoes">
                 <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
-                <a href="/logout" class="btn btn-outline btn-sm">Sair</a>
+                <a href="/logout" class="btn btn-secondary btn-sm">Sair</a>
             </div>
             {% else %}
             <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
             {% endif %}
         </div>
     </header>
-    <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm">
-        <h1 class="text-2xl font-bold text-zinc-900 mb-2">Trocar Senha</h1>
-        <p class="text-sm text-zinc-500 mb-6">Professor: <strong>{{ prof.nome }}</strong></p>
+    <div class="max-w-md mx-auto">
 
-        <form action="/profSenha" method="POST">
-            <input type="hidden" name="id" value="{{ prof.id }}">
-            
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-zinc-700 mb-1" for="nova_senha">Nova Senha</label>
-                <input type="password" name="nova_senha" id="nova_senha" required
-                    pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$"
-                    title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número."
-                    class="w-full px-4 py-2 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        <div class="mb-6">
+            <nav class="text-sm text-zinc-400 mb-1">
+                <a href="/" class="hover:text-indigo-500">Home</a> /
+                <a href="/aulaListar" class="hover:text-indigo-500">Aulas</a> / Excluir
+            </nav>
+            <h1 class="text-2xl font-bold text-zinc-900">Excluir Aula</h1>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-sm p-6">
+            <p class="text-zinc-600 mb-4">Tem certeza que deseja excluir a aula abaixo?</p>
+
+            <div class="bg-zinc-50 rounded-xl p-4 space-y-2 text-sm mb-6">
+                <div><span class="font-medium text-zinc-700">Nome:</span> {{ aula.nome }}</div>
+                <div><span class="font-medium text-zinc-700">Professor:</span> {{ aula.professor_nome or "-" }}</div>
+                <div><span class="font-medium text-zinc-700">Descrição:</span> {{ aula.descricao }}</div>
             </div>
 
-            <div class="flex gap-3 justify-end mt-6">
-                <a href="/profListar" class="px-4 py-2 text-sm text-zinc-600 hover:text-zinc-900">Cancelar</a>
-                <button type="submit" class="px-4 py-2 bg-indigo-500 hover:bg-indigo-400 text-white text-sm font-medium rounded-lg">
-                    Atualizar Senha
+            <form action="/aulaExcluir" method="POST" class="flex gap-3">
+                <input type="hidden" name="id" value="{{ aula.id }}">
+                <button type="submit"
+                    class="flex-1 bg-red-500 hover:bg-red-400 text-white font-medium py-2 rounded-lg text-sm">
+                    Confirmar Exclusão
                 </button>
-            </div>
-        </form>
+                <a href="/aulaListar"
+                    class="flex-1 text-center border border-zinc-300 text-zinc-600 hover:bg-zinc-50 font-medium py-2 rounded-lg text-sm">
+                    Cancelar
+                </a>
+            </form>
+        </div>
+
     </div>
 
-    <footer class="rodape" id="sobre">
+        <footer class="rodape" id="sobre">
         <div class="container rodape-in">
             <div class="marca">
                 <img src="/static/images/logo_grip.svg" alt="logo grip">
@@ -69,10 +79,10 @@
                 <h4>O Grip</h4>
                 <ul>
                     <li><a href="/">Home</a></li>
-                    <li><a href="/aulas">Aulas</a></li>
-                    <li><a href="/professores">Professores</a></li>
-                    <li><a href="/planos">Planos</a></li>
-                    <li><a href="/sobre">Sobre</a></li>
+                    <li><a href="/templates/aulas">Aulas</a></li>
+                    <li><a href="/templates/professores">Professores</a></li>
+                    <li><a href="/templates/planos">Planos</a></li>
+                    <li><a href="/templates/sobre">Sobre</a></li>
                 </ul>
             </div>
             <div class="col">

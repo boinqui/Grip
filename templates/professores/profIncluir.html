@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Editar Aula — Grip</title>
+    <title>Novo Professor — Grip</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 <body class="min-h-screen bg-zinc-100 px-4 py-10">
@@ -27,7 +27,7 @@
             {% if nome_usuario %}
             <div class="nav-acoes">
                 <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
-                <a href="/logout" class="btn btn-outline btn-sm">Sair</a>
+                <a href="/logout" class="btn btn-secondary btn-sm">Sair</a>
             </div>
             {% else %}
             <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
@@ -39,44 +39,43 @@
         <div class="mb-6">
             <nav class="text-sm text-zinc-400 mb-1">
                 <a href="/" class="hover:text-indigo-500">Home</a> /
-                <a href="/aulaListar" class="hover:text-indigo-500">Aulas</a> / Editar
+                <a href="/profListar" class="hover:text-indigo-500">Professores</a> / Novo
             </nav>
-            <h1 class="text-2xl font-bold text-zinc-900">Editar Aula</h1>
+            <h1 class="text-2xl font-bold text-zinc-900">Novo Professor</h1>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm p-6">
-            <form action="/aulaAtualizar" method="POST" class="space-y-4">
-                <input type="hidden" name="id" value="{{ aula.id }}">
+            <form action="/profIncluir" method="POST" class="space-y-4">
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">Nome da Aula</label>
-                    <input type="text" name="nome" value="{{ aula.nome }}" required
-                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ0-9\s']+" title="O nome da aula deve conter apenas letras e números."
+                    <label class="block text-sm font-medium text-zinc-700 mb-1">Nome</label>
+                    <input type="text" name="nome" required
                         class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">Data</label>
-                    <input type="date" name="data" value="{{ aula.data_fmt }}" required
+                    <label class="block text-sm font-medium text-zinc-700 mb-1">Registro DRT</label>
+                    <input type="text" name="registro_drt" placeholder="DRT-0000" 
+                           pattern="DRT-\d+" title="O registro deve seguir o formato DRT-1234" required
+                           class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-zinc-700 mb-1">CPF</label>
+                    <input type="text" name="cpf" placeholder="000.000.000-00"
                         class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">Professor Responsável</label>
-                    <select name="fk_Professor_id" required
+                    <label class="block text-sm font-medium text-zinc-700 mb-1">E-mail</label>
+                    <input type="email" name="email" required
                         class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                        {% for prof in professores %}
-                        <option value="{{ prof.id }}" {% if prof.id == aula.fk_Professor_id %}selected{% endif %}>
-                            {{ prof.nome }}
-                        </option>
-                        {% endfor %}
-                    </select>
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">Descrição</label>
-                    <textarea name="descricao" rows="3"
-                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 resize-none">{{ aula.descricao }}</textarea>
+                    <label class="block text-sm font-medium text-zinc-700 mb-1">Senha</label>
+                    <input type="password" name="senha" required
+                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
                 </div>
 
                 <div class="flex gap-3 pt-2">
@@ -84,7 +83,7 @@
                         class="flex-1 bg-indigo-500 hover:bg-indigo-400 text-white font-medium py-2 rounded-lg text-sm">
                         Salvar
                     </button>
-                    <a href="/aulaListar"
+                    <a href="/profListar"
                         class="flex-1 text-center border border-zinc-300 text-zinc-600 hover:bg-zinc-50 font-medium py-2 rounded-lg text-sm">
                         Cancelar
                     </a>
@@ -95,7 +94,7 @@
 
     </div>
 
-        <footer class="rodape" id="sobre">
+    <footer class="rodape" id="sobre">
         <div class="container rodape-in">
             <div class="marca">
                 <img src="/static/images/logo_grip.svg" alt="logo grip">
@@ -106,10 +105,10 @@
                 <h4>O Grip</h4>
                 <ul>
                     <li><a href="/">Home</a></li>
-                    <li><a href="/templates/aulas">Aulas</a></li>
-                    <li><a href="/templates/professores">Professores</a></li>
-                    <li><a href="/templates/planos">Planos</a></li>
-                    <li><a href="/templates/sobre">Sobre</a></li>
+                    <li><a href="/aulas">Aulas</a></li>
+                    <li><a href="/professores">Professores</a></li>
+                    <li><a href="/planos">Planos</a></li>
+                    <li><a href="/sobre">Sobre</a></li>
                 </ul>
             </div>
             <div class="col">

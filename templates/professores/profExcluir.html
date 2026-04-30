@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Excluir Aluno — Grip</title>
+    <title>Excluir Professor — Grip</title>
     <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
 </head>
 <body class="min-h-screen bg-zinc-100 px-4 py-10">
@@ -27,41 +27,40 @@
             {% if nome_usuario %}
             <div class="nav-acoes">
                 <a href="/logado" class="btn btn-primary btn-sm">{{ nome_usuario }}</a>
-                <a href="/logout" class="btn btn-outline btn-sm">Sair</a>
+                <a href="/logout" class="btn btn-secondary btn-sm">Sair</a>
             </div>
             {% else %}
             <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
             {% endif %}
         </div>
     </header>
-
     <div class="max-w-md mx-auto">
 
         <div class="mb-6">
             <nav class="text-sm text-zinc-400 mb-1">
                 <a href="/" class="hover:text-indigo-500">Home</a> /
-                <a href="/alunoListar" class="hover:text-indigo-500">Alunos</a> / Excluir
+                <a href="/profListar" class="hover:text-indigo-500">Professores</a> / Excluir
             </nav>
-            <h1 class="text-2xl font-bold text-zinc-900">Excluir Aluno</h1>
+            <h1 class="text-2xl font-bold text-zinc-900">Excluir Professor</h1>
         </div>
 
         <div class="bg-white rounded-2xl shadow-sm p-6">
-            <p class="text-zinc-600 mb-4">Tem certeza que deseja excluir o aluno abaixo?</p>
+            <p class="text-zinc-600 mb-4">Tem certeza que deseja excluir o professor abaixo?</p>
 
             <div class="bg-zinc-50 rounded-xl p-4 space-y-2 text-sm mb-6">
-                <div><span class="font-medium text-zinc-700">Nome:</span> {{ aluno.nome }}</div>
-                <div><span class="font-medium text-zinc-700">CPF:</span> {{ aluno.cpf }}</div>
-                <div><span class="font-medium text-zinc-700">Telefone:</span> {{ aluno.telefone }}</div>
-                <div><span class="font-medium text-zinc-700">E-mail:</span> {{ aluno.email }}</div>
+                <div><span class="font-medium text-zinc-700">Nome:</span> {{ prof.nome }}</div>
+                <div><span class="font-medium text-zinc-700">DRT:</span> {{ prof.registro_drt }}</div>
+                <div><span class="font-medium text-zinc-700">CPF:</span> {{ prof.cpf }}</div>
+                <div><span class="font-medium text-zinc-700">E-mail:</span> {{ prof.email }}</div>
             </div>
 
-            <form action="/alunoExcluir" method="POST" class="flex gap-3">
-                <input type="hidden" name="id" value="{{ aluno.id }}">
+            <form action="/profExcluir" method="POST" class="flex gap-3">
+                <input type="hidden" name="id" value="{{ prof.id }}">
                 <button type="submit"
                     class="flex-1 bg-red-500 hover:bg-red-400 text-white font-medium py-2 rounded-lg text-sm">
                     Confirmar Exclusão
                 </button>
-                <a href="/alunoListar"
+                <a href="/profListar"
                     class="flex-1 text-center border border-zinc-300 text-zinc-600 hover:bg-zinc-50 font-medium py-2 rounded-lg text-sm">
                     Cancelar
                 </a>

@@ -33,7 +33,7 @@ templates = Jinja2Templates(directory="templates")
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "dalpramysql",
+    "password": "carlamysql",
     "database": "grip"
 }
 
@@ -879,7 +879,5 @@ def validate_drt(drt: str) -> bool:
 
 def validate_name(name: str) -> bool:
     return bool(re.match(r"^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$", name))
-
-
 
 
