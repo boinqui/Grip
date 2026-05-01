@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/templates/styles/styles.css" />
     <link rel="stylesheet" href="/templates/styles/stylesnavbar.css" />
     <link rel="stylesheet" href="/templates/styles/stylesfooter.css" />
+    <link rel="stylesheet" href="/templates/styles/styleadmin.css" />
 </head>
 <body>
     <header class="header">
@@ -41,37 +42,37 @@
             {% endif %}
         </div>
     </header>
-    <div >
 
-        <div >
-            <nav >
-                <a href="/" >Home</a> /
-                <a href="/aulaListar" >Aulas</a> / Editar
-            </nav>
-            <h1 >Editar Aula</h1>
+    <div class="admin-page container">
+
+        <div class="admin-header">
+            <div>
+                <nav class="breadcrumb">
+                    <a href="/">Home</a> /
+                    <a href="/aulaListar">Aulas</a> / Editar
+                </nav>
+                <h1>Editar Aula</h1>
+            </div>
         </div>
 
-        <div >
-            <form action="/aulaAtualizar" method="POST" >
+        <div class="form-card">
+            <form action="/aulaAtualizar" method="POST" class="admin-form">
                 <input type="hidden" name="id" value="{{ aula.id }}">
 
-                <div>
-                    <label >Nome da Aula</label>
+                <div class="admin-campo">
+                    <label>Nome da Aula</label>
                     <input type="text" name="nome" value="{{ aula.nome }}" required
-                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ0-9\s']+" title="O nome da aula deve conter apenas letras e números."
-                        >
+                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ0-9\s']+" title="O nome da aula deve conter apenas letras e números.">
                 </div>
 
-                <div>
-                    <label >Data</label>
-                    <input type="date" name="data" value="{{ aula.data_fmt }}" required
-                        >
+                <div class="admin-campo">
+                    <label>Data</label>
+                    <input type="date" name="data" value="{{ aula.data_fmt }}" required>
                 </div>
 
-                <div>
-                    <label >Professor Responsável</label>
-                    <select name="fk_Professor_id" required
-                        >
+                <div class="admin-campo">
+                    <label>Professor Responsável</label>
+                    <select name="fk_Professor_id" required>
                         {% for prof in professores %}
                         <option value="{{ prof.id }}" {% if prof.id == aula.fk_Professor_id %}selected{% endif %}>
                             {{ prof.nome }}
@@ -80,21 +81,14 @@
                     </select>
                 </div>
 
-                <div>
-                    <label >Descrição</label>
-                    <textarea name="descricao" rows="3"
-                        >{{ aula.descricao }}</textarea>
+                <div class="admin-campo">
+                    <label>Descrição</label>
+                    <textarea name="descricao" rows="3">{{ aula.descricao }}</textarea>
                 </div>
 
-                <div >
-                    <button type="submit"
-                        >
-                        Salvar
-                    </button>
-                    <a href="/aulaListar"
-                        >
-                        Cancelar
-                    </a>
+                <div class="form-acoes">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <a href="/aulaListar" class="btn btn-secondary">Cancelar</a>
                 </div>
 
             </form>
@@ -102,7 +96,7 @@
 
     </div>
 
-        <footer class="rodape" id="sobre">
+    <footer class="rodape" id="sobre">
         <div class="container rodape-in">
             <div class="marca">
                 <img src="/static/images/logo_grip.svg" alt="logo grip">
@@ -113,10 +107,10 @@
                 <h4>O Grip</h4>
                 <ul>
                     <li><a href="/">Home</a></li>
-                    <li><a href="/templates/aulas">Aulas</a></li>
-                    <li><a href="/templates/professores">Professores</a></li>
-                    <li><a href="/templates/planos">Planos</a></li>
-                    <li><a href="/templates/sobre">Sobre</a></li>
+                    <li><a href="/aulas">Aulas</a></li>
+                    <li><a href="/professores">Professores</a></li>
+                    <li><a href="/planos">Planos</a></li>
+                    <li><a href="/sobre">Sobre</a></li>
                 </ul>
             </div>
             <div class="col">
@@ -133,5 +127,7 @@
             <p>© 2026 Grip. Todos os direitos reservados.</p>
         </div>
     </footer>
+
+    <script src="/templates/script/main.js"></script>
 </body>
 </html>

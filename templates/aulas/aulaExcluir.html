@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/templates/styles/styles.css" />
     <link rel="stylesheet" href="/templates/styles/stylesnavbar.css" />
     <link rel="stylesheet" href="/templates/styles/stylesfooter.css" />
+    <link rel="stylesheet" href="/templates/styles/styleadmin.css" />
 </head>
 <body>
     <header class="header">
@@ -41,41 +42,40 @@
             {% endif %}
         </div>
     </header>
-    <div >
 
-        <div >
-            <nav >
-                <a href="/" >Home</a> /
-                <a href="/aulaListar" >Aulas</a> / Excluir
-            </nav>
-            <h1 >Excluir Aula</h1>
+    <div class="admin-page container">
+
+        <div class="admin-header">
+            <div>
+                <nav class="breadcrumb">
+                    <a href="/">Home</a> /
+                    <a href="/aulaListar">Aulas</a> / Excluir
+                </nav>
+                <h1>Excluir Aula</h1>
+            </div>
         </div>
 
-        <div >
-            <p >Tem certeza que deseja excluir a aula abaixo?</p>
+        <div class="delete-card">
+            <p class="delete-aviso">Tem certeza que deseja excluir a aula abaixo?</p>
 
-            <div >
-                <div><span >Nome:</span> {{ aula.nome }}</div>
-                <div><span >Professor:</span> {{ aula.professor_nome or "-" }}</div>
-                <div><span >Descrição:</span> {{ aula.descricao }}</div>
+            <div class="delete-info">
+                <div><span>Nome:</span> {{ aula.nome }}</div>
+                <div><span>Professor:</span> {{ aula.professor_nome or "-" }}</div>
+                <div><span>Descrição:</span> {{ aula.descricao }}</div>
             </div>
 
-            <form action="/aulaExcluir" method="POST" >
+            <form action="/aulaExcluir" method="POST">
                 <input type="hidden" name="id" value="{{ aula.id }}">
-                <button type="submit"
-                    >
-                    Confirmar Exclusão
-                </button>
-                <a href="/aulaListar"
-                    >
-                    Cancelar
-                </a>
+                <div class="form-acoes">
+                    <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                    <a href="/aulaListar" class="btn btn-secondary">Cancelar</a>
+                </div>
             </form>
         </div>
 
     </div>
 
-        <footer class="rodape" id="sobre">
+    <footer class="rodape" id="sobre">
         <div class="container rodape-in">
             <div class="marca">
                 <img src="/static/images/logo_grip.svg" alt="logo grip">
@@ -86,10 +86,10 @@
                 <h4>O Grip</h4>
                 <ul>
                     <li><a href="/">Home</a></li>
-                    <li><a href="/templates/aulas">Aulas</a></li>
-                    <li><a href="/templates/professores">Professores</a></li>
-                    <li><a href="/templates/planos">Planos</a></li>
-                    <li><a href="/templates/sobre">Sobre</a></li>
+                    <li><a href="/aulas">Aulas</a></li>
+                    <li><a href="/professores">Professores</a></li>
+                    <li><a href="/planos">Planos</a></li>
+                    <li><a href="/sobre">Sobre</a></li>
                 </ul>
             </div>
             <div class="col">
@@ -106,5 +106,7 @@
             <p>© 2026 Grip. Todos os direitos reservados.</p>
         </div>
     </footer>
+
+    <script src="/templates/script/main.js"></script>
 </body>
 </html>

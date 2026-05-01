@@ -32,11 +32,17 @@
 }
 
 .lista-espec {
-    gap: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 16px;
 }
 
 .espec {
-    padding: 32px !important;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 24px !important;
     border: 1px solid #ece8f5;
     background: #fff;
     border-radius: 20px !important;
@@ -50,6 +56,10 @@
 }
 
 .espec .nivel-ic {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
     background: linear-gradient(135deg, #f3eeff 0%, #e8e0ff 100%);
     color: #6c47ff;
     width: 50px;
@@ -58,19 +68,18 @@
     font-weight: 700;
     font-size: 1.1rem;
     border-radius: 14px;
-    flex-shrink: 0;
 }
 
 .espec-destaque {
-    background: linear-gradient(145deg, #6c47ff, #5b36e0) !important;
+    background: linear-gradient(145deg, #6c47ff, #5b36e0);
     color: #fff !important;
     border: none !important;
     transform: scale(1.05);
     box-shadow: 0 25px 50px rgba(108, 71, 255, 0.2);
 }
 
-.espec-destaque h4 { color: #fff !important; }
-.espec-destaque p { color: rgba(255, 255, 255, 0.85) !important; }
+.espec-destaque h4 { color: #fff; }
+.espec-destaque p { color: rgba(255, 255, 255, 0.85); }
 .espec-destaque .nivel-ic { 
     background: rgba(255, 255, 255, 0.2); 
     color: #fff; 
