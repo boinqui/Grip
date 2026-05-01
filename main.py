@@ -114,7 +114,7 @@ async def login_get(request: Request):
     if not mensagem and login_error:
         mensagem = login_error if login_error.startswith("Erro:") else f"Erro: {login_error}"
 
-    return templates.TemplateResponse("login.html", {
+    return templates.TemplateResponse("cadastrologin/login.html", {
         "request": request,
         "mensagem": mensagem,
         "status": "erro" if mensagem else None
@@ -122,7 +122,7 @@ async def login_get(request: Request):
 
 @app.get("/aulas", response_class=HTMLResponse)
 async def aulas_page(request: Request):
-    return templates.TemplateResponse("aulas.html", {
+    return templates.TemplateResponse("aulas/aulas.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario")
     })
@@ -130,7 +130,7 @@ async def aulas_page(request: Request):
 
 @app.get("/professores", response_class=HTMLResponse)
 async def professores_page(request: Request):
-    return templates.TemplateResponse("professores.html", {
+    return templates.TemplateResponse("professores/professores.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario")
     })
@@ -154,7 +154,7 @@ async def sobre_page(request: Request):
 
 @app.get("/professor-perfil", response_class=HTMLResponse)
 async def professor_perfil(request: Request):
-    return templates.TemplateResponse("professor-perfil.html", {
+    return templates.TemplateResponse("professores/professor-perfil.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario")
     })
@@ -249,7 +249,7 @@ async def aluno_perfil(request: Request, db=Depends(get_db)):
         else:
             aula["data_fmt"] = "Data não informada"
 
-    return templates.TemplateResponse("alunoPerfil.html", {
+    return templates.TemplateResponse("alunos/alunoPerfil.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario"),
         "aluno": aluno,
@@ -290,7 +290,7 @@ async def prof_perfil(request: Request, db=Depends(get_db)):
 
     mensagem = request.session.pop("mensagem", None)
 
-    return templates.TemplateResponse("profPerfil.html", {
+    return templates.TemplateResponse("professores/profPerfil.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario"),
         "perfil": request.session.get("perfil"),
@@ -308,7 +308,7 @@ async def prof_perfil(request: Request, db=Depends(get_db)):
 @app.get("/cadastro", response_class=HTMLResponse)
 async def cadastro_page(request: Request):
     mensagem = request.session.pop("mensagem", None)
-    return templates.TemplateResponse("cadastro.html", {
+    return templates.TemplateResponse("cadastrologin/cadastro.html", {
         "request": request,
         "mensagem": mensagem
     })
@@ -377,7 +377,7 @@ async def listar_professores(request: Request, db=Depends(get_db)):
         
     mensagem = request.session.pop("mensagem", None)
     
-    return templates.TemplateResponse("profListar.html", {
+    return templates.TemplateResponse("professores/profListar.html", {
         "request": request,
         "professores": professores,
         "hoje": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
@@ -391,7 +391,7 @@ async def listar_professores(request: Request, db=Depends(get_db)):
 async def prof_incluir(request: Request, auth=Depends(verify_admin)):
     if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
         return RedirectResponse(url="/profListar", status_code=303)
-    return templates.TemplateResponse("profIncluir.html", {
+    return templates.TemplateResponse("professores/profIncluir.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario")
     })
@@ -432,7 +432,7 @@ async def prof_excluir(request: Request, id: int, db=Depends(get_db), auth=Depen
             professor = cursor.fetchone()
     finally:
         db.close()
-    return templates.TemplateResponse("profExcluir.html", {
+    return templates.TemplateResponse("professores/profExcluir.html", {
         "request": request,
         "prof": professor,
         "nome_usuario": request.session.get("nome_usuario")
@@ -461,7 +461,7 @@ async def prof_atualizar(request: Request, id: int, db=Depends(get_db), auth=Dep
             professor = cursor.fetchone()
     finally:
         db.close()
-    return templates.TemplateResponse("profAtualizar.html", {
+    return templates.TemplateResponse("professores/profAtualizar.html", {
         "request": request,
         "prof": professor,
         "nome_usuario": request.session.get("nome_usuario")
@@ -500,7 +500,7 @@ async def prof_senha(request: Request, id: int, db=Depends(get_db), auth=Depends
             professor = cursor.fetchone()
     finally:
         db.close()
-    return templates.TemplateResponse("profSenha.html", {
+    return templates.TemplateResponse("professores/profSenha.html", {
         "request": request,
         "prof": professor,
         "nome_usuario": request.session.get("nome_usuario")
@@ -550,7 +550,7 @@ async def listar_alunos(request: Request, db=Depends(get_db), auth=Depends(verif
         
     mensagem = request.session.pop("mensagem", None)
     
-    return templates.TemplateResponse("alunoListar.html", {
+    return templates.TemplateResponse("alunos/alunoListar.html", {
         "request": request,
         "alunos": alunos,
         "hoje": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
@@ -562,7 +562,7 @@ async def listar_alunos(request: Request, db=Depends(get_db), auth=Depends(verif
 
 @app.get("/alunoIncluir", response_class=HTMLResponse)
 async def aluno_incluir(request: Request, auth=Depends(verify_admin)):
-    return templates.TemplateResponse("alunoIncluir.html", {
+    return templates.TemplateResponse("alunos/alunoIncluir.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario")
     })
@@ -603,7 +603,7 @@ async def aluno_excluir(request: Request, id: int, db=Depends(get_db), auth=Depe
             aluno = cursor.fetchone()
     finally:
         db.close()
-    return templates.TemplateResponse("alunoExcluir.html", {
+    return templates.TemplateResponse("alunos/alunoExcluir.html", {
         "request": request,
         "aluno": aluno,
         "nome_usuario": request.session.get("nome_usuario")
@@ -632,7 +632,7 @@ async def aluno_atualizar(request: Request, id: int, db=Depends(get_db), auth=De
             aluno = cursor.fetchone()
     finally:
         db.close()
-    return templates.TemplateResponse("alunoAtualizar.html", {
+    return templates.TemplateResponse("alunos/alunoAtualizar.html", {
         "request": request,
         "aluno": aluno,
         "nome_usuario": request.session.get("nome_usuario")
@@ -672,7 +672,7 @@ async def aluno_senha(request: Request, id: int, db=Depends(get_db), auth=Depend
             aluno = cursor.fetchone()
     finally:
         db.close()
-    return templates.TemplateResponse("alunoSenha.html", {
+    return templates.TemplateResponse("alunos/alunoSenha.html", {
         "request": request,
         "aluno": aluno,
         "nome_usuario": request.session.get("nome_usuario")
@@ -732,7 +732,7 @@ async def listar_aulas(request: Request, db=Depends(get_db), auth=Depends(verify
             
     mensagem = request.session.pop("mensagem", None)
     
-    return templates.TemplateResponse("aulaListar.html", {
+    return templates.TemplateResponse("aulas/aulaListar.html", {
         "request": request,
         "aulas": aulas,
         "hoje": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
@@ -750,7 +750,7 @@ async def aula_incluir(request: Request, db=Depends(get_db), auth=Depends(verify
             professores = cursor.fetchall()
     finally:
         db.close()
-    return templates.TemplateResponse("aulaIncluir.html", {
+    return templates.TemplateResponse("aulas/aulaIncluir.html", {
         "request": request,
         "professores": professores,
         "nome_usuario": request.session.get("nome_usuario")
@@ -795,7 +795,7 @@ async def aula_excluir(request: Request, id: int, db=Depends(get_db), auth=Depen
             aula = cursor.fetchone()
     finally:
         db.close()
-    return templates.TemplateResponse("aulaExcluir.html", {
+    return templates.TemplateResponse("aulas/aulaExcluir.html", {
         "request": request,
         "aula": aula,
         "nome_usuario": request.session.get("nome_usuario")
@@ -829,7 +829,7 @@ async def aula_atualizar(request: Request, id: int, db=Depends(get_db), auth=Dep
     if aula and aula["data"]:
         d = aula["data"]
         aula["data_fmt"] = d.strftime("%Y-%m-%d") if hasattr(d, "strftime") else str(d)
-    return templates.TemplateResponse("aulaAtualizar.html", {
+    return templates.TemplateResponse("aulas/aulaAtualizar.html", {
         "request": request,
         "aula": aula,
         "professores": professores,

@@ -4,15 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Novo Professor — Grip</title>
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="/templates/styles/styles.css" />
+    <link rel="stylesheet" href="/templates/styles/stylesnavbar.css" />
+    <link rel="stylesheet" href="/templates/styles/stylesfooter.css" />
 </head>
-<body class="min-h-screen bg-zinc-100 px-4 py-10">
-    <header class="topo">
+<body>
+    <header class="header">
         <div class="container nav">
             <a href="/" class="logo">
                 <img src="/static/images/logo_grip.svg" alt="logo grip">
             </a>
-            <nav class="menu" aria-label="Navegação principal">
+            <nav class="navbar" aria-label="Navegação principal">
                 <a href="/">Home</a>
                 <a href="/aulas">Aulas</a>
                 <a href="/professores">Professores</a>
@@ -34,57 +41,57 @@
             {% endif %}
         </div>
     </header>
-    <div class="max-w-xl mx-auto">
+    <div >
 
-        <div class="mb-6">
-            <nav class="text-sm text-zinc-400 mb-1">
-                <a href="/" class="hover:text-indigo-500">Home</a> /
-                <a href="/profListar" class="hover:text-indigo-500">Professores</a> / Novo
+        <div >
+            <nav >
+                <a href="/" >Home</a> /
+                <a href="/profListar" >Professores</a> / Novo
             </nav>
-            <h1 class="text-2xl font-bold text-zinc-900">Novo Professor</h1>
+            <h1 >Novo Professor</h1>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-sm p-6">
-            <form action="/profIncluir" method="POST" class="space-y-4">
+        <div >
+            <form action="/profIncluir" method="POST" >
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">Nome</label>
+                    <label >Nome</label>
                     <input type="text" name="nome" required
-                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        >
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">Registro DRT</label>
+                    <label >Registro DRT</label>
                     <input type="text" name="registro_drt" placeholder="DRT-0000" 
                            pattern="DRT-\d+" title="O registro deve seguir o formato DRT-1234" required
-                           class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                           >
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">CPF</label>
+                    <label >CPF</label>
                     <input type="text" name="cpf" placeholder="000.000.000-00"
-                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        >
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">E-mail</label>
+                    <label >E-mail</label>
                     <input type="email" name="email" required
-                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        >
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-zinc-700 mb-1">Senha</label>
+                    <label >Senha</label>
                     <input type="password" name="senha" required
-                        class="w-full border border-zinc-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+                        >
                 </div>
 
-                <div class="flex gap-3 pt-2">
+                <div >
                     <button type="submit"
-                        class="flex-1 bg-indigo-500 hover:bg-indigo-400 text-white font-medium py-2 rounded-lg text-sm">
+                        >
                         Salvar
                     </button>
                     <a href="/profListar"
-                        class="flex-1 text-center border border-zinc-300 text-zinc-600 hover:bg-zinc-50 font-medium py-2 rounded-lg text-sm">
+                        >
                         Cancelar
                     </a>
                 </div>
