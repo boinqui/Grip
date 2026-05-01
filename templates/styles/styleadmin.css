@@ -199,3 +199,138 @@ table .nome-cell {
     .atalhos-grid { grid-template-columns: 1fr 1fr; }
     .admin-search input { width: 100%; }
 }
+
+
+/* PÁGINA ADMIN */
+
+.admin-page {
+    padding: 48px 0 80px;
+}
+
+.breadcrumb {
+    font-size: 13px;
+    color: #8b8aa1;
+    margin-bottom: 6px;
+}
+
+.breadcrumb a {
+    color: #8b8aa1;
+}
+
+.breadcrumb a:hover {
+    color: #6c47ff;
+}
+
+
+/* FORMULÁRIO ADMIN */
+
+.form-card {
+    background: #fff;
+    border-radius: 18px;
+    border: 1px solid #ece8f5;
+    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    padding: 32px;
+    max-width: 600px;
+}
+
+.admin-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.admin-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.admin-campo label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #1a1830;
+}
+
+.admin-campo input,
+.admin-campo select,
+.admin-campo textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid rgba(124, 92, 255, 0.2);
+    border-radius: 12px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    color: #1a1830;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.admin-campo input:focus,
+.admin-campo select:focus,
+.admin-campo textarea:focus {
+    border-color: #7c5cff;
+    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.14);
+}
+
+.admin-campo textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.form-acoes {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+}
+
+
+/* PÁGINA DE EXCLUSÃO */
+
+.delete-card {
+    background: #fff;
+    border-radius: 18px;
+    border: 1px solid #ece8f5;
+    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    padding: 32px;
+    max-width: 600px;
+}
+
+.delete-aviso {
+    font-size: 15px;
+    color: #4a4761;
+    margin-bottom: 20px;
+}
+
+.delete-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 20px;
+    background: #f7f5fb;
+    border-radius: 12px;
+    margin-bottom: 28px;
+}
+
+.delete-info div {
+    font-size: 14px;
+    color: #4a4761;
+}
+
+.delete-info span {
+    font-weight: 600;
+    color: #1a1830;
+    margin-right: 6px;
+}
+
+.btn-danger {
+    background: #dc2626;
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.25);
+}
+
+.btn-danger:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}

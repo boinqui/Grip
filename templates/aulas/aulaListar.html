@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="/templates/styles/styles.css" />
     <link rel="stylesheet" href="/templates/styles/stylesnavbar.css" />
     <link rel="stylesheet" href="/templates/styles/stylesfooter.css" />
+    <link rel="stylesheet" href="/templates/styles/styleadmin.css" />
 </head>
 <body>
     <header class="header">
@@ -41,22 +42,22 @@
             {% endif %}
         </div>
     </header>
-    <div >
 
-        <div >
+    <div class="admin-page container">
+
+        <div class="admin-header">
             <div>
-                <nav >
-                    <a href="/" >Home</a> / Aulas
+                <nav class="breadcrumb">
+                    <a href="/">Home</a> / Aulas
                 </nav>
-                <h1 >Aulas</h1>
-                <p >{{ hoje }}</p>
+                <h1>Aulas</h1>
+                <p>{{ hoje }}</p>
             </div>
-            <div >
-                <span >{{ nome_usuario }}</span>
+            <div class="admin-search">
                 {% if perfil == "admin" %}
-                <a href="/aulaIncluir" >+ Nova</a>
+                <a href="/aulaIncluir" class="btn btn-primary btn-sm">+ Nova</a>
                 {% endif %}
-                <a href="/logout" >Sair</a>
+                <a href="/logout" class="btn btn-secondary btn-sm">Sair</a>
             </div>
         </div>
 
@@ -64,36 +65,38 @@
             <div class="alert alert-info">{{ mensagem }}</div>
         {% endif %}
 
-        <div >
-            <table >
-                <thead >
+        <div class="table-wrap">
+            <table>
+                <thead>
                     <tr>
-                        <th >Nome</th>
-                        <th >Data</th>
-                        <th >Professor</th>
-                        <th >Descrição</th>
+                        <th>Nome</th>
+                        <th>Data</th>
+                        <th>Professor</th>
+                        <th>Descrição</th>
                         {% if perfil == "admin" %}
-                        <th >Ações</th>
+                        <th class="center">Ações</th>
                         {% endif %}
                     </tr>
                 </thead>
-                <tbody >
+                <tbody>
                     {% for aula in aulas %}
-                    <tr >
-                        <td >{{ aula.nome }}</td>
-                        <td >{{ aula.data_fmt }}</td>
-                        <td >{{ aula.professor_nome or "-" }}</td>
-                        <td >{{ aula.descricao }}</td>
+                    <tr>
+                        <td class="nome-cell">{{ aula.nome }}</td>
+                        <td>{{ aula.data_fmt }}</td>
+                        <td>{{ aula.professor_nome or "-" }}</td>
+                        <td>{{ aula.descricao }}</td>
                         {% if perfil == "admin" %}
-                        <td >
-                            <a href="/aulaAtualizar?id={{ aula.id }}" >Editar</a>
-                            <a href="/aulaExcluir?id={{ aula.id }}" >Excluir</a>
+                        <td>
+                            <div class="acoes-gap">
+                                <a href="/aulaAtualizar?id={{ aula.id }}" class="acao-btn acao-editar">Editar</a>
+                                <a href="/aulaExcluir?id={{ aula.id }}" class="acao-btn acao-excluir">Excluir</a>
+                            </div>
                         </td>
                         {% endif %}
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" >Nenhuma aula cadastrada.</td>
+                        <td colspan="5" class="vazia">Nenhuma aula cadastrada.</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -133,5 +136,7 @@
             <p>© 2026 Grip. Todos os direitos reservados.</p>
         </div>
     </footer>
+
+    <script src="/templates/script/main.js"></script>
 </body>
 </html>
