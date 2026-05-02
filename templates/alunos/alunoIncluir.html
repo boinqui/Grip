@@ -9,9 +9,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="/templates/styles/styles.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesnavbar.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/stylesnavbar.css" />
+    <link rel="stylesheet" href="/static/css/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/styleadmin.css" />
 </head>
 <body>
     <header class="header">
@@ -42,64 +43,55 @@
         </div>
     </header>
 
-    <div >
+    <div class="admin-page container">
 
-        <div >
-            <nav >
-                <a href="/" >Home</a> /
-                <a href="/alunoListar" >Alunos</a> / Novo
-            </nav>
-            <h1 >Novo Aluno</h1>
+        <div class="admin-header">
+            <div>
+                <nav class="breadcrumb">
+                    <a href="/">Home</a> /
+                    <a href="/alunoListar">Alunos</a> / Novo
+                </nav>
+                <h1>Novo Aluno</h1>
+            </div>
         </div>
 
-        <div >
-            <form action="/alunoIncluir" method="POST" >
+        <div class="form-card">
+            <form action="/alunoIncluir" method="POST" class="admin-form">
 
-                <div>
-                    <label >Nome</label>
+                <div class="admin-campo">
+                    <label>Nome</label>
                     <input type="text" name="nome" required
-                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" title="O nome deve conter apenas letras."
-                        >
+                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" title="O nome deve conter apenas letras.">
                 </div>
 
-                <div>
-                    <label >CPF</label>
+                <div class="admin-campo">
+                    <label>CPF</label>
                     <input type="text" name="cpf" placeholder="000.000.000-00"
-                        pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}"
-                        >
+                        pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}">
                 </div>
 
-                <div>
-                    <label >Telefone</label>
+                <div class="admin-campo">
+                    <label>Telefone</label>
                     <input type="tel" name="telefone" placeholder="(41) 99999-9999"
-                        pattern="\(?\d{2}\)?\s?9?\d{4}-?\d{4}"
-                        >
+                        pattern="\(?\d{2}\)?\s?9?\d{4}-?\d{4}">
                 </div>
 
-                <div>
-                    <label >E-mail</label>
+                <div class="admin-campo">
+                    <label>E-mail</label>
                     <input type="email" name="email" required
-                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                        >
+                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
                 </div>
 
-                <div>
-                    <label >Senha</label>
+                <div class="admin-campo">
+                    <label>Senha</label>
                     <input type="password" name="senha" required
                         pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$"
-                        title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número."
-                        >
+                        title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número.">
                 </div>
 
-                <div >
-                    <button type="submit"
-                        >
-                        Salvar
-                    </button>
-                    <a href="/alunoListar"
-                        >
-                        Cancelar
-                    </a>
+                <div class="form-acoes">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <a href="/alunoListar" class="btn btn-secondary">Cancelar</a>
                 </div>
 
             </form>

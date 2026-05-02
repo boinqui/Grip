@@ -9,9 +9,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="/templates/styles/styles.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesnavbar.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/stylesnavbar.css" />
+    <link rel="stylesheet" href="/static/css/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/styleadmin.css" />
 </head>
 <body>
     <header class="header">
@@ -41,36 +42,35 @@
             {% endif %}
         </div>
     </header>
-    <div >
 
-        <div >
-            <nav >
-                <a href="/" >Home</a> /
-                <a href="/profListar" >Professores</a> / Excluir
-            </nav>
-            <h1 >Excluir Professor</h1>
+    <div class="admin-page container">
+
+        <div class="admin-header">
+            <div>
+                <nav class="breadcrumb">
+                    <a href="/">Home</a> /
+                    <a href="/profListar">Professores</a> / Excluir
+                </nav>
+                <h1>Excluir Professor</h1>
+            </div>
         </div>
 
-        <div >
-            <p >Tem certeza que deseja excluir o professor abaixo?</p>
+        <div class="delete-card">
+            <p class="delete-aviso">Tem certeza que deseja excluir o professor abaixo?</p>
 
-            <div >
-                <div><span >Nome:</span> {{ prof.nome }}</div>
-                <div><span >DRT:</span> {{ prof.registro_drt }}</div>
-                <div><span >CPF:</span> {{ prof.cpf }}</div>
-                <div><span >E-mail:</span> {{ prof.email }}</div>
+            <div class="delete-info">
+                <div><span>Nome:</span> {{ prof.nome }}</div>
+                <div><span>DRT:</span> {{ prof.registro_drt }}</div>
+                <div><span>CPF:</span> {{ prof.cpf }}</div>
+                <div><span>E-mail:</span> {{ prof.email }}</div>
             </div>
 
-            <form action="/profExcluir" method="POST" >
+            <form action="/profExcluir" method="POST">
                 <input type="hidden" name="id" value="{{ prof.id }}">
-                <button type="submit"
-                    >
-                    Confirmar Exclusão
-                </button>
-                <a href="/profListar"
-                    >
-                    Cancelar
-                </a>
+                <div class="form-acoes">
+                    <button type="submit" class="btn btn-danger">Confirmar Exclusão</button>
+                    <a href="/profListar" class="btn btn-secondary">Cancelar</a>
+                </div>
             </form>
         </div>
 

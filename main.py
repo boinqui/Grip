@@ -4,6 +4,7 @@ import hashlib
 import hmac
 import secrets
 from mangum import Mangum
+from validators import validate_email, validate_cpf, validate_phone, validate_password, validate_drt, validate_name
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -20,13 +21,11 @@ app.add_middleware(
     session_cookie="grip_session",
     max_age=3600,
     same_site="lax",
-    https_only=True
+    https_only=False
 )
 
 # Arquivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
-app.mount("/templates/styles", StaticFiles(directory="templates/styles"), name="styles")
-app.mount("/templates/script", StaticFiles(directory="templates/script"), name="scripts")
 templates = Jinja2Templates(directory="templates")
 
 # Banco de dados
@@ -321,15 +320,37 @@ async def cadastrar_usuario(
     email: str = Form(...),
     senha: str = Form(...),
     confirmar_senha: str = Form(None),
-    cpf: str = Form(""),
-    telefone: str = Form(""),
+    cpf: str = Form(...),
+    telefone: str = Form(...),
     db=Depends(get_db)
 ):
     try:
         if confirmar_senha and senha != confirmar_senha:
             request.session["mensagem"] = "Erro: As senhas não coincidem!"
             return RedirectResponse(url="/cadastro", status_code=303)
+        
+        #colocando regex aqui
+        if not validate_name(nome):
+            request.session["mensagem"] = "Nome inválido"
+            return RedirectResponse(url="/cadastro", status_code=303)
+        
+        if not validate_email(email):
+            request.session["mensagem"] = "Email inválido"
+            return RedirectResponse(url="/cadastro", status_code=303)
+        
+        if not validate_password(senha):
+            request.session["mensagem"] = "Senha inválida"
+            return RedirectResponse(url="/cadastro", status_code=303)
+        
+        if not validate_cpf(cpf):
+            request.session["mensagem"] = "CPF inválido"
+            return RedirectResponse(url="/cadastro", status_code=303)
 
+        if not validate_phone(telefone):
+            request.session["mensagem"] = "Telefone inválido"
+            return RedirectResponse(url="/cadastro", status_code=303)
+
+#parte do banco
         with db.cursor() as cursor:
             cursor.execute("SELECT id FROM Aluno WHERE email = %s", (email,))
             if cursor.fetchone():
@@ -409,6 +430,25 @@ async def prof_incluir_post(
     auth=Depends(verify_admin)
 ):
     try:
+
+        #regex
+        if not validate_name(nome):
+            request.session["mensagem"] = "Nome inválido"
+            return RedirectResponse(url="/profIncluir", status_code=303)
+        
+        if not validate_email(email):
+            request.session["mensagem"] = "Email inválido"
+            return RedirectResponse(url="/profIncluir", status_code=303)
+        
+        if not validate_password(senha):
+            request.session["mensagem"] = "Senha inválida"
+            return RedirectResponse(url="/profIncluir", status_code=303)
+        
+        if not validate_drt(registro_drt):
+            request.session["mensagem"] = "Registro DRT inválido"
+            return RedirectResponse(url="/profIncluir", status_code=303)
+        
+
         with db.cursor() as cursor:
             senha_hash = hash_password(senha)
             cursor.execute(
@@ -478,6 +518,16 @@ async def prof_atualizar_post(
     auth=Depends(verify_admin)
 ):
     try:
+
+        if not validate_name(nome):
+            request.session["mensagem"] = "Nome inválido"
+            return RedirectResponse(url="/profAtualizar", status_code=303)
+        
+        if not validate_email(email):
+            request.session["mensagem"] = "Email inválido"
+            return RedirectResponse(url="/profAtualizar", status_code=303)
+        
+
         with db.cursor() as cursor:
             # Não atualizamos registro_drt, cpf e senha aqui
             cursor.execute(
@@ -495,6 +545,10 @@ async def prof_atualizar_post(
 @app.get("/profSenha", response_class=HTMLResponse)
 async def prof_senha(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
+
+        
+        
+
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome FROM Professor WHERE id = %s", (id,))
             professor = cursor.fetchone()
@@ -515,6 +569,10 @@ async def prof_senha_post(
     auth=Depends(verify_admin)
 ):
     try:
+        if not validate_password(nova_senha):
+            request.session["mensagem"] = "Senha inválida"
+            return RedirectResponse(url=f"/profSenha?id={id}", status_code=303)
+
         with db.cursor() as cursor:
             senha_hash = hash_password(nova_senha)
             cursor.execute("UPDATE Professor SET senha=%s WHERE id=%s", (senha_hash, id))
@@ -572,14 +630,37 @@ async def aluno_incluir(request: Request, auth=Depends(verify_admin)):
 async def aluno_incluir_post(
     request: Request,
     nome: str = Form(...),
-    cpf: str = Form(""),
-    telefone: str = Form(""),
+    cpf: str = Form(...),
+    telefone: str = Form(...),
     email: str = Form(...),
     senha: str = Form(...),
     db=Depends(get_db),
     auth=Depends(verify_admin)
 ):
     try:
+
+        #regex
+        if not validate_name(nome):
+            request.session["mensagem"] = "Nome inválido"
+            return RedirectResponse(url="/alunoIncluir", status_code=303)
+        
+        if not validate_email(email):
+            request.session["mensagem"] = "Email inválido"
+            return RedirectResponse(url="/alunoIncluir", status_code=303)
+        
+        if not validate_password(senha):
+            request.session["mensagem"] = "Senha inválida"
+            return RedirectResponse(url="/alunoIncluir", status_code=303)
+        
+        if not validate_cpf(cpf):
+            request.session["mensagem"] = "CPF inválido"
+            return RedirectResponse(url="/alunoIncluir", status_code=303)
+
+        if not validate_phone(telefone):
+            request.session["mensagem"] = "Telefone inválido"
+            return RedirectResponse(url="/alunoIncluir", status_code=303)
+
+        #banco
         with db.cursor() as cursor:
             senha_hash = hash_password(senha)
             cursor.execute(
@@ -644,12 +725,28 @@ async def aluno_atualizar_post(
     request: Request,
     id: int = Form(...),
     nome: str = Form(...),
-    telefone: str = Form(""),
+    telefone: str = Form(...),
     email: str = Form(...),
     db=Depends(get_db),
     auth=Depends(verify_admin)
 ):
     try:
+
+        #regex
+        if not validate_name(nome):
+            request.session["mensagem"] = "Nome inválido"
+            return RedirectResponse(url="/alunoAtualizar", status_code=303)
+        
+        if not validate_email(email):
+            request.session["mensagem"] = "Email inválido"
+            return RedirectResponse(url="/alunoAtualizar", status_code=303)
+        
+        if not validate_phone(telefone):
+            request.session["mensagem"] = "Telefone inválido"
+            return RedirectResponse(url="/alunoAtualizar", status_code=303)
+
+
+
         with db.cursor() as cursor:
             #att cpf e senha nao é aqui
             cursor.execute(
@@ -687,6 +784,10 @@ async def aluno_senha_post(
     auth=Depends(verify_admin)
 ):
     try:
+        if not validate_password(nova_senha):
+            request.session["mensagem"] = "Senha inválida"
+            return RedirectResponse(url=f"/alunoSenha?id={id}", status_code=303)
+
         with db.cursor() as cursor:
             senha_hash = hash_password(nova_senha)
             cursor.execute("UPDATE Aluno SET senha=%s WHERE id=%s", (senha_hash, id))
@@ -862,22 +963,5 @@ async def aula_atualizar_post(
         db.close()
     return RedirectResponse(url="/aulaListar", status_code=303)
 
-def validate_email(email: str) -> bool:
-    return bool(re.match(r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", email))
-
-def validate_cpf(cpf: str) -> bool:
-    return bool(re.match(r"^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$", cpf))
-
-def validate_phone(phone: str) -> bool:
-    return bool(re.match(r"^\(?\d{2}\)?\s?9?\d{4}-?\d{4}$", phone))
-
-def validate_password(password: str) -> bool:
-    return bool(re.match(r"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$", password))
-
-def validate_drt(drt: str) -> bool:
-    return bool(re.match(r"^DRT-\d+$", drt))
-
-def validate_name(name: str) -> bool:
-    return bool(re.match(r"^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$", name))
 
 

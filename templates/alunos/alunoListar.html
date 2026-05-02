@@ -9,9 +9,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="/templates/styles/styles.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesnavbar.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/stylesnavbar.css" />
+    <link rel="stylesheet" href="/static/css/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/styleadmin.css" />
 </head>
 <body>
     <header class="header">
@@ -42,22 +43,21 @@
         </div>
     </header>
 
-    <div >
+    <div class="admin-page container">
 
-        <div >
+        <div class="admin-header">
             <div>
-                <nav >
-                    <a href="/" >Home</a> / Alunos
+                <nav class="breadcrumb">
+                    <a href="/">Home</a> / Alunos
                 </nav>
-                <h1 >Alunos</h1>
-                <p >{{ hoje }}</p>
+                <h1>Alunos</h1>
+                <p>{{ hoje }}</p>
             </div>
-            <div >
-                <span >{{ nome_usuario }}</span>
+            <div class="admin-search">
                 {% if perfil == "admin" %}
-                <a href="/alunoIncluir" >+ Novo</a>
+                <a href="/alunoIncluir" class="btn btn-primary btn-sm">+ Novo</a>
                 {% endif %}
-                <a href="/logout" >Sair</a>
+                <a href="/logout" class="btn btn-secondary btn-sm">Sair</a>
             </div>
         </div>
 
@@ -65,37 +65,39 @@
             <div class="alert alert-info">{{ mensagem }}</div>
         {% endif %}
 
-        <div >
-            <table >
-                <thead >
+        <div class="table-wrap">
+            <table>
+                <thead>
                     <tr>
-                        <th >Nome</th>
-                        <th >CPF</th>
-                        <th >Telefone</th>
-                        <th >E-mail</th>
+                        <th>Nome</th>
+                        <th>CPF</th>
+                        <th>Telefone</th>
+                        <th>E-mail</th>
                         {% if perfil == "admin" %}
-                        <th >Ações</th>
+                        <th class="center">Ações</th>
                         {% endif %}
                     </tr>
                 </thead>
-                <tbody >
+                <tbody>
                     {% for aluno in alunos %}
-                    <tr >
-                        <td >{{ aluno.nome }}</td>
-                        <td >{{ aluno.cpf }}</td>
-                        <td >{{ aluno.telefone }}</td>
-                        <td >{{ aluno.email }}</td>
+                    <tr>
+                        <td class="nome-cell">{{ aluno.nome }}</td>
+                        <td>{{ aluno.cpf }}</td>
+                        <td>{{ aluno.telefone }}</td>
+                        <td>{{ aluno.email }}</td>
                         {% if perfil == "admin" %}
-                        <td >
-                            <a href="/alunoAtualizar?id={{ aluno.id }}" >Editar</a>
-                            <a href="/alunoSenha?id={{ aluno.id }}" >Senha</a>
-                            <a href="/alunoExcluir?id={{ aluno.id }}" >Excluir</a>
+                        <td>
+                            <div class="acoes-gap">
+                                <a href="/alunoAtualizar?id={{ aluno.id }}" class="acao-btn acao-editar">Editar</a>
+                                <a href="/alunoSenha?id={{ aluno.id }}" class="acao-btn acao-senha">Senha</a>
+                                <a href="/alunoExcluir?id={{ aluno.id }}" class="acao-btn acao-excluir">Excluir</a>
+                            </div>
                         </td>
                         {% endif %}
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="5" >Nenhum aluno cadastrado.</td>
+                        <td colspan="5" class="vazia">Nenhum aluno cadastrado.</td>
                     </tr>
                     {% endfor %}
                 </tbody>

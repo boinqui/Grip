@@ -10,10 +10,12 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="/templates/styles/styles.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesnavbar.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesfooter.css" />
-    <link rel="stylesheet" href="/templates/styles/styleprofessores.css" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/stylesnavbar.css" />
+    <link rel="stylesheet" href="/static/css/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/styleprofessores.css" />
+    <link rel="stylesheet" href="/static/css/stylescta.css" />
+    <link rel="stylesheet" href="/static/css/stylesindex.css" />
 </head>
 
 <body>
@@ -102,7 +104,6 @@
 
                     <div class="acoes">
                         <a href="#agenda" class="btn btn-primary">Agendar Aula</a>
-                        <button class="btn btn-secondary">Enviar Mensagem</button>
                     </div>
                 </div>
             </div>
@@ -165,16 +166,15 @@
             </div>
         </section>
 
-        <section class="booking" id="aulas">
+           <section class="booking" id="aulas">
             <div class="container sec-titulo center">
                 <span class="eyebrow muted">AULAS AO VIVO</span>
-                <!--DAL PRA-->
-                <h2>Agende uma Aula com <em>nome do professor</em></h2>
-                <p>Agende instrução personalizada para feedback e orientação em tempo real.</p>
+                <h2>Agende uma Aula <em>ao Vivo</em></h2>
+                <p>Agende instrução personalizada com nossos professores especialistas para feedback e orientação em
+                    tempo real.</p>
             </div>
             <div class="container reserva">
                 <div class="field">
-                    <!--DAL PRA-->
                     <label class="rotulo">Tipo de Aula</label>
                     <div class="tipos">
                         <label class="opcao active">
@@ -191,60 +191,26 @@
                 </div>
 
                 <div class="field">
-                    <label class="rotulo">Horários Disponíveis de <em>NOME DO PROFESSOR</em></label>
+                    <label class="rotulo">Selecione o Professor</label>
+                    <div class="abas">
+                        <button class="tab active">Isabella</button>
+                        <button class="tab">Alexander</button>
+                        <button class="tab">Sofia</button>
+                        <button class="tab">Elena</button>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="rotulo">Horários Disponíveis</label>
                     <div class="grade-slots">
-                        <!--DAL PRA-->
-                        <button class="slot active">HORARIO - HORARIO</button>
-                        <button class="slot">HORARIO - HORARIO</button>
-                        <button class="slot">HORARIO - HORARIO</button>
-                        <button class="slot">HORARIO - HORARIO</button>
+                        <button class="slot active">9:30 - 10:30</button>
+                        <button class="slot">11:00 - 12:00</button>
+                        <button class="slot">14:00 - 15:00</button>
+                        <button class="slot">16:30 - 17:30</button>
                     </div>
                 </div>
 
                 <button class="btn btn-primary btn-block">Reservar Horário</button>
-            </div>
-        </section>
-
-        <section class="testimonials">
-            <div class="container sec-titulo center">
-                <span class="eyebrow muted">HISTÓRIAS DE ESTUDANTES</span>
-                <!--DAL PRA-->
-                <h2>O que os estudantes dizem sobre <em>Nome do Professor</em></h2>
-            </div>
-            <div class="container depos">
-                <!--DAL PRA-->
-                <article class="depo">
-                    <div class="stars">★ ★ ★ ★ ★</div>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Odio, qui natus illo eaque eius
-                        laudantium ipsa officia accusamus odit nihil nisi illum iusto, expedita harum incidunt eos
-                        itaque ex doloribus?</p>
-                    <div class="autor">
-                        <strong> Prof. Cristina</strong>
-                        <span>Aluna há 2 anos</span>
-                    </div>
-                </article>
-                <!--DAL PRA-->
-                <article class="depo">
-                    <div class="stars">★ ★ ★ ★ ★</div>
-                    <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Quod officia, asperiores maiores
-                        impedit, necessitatibus ex odio ea saepe numquam illum eos? Deserunt vitae temporibus, aut
-                        repellendus enim corrupti eum numquam!</p>
-                    <div class="autor">
-                        <strong>Prof. Geucimar</strong>
-                        <span>Aluno avançado</span>
-                    </div>
-                </article>
-                <!--DAL PRA-->
-                <article class="depo">
-                    <div class="stars">★ ★ ★ ★ ★</div>
-                    <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Totam quos ducimus sequi nemo laborum
-                        unde amet accusantium, quae ipsum voluptatibus in modi minima optio fugit quas sint adipisci
-                        alias? Deserunt.</p>
-                    <div class="autor">
-                        <strong>Carla Ferraz</strong>
-                        <span>Bailarina profissional</span>
-                    </div>
-                </article>
             </div>
         </section>
 
@@ -298,7 +264,7 @@
         </div>
     </footer>
 
-    <script src="/templates/script/scriptprofessores.js"></script>
+    <script src="/static/js/scriptprofessores.js"></script>
 </body>
 
 </html>
