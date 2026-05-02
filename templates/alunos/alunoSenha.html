@@ -9,9 +9,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="/templates/styles/styles.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesnavbar.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/stylesnavbar.css" />
+    <link rel="stylesheet" href="/static/css/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/styleadmin.css" />
 </head>
 <body>
     <header class="header">
@@ -41,30 +42,41 @@
             {% endif %}
         </div>
     </header>
-    <div >
-        <h1 >Trocar Senha</h1>
-        <p >Aluno: <strong>{{ aluno.nome }}</strong></p>
 
-        <form action="/alunoSenha" method="POST">
-            <input type="hidden" name="id" value="{{ aluno.id }}">
-            
-            <div >
-                <label  for="nova_senha">Nova Senha</label>
-                <input type="password" name="nova_senha" id="nova_senha" required
-                    pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$"
-                    title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número."
-                    >
-            </div>
+    <div class="admin-page container">
 
-            <div >
-                <a href="/alunoListar" >Cancelar</a>
-                <button type="submit" >
-                    Atualizar Senha
-                </button>
+        <div class="admin-header">
+            <div>
+                <nav class="breadcrumb">
+                    <a href="/">Home</a> /
+                    <a href="/alunoListar">Alunos</a> / Trocar Senha
+                </nav>
+                <h1>Trocar Senha</h1>
+                <p>Aluno: <strong>{{ aluno.nome }}</strong></p>
             </div>
-        </form>
+        </div>
+
+        <div class="form-card">
+            <form action="/alunoSenha" method="POST" class="admin-form">
+                <input type="hidden" name="id" value="{{ aluno.id }}">
+
+                <div class="admin-campo">
+                    <label for="nova_senha">Nova Senha</label>
+                    <input type="password" name="nova_senha" id="nova_senha" required
+                        pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$"
+                        title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número.">
+                </div>
+
+                <div class="form-acoes">
+                    <button type="submit" class="btn btn-primary">Atualizar Senha</button>
+                    <a href="/alunoListar" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+
     </div>
-        <footer class="rodape" id="sobre">
+
+    <footer class="rodape" id="sobre">
         <div class="container rodape-in">
             <div class="marca">
                 <img src="/static/images/logo_grip.svg" alt="logo grip">
@@ -75,10 +87,10 @@
                 <h4>O Grip</h4>
                 <ul>
                     <li><a href="/">Home</a></li>
-                    <li><a href="/templates/aulas">Aulas</a></li>
-                    <li><a href="/templates/professores">Professores</a></li>
-                    <li><a href="/templates/planos">Planos</a></li>
-                    <li><a href="/templates/sobre">Sobre</a></li>
+                    <li><a href="/aulas">Aulas</a></li>
+                    <li><a href="/professores">Professores</a></li>
+                    <li><a href="/planos">Planos</a></li>
+                    <li><a href="/sobre">Sobre</a></li>
                 </ul>
             </div>
             <div class="col">

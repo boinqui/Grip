@@ -9,9 +9,10 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="/templates/styles/styles.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesnavbar.css" />
-    <link rel="stylesheet" href="/templates/styles/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/css/stylesnavbar.css" />
+    <link rel="stylesheet" href="/static/css/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/styleadmin.css" />
 </head>
 <body>
     <header class="header">
@@ -41,59 +42,47 @@
             {% endif %}
         </div>
     </header>
-    <div >
 
-        <div >
-            <nav >
-                <a href="/" >Home</a> /
-                <a href="/profListar" >Professores</a> / Editar
-            </nav>
-            <h1 >Editar Professor</h1>
+    <div class="admin-page container">
+
+        <div class="admin-header">
+            <div>
+                <nav class="breadcrumb">
+                    <a href="/">Home</a> /
+                    <a href="/profListar">Professores</a> / Editar
+                </nav>
+                <h1>Editar Professor</h1>
+            </div>
         </div>
 
-        <div >
-            <form action="/profAtualizar" method="POST" >
+        <div class="form-card">
+            <form action="/profAtualizar" method="POST" class="admin-form">
                 <input type="hidden" name="id" value="{{ prof.id }}">
 
-                <div>
-                    <label >Nome</label>
+                <div class="admin-campo">
+                    <label>Nome</label>
                     <input type="text" name="nome" value="{{ prof.nome }}" required
-                        >
+                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" title="O nome deve conter apenas letras.">
                 </div>
 
-                <div>
-                    <label >Registro DRT</label>
-                    <input type="text" name="registro_drt" value="{{ prof.registro_drt }}" required
-                        >
+                <div class="admin-campo">
+                    <label>Registro DRT</label>
+                    <input type="text" value="{{ prof.registro_drt }}" disabled>
                 </div>
 
-                <div>
-                    <label >CPF</label>
-                    <input type="text" name="cpf" value="{{ prof.cpf }}"
-                        >
+                <div class="admin-campo">
+                    <label>CPF</label>
+                    <input type="text" value="{{ prof.cpf }}" disabled>
                 </div>
 
-                <div>
-                    <label >E-mail</label>
-                    <input type="email" name="email" value="{{ prof.email }}" required
-                        >
+                <div class="admin-campo">
+                    <label>E-mail</label>
+                    <input type="email" name="email" value="{{ prof.email }}" required>
                 </div>
 
-                <div>
-                    <label >Nova Senha <span >(deixe em branco para manter)</span></label>
-                    <input readonly disabled type="password" name="senha"
-                        >
-                </div>
-
-                <div >
-                    <button type="submit"
-                        >
-                        Salvar
-                    </button>
-                    <a href="/profListar"
-                        >
-                        Cancelar
-                    </a>
+                <div class="form-acoes">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                    <a href="/profListar" class="btn btn-secondary">Cancelar</a>
                 </div>
 
             </form>
