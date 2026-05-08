@@ -19,7 +19,7 @@ app.add_middleware(
     SessionMiddleware,
     secret_key="grip_secret",
     session_cookie="grip_session",
-    max_age=3600,
+    max_age=5,
     same_site="lax",
     https_only=False
 )
@@ -32,7 +32,7 @@ templates = Jinja2Templates(directory="templates")
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "carlamysql",
+    "password": "dudumysql",
     "database": "grip"
 }
 
@@ -53,7 +53,7 @@ def verify_admin(request: Request):
         raise HTTPException(status_code=303, headers={"Location": "/login"})
     if request.session.get("perfil") != "admin":
         #se nao for admin, vai para /login
-        raise HTTPException(status_code=303, headers={"Location": "/aulaListar"})
+        raise HTTPException(status_code=303, headers={"Location": "/"})
 
 def hash_password(password: str) -> str:
     salt = secrets.token_hex(16)
@@ -461,7 +461,7 @@ async def prof_incluir_post(
         request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
     finally:
         db.close()
-    return RedirectResponse(url="/profListar", status_code=303)
+    return RedirectResponse(url="/profPerfil", status_code=303)
 
 
 @app.get("/profExcluir", response_class=HTMLResponse)
@@ -490,7 +490,7 @@ async def prof_excluir_post(request: Request, id: int = Form(...), db=Depends(ge
         request.session["mensagem"] = f"Erro ao excluir: {str(e)}"
     finally:
         db.close()
-    return RedirectResponse(url="/profListar", status_code=303)
+    return RedirectResponse(url="/profPerfil", status_code=303)
 
 
 @app.get("/profAtualizar", response_class=HTMLResponse)
@@ -540,7 +540,7 @@ async def prof_atualizar_post(
         request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
     finally:
         db.close()
-    return RedirectResponse(url="/profListar", status_code=303)
+    return RedirectResponse(url="/profPerfil", status_code=303)
 
 @app.get("/profSenha", response_class=HTMLResponse)
 async def prof_senha(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
@@ -582,7 +582,7 @@ async def prof_senha_post(
         request.session["mensagem"] = f"Erro ao atualizar senha: {str(e)}"
     finally:
         db.close()
-    return RedirectResponse(url="/profListar", status_code=303)
+    return RedirectResponse(url="/profPerfil", status_code=303)
 
 
 
@@ -673,7 +673,7 @@ async def aluno_incluir_post(
         request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
     finally:
         db.close()
-    return RedirectResponse(url="/alunoListar", status_code=303)
+    return RedirectResponse(url="/profPerfil", status_code=303)
 
 
 @app.get("/alunoExcluir", response_class=HTMLResponse)
@@ -702,7 +702,7 @@ async def aluno_excluir_post(request: Request, id: int = Form(...), db=Depends(g
         request.session["mensagem"] = f"Erro ao excluir: {str(e)}"
     finally:
         db.close()
-    return RedirectResponse(url="/alunoListar", status_code=303)
+    return RedirectResponse(url="/profPerfil", status_code=303)
 
 
 @app.get("/alunoAtualizar", response_class=HTMLResponse)
@@ -759,7 +759,7 @@ async def aluno_atualizar_post(
         request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
     finally:
         db.close()
-    return RedirectResponse(url="/alunoListar", status_code=303)
+    return RedirectResponse(url="/profPerfil", status_code=303)
 
 @app.get("/alunoSenha", response_class=HTMLResponse)
 async def aluno_senha(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
@@ -797,7 +797,7 @@ async def aluno_senha_post(
         request.session["mensagem"] = f"Erro ao atualizar senha: {str(e)}"
     finally:
         db.close()
-    return RedirectResponse(url="/alunoListar", status_code=303)
+    return RedirectResponse(url="/profPerfil", status_code=303)
 
 
 
@@ -880,7 +880,7 @@ async def aula_incluir_post(
         request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
     finally:
         db.close()
-    return RedirectResponse(url="/aulaListar", status_code=303)
+    return RedirectResponse(url="/profPerfil", status_code=303)
 
 
 @app.get("/aulaExcluir", response_class=HTMLResponse)
@@ -914,7 +914,7 @@ async def aula_excluir_post(request: Request, id: int = Form(...), db=Depends(ge
         request.session["mensagem"] = f"Erro ao excluir: {str(e)}"
     finally:
         db.close()
-    return RedirectResponse(url="/aulaListar", status_code=303)
+    return RedirectResponse(url="/profPerfil", status_code=303)
 
 
 @app.get("/aulaAtualizar", response_class=HTMLResponse)
@@ -961,7 +961,7 @@ async def aula_atualizar_post(
         request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
     finally:
         db.close()
-    return RedirectResponse(url="/aulaListar", status_code=303)
+    return RedirectResponse(url="/profPerfil", status_code=303)
 
 
 
