@@ -9,6 +9,7 @@ from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi import UploadFile, File
 from starlette.middleware.sessions import SessionMiddleware
 from datetime import datetime
 
@@ -19,7 +20,7 @@ app.add_middleware(
     SessionMiddleware,
     secret_key="grip_secret",
     session_cookie="grip_session",
-    max_age=5,
+    max_age=3600,
     same_site="lax",
     https_only=False
 )
@@ -91,14 +92,37 @@ def verify_password(plain_password: str, stored_password: str) -> bool:
             return False
     return hmac.compare_digest(plain_password, stored_password)
 
+def get_user_foto_b64(request: Request, db):
+    """Busca a foto de perfil do usuário logado na sessão atual"""
+    usuario_id = request.session.get("usuario_id")
+    tipo_usuario = request.session.get("perfil")
+    
+    if not usuario_id:
+        return None
+        
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            if tipo_usuario == "admin":
+                cursor.execute("SELECT fotoPerfil FROM Professor WHERE id = %s", (usuario_id,))
+            else:
+                cursor.execute("SELECT fotoPerfil FROM Aluno WHERE id = %s", (usuario_id,))
+            
+            usuario = cursor.fetchone()
+            if usuario and usuario.get("fotoPerfil"):
+                return base64.b64encode(usuario["fotoPerfil"]).decode("utf-8")
+    except Exception:
+        pass
+    return None
+
 
 # ── Páginas públicas ──────────────────────────────────────────────────────────
 
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
+async def home(request: Request, db=Depends(get_db)):
     return templates.TemplateResponse("index.html", {
         "request": request,
-        "nome_usuario": request.session.get("nome_usuario")
+        "nome_usuario": request.session.get("nome_usuario"),
+        "foto_b64": get_user_foto_b64(request, db)
     })
 
 @app.get("/login", response_class=HTMLResponse)
@@ -120,42 +144,38 @@ async def login_get(request: Request):
     })
 
 @app.get("/aulas", response_class=HTMLResponse)
-async def aulas_page(request: Request):
+async def aulas_page(request: Request, db=Depends(get_db)):
     return templates.TemplateResponse("aulas/aulas.html", {
         "request": request,
-        "nome_usuario": request.session.get("nome_usuario")
+        "nome_usuario": request.session.get("nome_usuario"),
+        "foto_b64": get_user_foto_b64(request, db)
     })
 
 
 @app.get("/professores", response_class=HTMLResponse)
-async def professores_page(request: Request):
+async def professores_page(request: Request, db=Depends(get_db)):
     return templates.TemplateResponse("professores/professores.html", {
         "request": request,
-        "nome_usuario": request.session.get("nome_usuario")
+        "nome_usuario": request.session.get("nome_usuario"),
+        "foto_b64": get_user_foto_b64(request, db)
     })
 
 
 @app.get("/planos", response_class=HTMLResponse)
-async def planos_page(request: Request):
+async def planos_page(request: Request, db=Depends(get_db)):
     return templates.TemplateResponse("planos.html", {
         "request": request,
-        "nome_usuario": request.session.get("nome_usuario")
+        "nome_usuario": request.session.get("nome_usuario"),
+        "foto_b64": get_user_foto_b64(request, db)
     })
 
 
 @app.get("/sobre", response_class=HTMLResponse)
-async def sobre_page(request: Request):
+async def sobre_page(request: Request, db=Depends(get_db)):
     return templates.TemplateResponse("sobre.html", {
         "request": request,
-        "nome_usuario": request.session.get("nome_usuario")
-    })
-
-
-@app.get("/professor-perfil", response_class=HTMLResponse)
-async def professor_perfil(request: Request):
-    return templates.TemplateResponse("professores/professor-perfil.html", {
-        "request": request,
-        "nome_usuario": request.session.get("nome_usuario")
+        "nome_usuario": request.session.get("nome_usuario"),
+        "foto_b64": get_user_foto_b64(request, db)
     })
 
 
@@ -218,15 +238,13 @@ async def usuario_logado(request: Request):
 
 
 @app.get("/alunoPerfil", response_class=HTMLResponse)
-async def aluno_perfil(request: Request, db=Depends(get_db)):
-    if not request.session.get("user_logged_in"):
-        return RedirectResponse(url="/login", status_code=303)
+async def aluno_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_logged_in)):
     usuario_id = request.session.get("usuario_id")
     aulas = []
     plano_status = "sem_plano"
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno WHERE id = %s", (usuario_id,))
+            cursor.execute("SELECT id, nome, cpf, telefone, email, fotoPerfil FROM Aluno WHERE id = %s", (usuario_id,))
             aluno = cursor.fetchone()
             cursor.execute("""
                 SELECT A.id, A.nome, A.data, A.descricao, P.nome AS professor_nome
@@ -241,6 +259,10 @@ async def aluno_perfil(request: Request, db=Depends(get_db)):
     finally:
         db.close()
 
+    foto_b64 = None
+    if aluno and aluno.get("fotoPerfil"):
+        foto_b64 = base64.b64encode(aluno["fotoPerfil"]).decode("utf-8")
+
     for aula in aulas:
         if aula["data"]:
             d = aula["data"]
@@ -254,17 +276,16 @@ async def aluno_perfil(request: Request, db=Depends(get_db)):
         "aluno": aluno,
         "aulas": aulas,
         "plano_status": plano_status,
+        "foto_b64": foto_b64,
     })
 
 
 @app.get("/profPerfil", response_class=HTMLResponse)
-async def prof_perfil(request: Request, db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/login", status_code=303)
+async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_admin)):
     usuario_id = request.session.get("usuario_id")
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor WHERE id = %s", (usuario_id,))
+            cursor.execute("SELECT id, nome, registro_drt, cpf, email, fotoPerfil FROM Professor WHERE id = %s", (usuario_id,))
             professor = cursor.fetchone()
             cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno ORDER BY nome")
             alunos = cursor.fetchall()
@@ -279,6 +300,10 @@ async def prof_perfil(request: Request, db=Depends(get_db)):
             aulas = cursor.fetchall()
     finally:
         db.close()
+
+    foto_b64 = None
+    if professor and professor.get("fotoPerfil"):
+        foto_b64 = base64.b64encode(professor["fotoPerfil"]).decode("utf-8")
 
     for aula in aulas:
         if aula["data"]:
@@ -350,7 +375,7 @@ async def cadastrar_usuario(
             request.session["mensagem"] = "Telefone inválido"
             return RedirectResponse(url="/cadastro", status_code=303)
 
-#parte do banco
+        #parte do banco
         with db.cursor() as cursor:
             cursor.execute("SELECT id FROM Aluno WHERE email = %s", (email,))
             if cursor.fetchone():
@@ -364,13 +389,39 @@ async def cadastrar_usuario(
             )
             db.commit()
             request.session["mensagem"] = "Aluno cadastrado com sucesso! Você já pode realizar login."
-            return RedirectResponse(url="/cadastro", status_code=303)
+            return RedirectResponse(url="/login", status_code=303)
 
     except Exception as e:
         request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
         return RedirectResponse(url="/cadastro", status_code=303)
     finally:
         db.close()
+
+@app.post("/profAtualizarFoto")
+async def prof_atualizar_foto(
+    request: Request,
+    id: int = Form(...),
+    fotoPerfil: UploadFile = File(None),
+    db=Depends(get_db),
+    auth=Depends(verify_logged_in)
+):
+    try:
+        if fotoPerfil and fotoPerfil.filename:
+            foto_bytes = await fotoPerfil.read()
+            with db.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE Professor SET fotoPerfil=%s WHERE id=%s",
+                    (foto_bytes, id)
+                )
+                db.commit()
+            request.session["mensagem"] = "Foto atualizada com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
+    finally:
+        db.close()
+        
+    return RedirectResponse(url="/profPerfil", status_code=303)
+
 
 
 
@@ -385,10 +436,7 @@ async def cadastrar_usuario(
 # ── Professor CRUD ────────────────────────────────────────────────────────────
 
 @app.get("/profListar", response_class=HTMLResponse)
-async def listar_professores(request: Request, db=Depends(get_db)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/aulaListar", status_code=303)
-    
+async def listar_professores(request: Request, db=Depends(get_db), auth=Depends(verify_admin)):    
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor ORDER BY nome")
@@ -410,8 +458,6 @@ async def listar_professores(request: Request, db=Depends(get_db)):
 
 @app.get("/profIncluir", response_class=HTMLResponse)
 async def prof_incluir(request: Request, auth=Depends(verify_admin)):
-    if not request.session.get("user_logged_in") or request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/profListar", status_code=303)
     return templates.TemplateResponse("professores/profIncluir.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario")
@@ -798,6 +844,36 @@ async def aluno_senha_post(
     finally:
         db.close()
     return RedirectResponse(url="/profPerfil", status_code=303)
+
+@app.post("/alunoAtualizarFoto")
+async def aluno_atualizar_foto(
+    request: Request,
+    fotoPerfil: UploadFile = File(None),
+    db=Depends(get_db),
+    auth=Depends(verify_logged_in)
+):
+    try:
+        usuario_id = request.session.get("usuario_id")
+        
+        foto_bytes = None
+        if fotoPerfil and fotoPerfil.filename:
+            foto_bytes = await fotoPerfil.read()
+            
+            with db.cursor() as cursor:
+                cursor.execute(
+                    "UPDATE Aluno SET fotoPerfil=%s WHERE id=%s",
+                    (foto_bytes, usuario_id)
+                )
+                db.commit()
+                
+        request.session["mensagem"] = "Foto de perfil atualizada com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao atualizar foto: {str(e)}"
+    finally:
+        db.close()
+        
+    return RedirectResponse(url="/alunoPerfil", status_code=303)
+
 
 
 

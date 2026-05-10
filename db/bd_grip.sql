@@ -48,6 +48,9 @@ ALTER TABLE Professor_Aluno ADD CONSTRAINT FK_Professor_Aluno_2
     REFERENCES Aluno (id)
     ON DELETE SET NULL;
 
+ALTER TABLE Aluno ADD COLUMN fotoPerfil MEDIUMBLOB;
+ALTER TABLE Professor ADD COLUMN fotoPerfil MEDIUMBLOB;
+
 /* Dados fake para testar */
 INSERT INTO Professor (id, nome, registro_drt, cpf, email, senha) 
 VALUES (1, 'Professor Diretor', 'DRT-1234', '11122233344', 'admin@escola.com', '123456');
