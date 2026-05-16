@@ -148,3 +148,53 @@
 
 .aviso-erro  { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
 .aviso-ok { background: #f0fdf4; color: #16a34a; border: 1px solid #dcfce7; }
+
+.campo {
+    position: relative;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding-right: 2.5rem;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #8b8aa1;
+    z-index: 10;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+
+.toggle-password:hover {
+    color: #7c5cff;
+}
+
+/* Container que junta os dois campos */
+.grupo-campos {
+    display: flex;
+    gap: 14px;
+    width: 100%;
+}
+
+/* Garante que cada campo ocupe exatamente a metade do espaço disponível */
+.grupo-campos .campo {
+    flex: 1;
+    position: relative; /* Mantém o olho no lugar certo */
+}
+
+/* Responsividade: Telas menores que 480px (Celulares) empilham os campos */
+@media (max-width: 480px) {
+    .grupo-campos {
+        flex-direction: column;
+        gap: 1.1rem; /* Mantém o mesmo espaçamento do resto do seu formulário */
+    }
+}
