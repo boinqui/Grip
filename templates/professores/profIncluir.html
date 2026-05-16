@@ -63,36 +63,36 @@
         </div>
 
         <div class="form-card">
-            <form action="/profIncluir" method="POST" class="admin-form">
+            <form id="profIncluirForm" action="/profIncluir" method="POST" class="admin-form">
 
                 <div class="admin-campo">
                     <label>Nome</label>
-                    <input type="text" name="nome" required
-                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" title="O nome deve conter apenas letras.">
+                    <input type="text" id="nome" name="nome">
+                    <span class="campo-erro" id="erro-nome"></span>
                 </div>
 
                 <div class="admin-campo">
                     <label>Registro DRT</label>
-                    <input type="text" name="registro_drt" placeholder="DRT-0000"
-                        pattern="DRT-\d+" title="O registro deve seguir o formato DRT-1234" required>
+                    <input type="text" id="registro_drt" name="registro_drt" placeholder="DRT-0000">
+                    <span class="campo-erro" id="erro-drt"></span>
                 </div>
 
                 <div class="admin-campo">
                     <label>CPF</label>
-                    <input type="text" name="cpf" placeholder="000.000.000-00"
-                        pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}">
+                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14">
+                    <span class="campo-erro" id="erro-cpf"></span>
                 </div>
 
                 <div class="admin-campo">
                     <label>E-mail</label>
-                    <input type="email" name="email" required>
+                    <input type="email" id="email" name="email">
+                    <span class="campo-erro" id="erro-email"></span>
                 </div>
 
                 <div class="admin-campo">
                     <label>Senha</label>
-                    <input type="password" name="senha" required
-                        pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$"
-                        title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número.">
+                    <input type="password" id="senha" name="senha">
+                    <span class="campo-erro" id="erro-senha"></span>
                 </div>
 
                 <div class="form-acoes">
@@ -136,5 +136,51 @@
             <p>© 2026 Grip. Todos os direitos reservados.</p>
         </div>
     </footer>
+    <script>
+    document.getElementById('profIncluirForm').addEventListener('submit', function(e) {
+        let valido = true;
+
+        function mostrarErro(id, msg) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = msg;
+            el.classList.add('visivel');
+        }
+        function limparErro(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = '';
+            el.classList.remove('visivel');
+        }
+
+        const nome = document.getElementById('nome');
+        const drt = document.getElementById('registro_drt');
+        const cpf = document.getElementById('cpf');
+        const email = document.getElementById('email');
+        const senha = document.getElementById('senha');
+
+        if (!nome || !/^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$/.test(nome.value.trim())) {
+            mostrarErro('erro-nome', 'Nome deve conter apenas letras.'); valido = false;
+        } else { limparErro('erro-nome'); }
+
+        if (!drt || !/^DRT-\d+$/.test(drt.value.trim())) {
+            mostrarErro('erro-drt', 'Informe um DRT válido: DRT-0000.'); valido = false;
+        } else { limparErro('erro-drt'); }
+
+        if (cpf && cpf.value.trim() && !/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf.value)) {
+            mostrarErro('erro-cpf', 'Informe um CPF válido: 000.000.000-00.'); valido = false;
+        } else { limparErro('erro-cpf'); }
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+            mostrarErro('erro-email', 'Informe um e-mail válido.'); valido = false;
+        } else { limparErro('erro-email'); }
+
+        if (!senha || senha.value.length < 8 || !/[A-Za-z]/.test(senha.value) || !/\d/.test(senha.value)) {
+            mostrarErro('erro-senha', 'A senha deve ter pelo menos 8 caracteres, uma letra e um número.'); valido = false;
+        } else { limparErro('erro-senha'); }
+
+        if (!valido) e.preventDefault();
+    });
+    </script>
 </body>
 </html>
