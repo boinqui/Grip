@@ -73,225 +73,40 @@
 
         <section class="secao">
             <div class="container grade" id="profs-grid">
-
-                <article class="card" data-category="classico">
-                    <div class="foto" style="background-image: linear-gradient(160deg, #e8e0ff 0%, #d4c8ff 100%);">
+                {% for prof in professores_publicos %}
+                {% set categoria = ['classico', 'russo', 'contemporaneo', 'pas-de-deux'][loop.index0 % 4] %}
+                <article class="card" data-category="{{ categoria }}">
+                    <div class="foto" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#ece4ff 0%,#d9cdff 100%);">
+                        {% if prof.foto_b64 %}
+                        <img src="data:image/jpeg;base64,{{ prof.foto_b64 }}" alt="{{ prof.nome }}" style="width:100%;height:100%;object-fit:cover;">
+                        {% else %}
+                        <span style="font-size:3.5rem;font-weight:600;color:#5b36e0;">{{ prof.iniciais }}</span>
+                        {% endif %}
                     </div>
                     <div class="corpo">
                         <div class="topo-card">
                             <div>
-                                <h3>Cristina</h3>
-                                <span class="cargo">Ballet Clássico</span>
+                                <h3>{{ prof.nome }}</h3>
+                                <span class="cargo">{{ prof.especialidade }}</span>
                             </div>
-                            <span class="nota">★ 4.9</span>
+                            <span class="nota">★ Grip</span>
                         </div>
-                        <p>Especialista no método Royal, foca na precisão dos movimentos e no desenvolvimento da postura
-                            ideal para iniciantes.</p>
+                        <p>Professor(a) disponível para agendamento de aula ao vivo com acompanhamento personalizado.</p>
                         <div class="tags">
-                            <span class="tag">Iniciante</span>
-                            <span class="tag">Infantil</span>
+                            <span class="tag">Ao Vivo</span>
+                            <span class="tag">Agendamento</span>
                         </div>
                         <div class="rodape-card">
                             <div class="stats-linha">
-                                <div class="estat"><strong>12+</strong><span>anos exp.</span></div>
-                                <div class="estat"><strong>800</strong><span>alunos</span></div>
+                                <div class="estat"><strong>Perfil</strong><span>atualizado</span></div>
                             </div>
-                            <a href="/professor-perfil" class="btn btn-primary btn-sm">Ver Perfil</a>
+                            <a href="/professor-perfil?id={{ prof.id }}" class="btn btn-primary btn-sm">Ver Perfil</a>
                         </div>
                     </div>
                 </article>
-
-                <article class="card" data-category="russo">
-                    <div class="foto" style="background-image: linear-gradient(160deg, #dce8f5 0%, #c8dcf0 100%);">
-                    </div>
-                    <div class="corpo">
-                        <div class="topo-card">
-                            <div>
-                                <h3>Geucimar</h3>
-                                <span class="cargo">Técnica Russa</span>
-                            </div>
-                            <span class="nota">★ 5.0</span>
-                        </div>
-                        <p>Formado pelo método Vaganova, traz o rigor técnico e a dramaticidade das grandes companhias
-                            russas para a sala de aula.</p>
-                        <div class="tags">
-                            <span class="tag">Avançado</span>
-                            <span class="tag">Profissional</span>
-                        </div>
-                        <div class="rodape-card">
-                            <div class="stats-linha">
-                                <div class="estat"><strong>25+</strong><span>anos exp.</span></div>
-                                <div class="estat"><strong>2k</strong><span>alunos</span></div>
-                            </div>
-                            <a href="/professor-perfil" class="btn btn-primary btn-sm">Ver Perfil</a>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="card" data-category="contemporaneo">
-                    <div class="foto" style="background-image: linear-gradient(160deg, #f0e5fb 0%, #e2d0f8 100%);">
-                    </div>
-                    <div class="corpo">
-                        <div class="topo-card">
-                            <div>
-                                <h3>Rafa Kelly</h3>
-                                <span class="cargo">Ballet Contemporâneo</span>
-                            </div>
-                            <span class="nota">★ 4.8</span>
-                        </div>
-                        <p>Explora a fluidez e a conexão entre o ballet clássico e a dança moderna, focando na expressão
-                            corporal livre.</p>
-                        <div class="tags">
-                            <span class="tag">Intermediário</span>
-                            <span class="tag">Livre</span>
-                        </div>
-                        <div class="rodape-card">
-                            <div class="stats-linha">
-                                <div class="estat"><strong>8+</strong><span>anos exp.</span></div>
-                                <div class="estat"><strong>450</strong><span>alunos</span></div>
-                            </div>
-                            <a href="/professor-perfil" class="btn btn-primary btn-sm">Ver Perfil</a>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="card" data-category="pas-de-deux">
-                    <div class="foto" style="background-image: linear-gradient(160deg, #e8f5e8 0%, #d0edd0 100%);">
-                    </div>
-                    <div class="corpo">
-                        <div class="topo-card">
-                            <div>
-                                <h3>Marina</h3>
-                                <span class="cargo">Ballet Pas de Deux</span>
-                            </div>
-                            <span class="nota">★ 4.9</span>
-                        </div>
-                        <p>Mestra em parcerias e sustentação, prepara casais para competições e performances de alto
-                            nível técnico.</p>
-                        <div class="tags">
-                            <span class="tag">Avançado</span>
-                            <span class="tag">Repertório</span>
-                        </div>
-                        <div class="rodape-card">
-                            <div class="stats-linha">
-                                <div class="estat"><strong>15+</strong><span>anos exp.</span></div>
-                                <div class="estat"><strong>600</strong><span>alunos</span></div>
-                            </div>
-                            <a href="/professor-perfil" class="btn btn-primary btn-sm">Ver Perfil</a>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="card" data-category="contemporaneo">
-                    <div class="foto" style="background-image: linear-gradient(160deg, #f5e8f0 0%, #edcfdf 100%);">
-                    </div>
-                    <div class="corpo">
-                        <div class="topo-card">
-                            <div>
-                                <h3>Carla Ferraz</h3>
-                                <span class="cargo">Ballet Contemporâneo</span>
-                            </div>
-                            <span class="nota">★ 4.7</span>
-                        </div>
-                        <p>Focada em improvisação e chão, Carla ajuda alunos a descobrirem sua própria identidade
-                            artística através da dança.</p>
-                        <div class="tags">
-                            <span class="tag">Iniciante</span>
-                            <span class="tag">Intermediário</span>
-                        </div>
-                        <div class="rodape-card">
-                            <div class="stats-linha">
-                                <div class="estat"><strong>10+</strong><span>anos exp.</span></div>
-                                <div class="estat"><strong>520</strong><span>alunos</span></div>
-                            </div>
-                            <a href="/professor-perfil" class="btn btn-primary btn-sm">Ver Perfil</a>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="card" data-category="russo">
-                    <div class="foto" style="background-image: linear-gradient(160deg, #e8f1f5 0%, #cfdfe8 100%);">
-                    </div>
-                    <div class="corpo">
-                        <div class="topo-card">
-                            <div>
-                                <h3>Eduardo Bertol</h3>
-                                <span class="cargo">Técnica Russa</span>
-                            </div>
-                            <span class="nota">★ 4.7</span>
-                        </div>
-                        <p>Especialista em saltos e técnica masculina, Eduardo foca na potência e resistência física
-                            exigida pelo estilo russo.</p>
-                        <div class="tags">
-                            <span class="tag">Masculino</span>
-                            <span class="tag">Avançado</span>
-                        </div>
-                        <div class="rodape-card">
-                            <div class="stats-linha">
-                                <div class="estat"><strong>14+</strong><span>anos exp.</span></div>
-                                <div class="estat"><strong>380</strong><span>alunos</span></div>
-                            </div>
-                            <a href="/professor-perfil" class="btn btn-primary btn-sm">Ver Perfil</a>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="card" data-category="classico">
-                    <div class="foto" style="background-image: linear-gradient(160deg, #fff3e0 0%, #ffe0b2 100%);">
-                    </div>
-                    <div class="corpo">
-                        <div class="topo-card">
-                            <div>
-                                <h3>Lucas Dal Pra</h3>
-                                <span class="cargo">Ballet Clássico</span>
-                            </div>
-                            <span class="nota">★ 4.5</span>
-                        </div>
-                        <p>Com foco em ballet para adultos, Lucas torna o aprendizado técnico acessível e prazeroso para
-                            quem está começando.</p>
-                        <div class="tags">
-                            <span class="tag">Adulto Iniciante</span>
-                            <span class="tag">Fitness</span>
-                        </div>
-                        <div class="rodape-card">
-                            <div class="stats-linha">
-                                <div class="estat"><strong>6+</strong><span>anos exp.</span></div>
-                                <div class="estat"><strong>290</strong><span>alunos</span></div>
-                            </div>
-                            <a href="/professor-perfil" class="btn btn-primary btn-sm">Ver Perfil</a>
-                        </div>
-                    </div>
-                </article>
-
-                <article class="card" data-category="pas-de-deux">
-                    <div class="foto" style="background-image: linear-gradient(160deg, #f3e5f5 0%, #e1bee7 100%);">
-                    </div>
-                    <div class="corpo">
-                        <div class="topo-card">
-                            <div>
-                                <h3>Pope Lion</h3>
-                                <span class="cargo">Ballet Pas-de-Deux</span>
-                            </div>
-                            <span class="nota">★ 4.9</span>
-                        </div>
-                        <p>Renomado por sua técnica de "portés" (elevações), Pope prepara bailarinos para o virtuosismo
-                            exigido nos palcos.</p>
-                        <div class="tags">
-                            <span class="tag">Intermediário</span>
-                            <span class="tag">Avançado</span>
-                        </div>
-                        <div class="rodape-card">
-                            <div class="stats-linha">
-                                <div class="estat"><strong>18+</strong><span>anos exp.</span></div>
-                                <div class="estat"><strong>950</strong><span>alunos</span></div>
-                            </div>
-                            <a href="/professor-perfil" class="btn btn-primary btn-sm">Ver Perfil</a>
-                        </div>
-                    </div>
-                </article>
-
+                {% endfor %}
             </div>
-            <p class="vazio" id="no-results" style="display:none;">Nenhum professor encontrado para esse filtro.</p>
+            <p class="vazio" id="no-results" {% if professores_publicos %}style="display:none;"{% endif %}>Nenhum professor encontrado para esse filtro.</p>
         </section>
 
         <section class="cta">

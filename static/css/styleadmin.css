@@ -25,7 +25,8 @@
     flex-wrap: wrap;
 }
 
-.admin-search input {
+.admin-search input,
+.admin-search select {
     padding: 10px 16px;
     border-radius: 12px;
     border: 1px solid rgba(124, 92, 255, 0.2);
@@ -38,7 +39,8 @@
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.admin-search input:focus {
+.admin-search input:focus,
+.admin-search select:focus {
     border-color: #7c5cff;
     box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.14);
 }

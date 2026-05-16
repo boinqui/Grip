@@ -33,7 +33,7 @@ templates = Jinja2Templates(directory="templates")
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "carlamysql",
+    "password": "dudumysql",
     "database": "grip"
 }
 
@@ -127,10 +127,32 @@ def get_user_foto_b64(request: Request, db):
 
 @app.get("/", response_class=HTMLResponse)
 async def home(request: Request, db=Depends(get_db)):
+    professores_publicos = []
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("""
+                SELECT id, nome, registro_drt, fotoPerfil
+                FROM Professor
+                ORDER BY nome
+                LIMIT 5
+            """)
+            professores_publicos = cursor.fetchall()
+    finally:
+        foto_b64 = get_user_foto_b64(request, db)
+        db.close()
+
+    for professor in professores_publicos:
+        nome = (professor.get("nome") or "").strip()
+        professor["iniciais"] = nome[0].upper() if nome else "P"
+        professor["especialidade"] = professor.get("registro_drt") or "Instrutor(a) Grip"
+        foto = professor.get("fotoPerfil")
+        professor["foto_b64"] = base64.b64encode(foto).decode("utf-8") if foto else None
+
     return templates.TemplateResponse("index.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario"),
-        "foto_b64": get_user_foto_b64(request, db)
+        "foto_b64": foto_b64,
+        "professores_publicos": professores_publicos
     })
 
 @app.get("/login", response_class=HTMLResponse)
@@ -163,10 +185,31 @@ async def aulas_page(request: Request, db=Depends(get_db)):
 
 @app.get("/professores", response_class=HTMLResponse)
 async def professores_page(request: Request, db=Depends(get_db)):
+    professores_publicos = []
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("""
+                SELECT id, nome, registro_drt, fotoPerfil
+                FROM Professor
+                ORDER BY nome
+            """)
+            professores_publicos = cursor.fetchall()
+    finally:
+        foto_b64 = get_user_foto_b64(request, db)
+        db.close()
+
+    for professor in professores_publicos:
+        nome = (professor.get("nome") or "").strip()
+        professor["iniciais"] = nome[0].upper() if nome else "P"
+        professor["especialidade"] = professor.get("registro_drt") or "Instrutor(a) Grip"
+        foto = professor.get("fotoPerfil")
+        professor["foto_b64"] = base64.b64encode(foto).decode("utf-8") if foto else None
+
     return templates.TemplateResponse("professores/professores.html", {
         "request": request,
         "nome_usuario": request.session.get("nome_usuario"),
-        "foto_b64": get_user_foto_b64(request, db)
+        "foto_b64": foto_b64,
+        "professores_publicos": professores_publicos
     })
 
 
@@ -249,8 +292,10 @@ async def usuario_logado(request: Request):
 @app.get("/alunoPerfil", response_class=HTMLResponse)
 async def aluno_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_logged_in)):
     usuario_id = request.session.get("usuario_id")
-    aulas = []
+    aulas_legado = []
+    aulas_agendadas = []
     plano_status = "sem_plano"
+    mensagem = request.session.pop("mensagem", None)
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, cpf, telefone, email, fotoPerfil, data_nascimento FROM Aluno WHERE id = %s", (usuario_id,))
@@ -264,7 +309,22 @@ async def aluno_perfil(request: Request, db=Depends(get_db), auth=Depends(verify
                 ORDER BY A.data ASC, A.id ASC
                 LIMIT 6
             """, (usuario_id,))
-            aulas = cursor.fetchall()
+            aulas_legado = cursor.fetchall()
+            cursor.execute("""
+                SELECT AG.id,
+                       CONCAT('Aula ', UPPER(LEFT(AG.tipo_aula, 1)), SUBSTRING(AG.tipo_aula, 2)) AS nome,
+                       AG.data_hora AS data,
+                       AG.observacao AS descricao,
+                       P.nome AS professor_nome
+                FROM Agendamento_Aula AG
+                INNER JOIN Professor P ON P.id = AG.fk_Professor_id
+                WHERE AG.fk_Aluno_id = %s
+                  AND AG.status = 'agendada'
+                  AND AG.data_hora >= NOW()
+                ORDER BY AG.data_hora ASC, AG.id ASC
+                LIMIT 6
+            """, (usuario_id,))
+            aulas_agendadas = cursor.fetchall()
     finally:
         db.close()
 
@@ -272,10 +332,18 @@ async def aluno_perfil(request: Request, db=Depends(get_db), auth=Depends(verify
     if aluno and aluno.get("fotoPerfil"):
         foto_b64 = base64.b64encode(aluno["fotoPerfil"]).decode("utf-8")
 
+    aulas = sorted(
+        (aulas_legado or []) + (aulas_agendadas or []),
+        key=lambda aula: (aula.get("data"), aula.get("id", 0))
+    )[:6]
+
     for aula in aulas:
         if aula["data"]:
             d = aula["data"]
-            aula["data_fmt"] = d.strftime("%d/%m/%Y") if hasattr(d, "strftime") else str(d)
+            if isinstance(d, datetime):
+                aula["data_fmt"] = d.strftime("%d/%m/%Y %H:%M")
+            else:
+                aula["data_fmt"] = d.strftime("%d/%m/%Y") if hasattr(d, "strftime") else str(d)
         else:
             aula["data_fmt"] = "Data não informada"
 
@@ -286,12 +354,181 @@ async def aluno_perfil(request: Request, db=Depends(get_db), auth=Depends(verify
         "aulas": aulas,
         "plano_status": plano_status,
         "foto_b64": foto_b64,
+        "mensagem": mensagem,
     })
+
+
+@app.get("/professor-perfil", response_class=HTMLResponse)
+async def professor_perfil_publico(
+    request: Request,
+    id: int | None = None,
+    db=Depends(get_db),
+    auth=Depends(verify_logged_in)
+):
+    professor = None
+    total_aulas_agendadas = 0
+    total_alunos_unicos = 0
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            if id:
+                cursor.execute("""
+                    SELECT id, nome, registro_drt, cpf, email, fotoPerfil
+                    FROM Professor
+                    WHERE id = %s
+                """, (id,))
+                professor = cursor.fetchone()
+            else:
+                cursor.execute("""
+                    SELECT id, nome, registro_drt, cpf, email, fotoPerfil
+                    FROM Professor
+                    ORDER BY nome
+                    LIMIT 1
+                """)
+                professor = cursor.fetchone()
+
+            if not professor:
+                request.session["mensagem"] = "Erro: Professor não encontrado."
+                return RedirectResponse(url="/professores", status_code=303)
+
+            cursor.execute("""
+                SELECT COUNT(*) AS total
+                FROM Agendamento_Aula
+                WHERE fk_Professor_id = %s
+                  AND status = 'agendada'
+                  AND data_hora >= NOW()
+            """, (professor["id"],))
+            total_aulas_agendadas = cursor.fetchone()["total"]
+
+            cursor.execute("""
+                SELECT COUNT(DISTINCT fk_Aluno_id) AS total
+                FROM Agendamento_Aula
+                WHERE fk_Professor_id = %s
+            """, (professor["id"],))
+            total_alunos_unicos = cursor.fetchone()["total"]
+    finally:
+        foto_b64 = get_user_foto_b64(request, db)
+        db.close()
+
+    professor_foto_b64 = None
+    if professor and professor.get("fotoPerfil"):
+        professor_foto_b64 = base64.b64encode(professor["fotoPerfil"]).decode("utf-8")
+
+    mensagem = request.session.pop("mensagem", None)
+    perfil = request.session.get("perfil")
+    pode_agendar = perfil == "user"
+
+    return templates.TemplateResponse("professores/professor-perfil.html", {
+        "request": request,
+        "nome_usuario": request.session.get("nome_usuario"),
+        "foto_b64": foto_b64,
+        "mensagem": mensagem,
+        "status": "erro" if mensagem and mensagem.startswith("Erro") else None,
+        "professor": professor,
+        "professor_foto_b64": professor_foto_b64,
+        "total_aulas_agendadas": total_aulas_agendadas,
+        "total_alunos_unicos": total_alunos_unicos,
+        "pode_agendar": pode_agendar,
+        "hoje_data": datetime.now().strftime("%Y-%m-%d")
+    })
+
+
+@app.post("/agendar-aula")
+async def agendar_aula(
+    request: Request,
+    professor_id: int = Form(...),
+    tipo_aula: str = Form(...),
+    data_aula: str = Form(...),
+    hora_aula: str = Form(...),
+    observacao: str = Form(""),
+    db=Depends(get_db),
+    auth=Depends(verify_logged_in)
+):
+    redirect_url = f"/professor-perfil?id={professor_id}"
+    try:
+        if request.session.get("perfil") != "user":
+            request.session["mensagem"] = "Erro: Somente alunos podem realizar agendamentos."
+            return RedirectResponse(url=redirect_url, status_code=303)
+
+        tipos_validos = {"grupo", "particular"}
+        if tipo_aula not in tipos_validos:
+            request.session["mensagem"] = "Erro: Tipo de aula inválido."
+            return RedirectResponse(url=redirect_url, status_code=303)
+
+        try:
+            data_hora = datetime.strptime(f"{data_aula} {hora_aula}", "%Y-%m-%d %H:%M")
+        except ValueError:
+            request.session["mensagem"] = "Erro: Data ou horário inválido."
+            return RedirectResponse(url=redirect_url, status_code=303)
+
+        if data_hora <= datetime.now():
+            request.session["mensagem"] = "Erro: Escolha um horário futuro para o agendamento."
+            return RedirectResponse(url=redirect_url, status_code=303)
+
+        aluno_id = request.session.get("usuario_id")
+
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("SELECT id FROM Professor WHERE id = %s", (professor_id,))
+            professor = cursor.fetchone()
+            if not professor:
+                request.session["mensagem"] = "Erro: Professor não encontrado."
+                return RedirectResponse(url="/professores", status_code=303)
+
+            cursor.execute("""
+                SELECT id
+                FROM Agendamento_Aula
+                WHERE fk_Professor_id = %s
+                  AND data_hora = %s
+                  AND status = 'agendada'
+                LIMIT 1
+            """, (professor_id, data_hora))
+            if cursor.fetchone():
+                request.session["mensagem"] = "Erro: Esse horário já foi reservado para este professor."
+                return RedirectResponse(url=f"/professor-perfil?id={professor_id}", status_code=303)
+
+            cursor.execute("""
+                SELECT id
+                FROM Agendamento_Aula
+                WHERE fk_Aluno_id = %s
+                  AND data_hora = %s
+                  AND status = 'agendada'
+                LIMIT 1
+            """, (aluno_id, data_hora))
+            if cursor.fetchone():
+                request.session["mensagem"] = "Erro: Você já possui um agendamento neste horário."
+                return RedirectResponse(url=f"/professor-perfil?id={professor_id}", status_code=303)
+
+            cursor.execute("""
+                INSERT INTO Agendamento_Aula (fk_Aluno_id, fk_Professor_id, tipo_aula, data_hora, observacao, status)
+                VALUES (%s, %s, %s, %s, %s, 'agendada')
+            """, (aluno_id, professor_id, tipo_aula, data_hora, observacao))
+
+            cursor.execute("""
+                SELECT 1
+                FROM Professor_Aluno
+                WHERE fk_Professor_id = %s AND fk_Aluno_id = %s
+                LIMIT 1
+            """, (professor_id, aluno_id))
+            if not cursor.fetchone():
+                cursor.execute(
+                    "INSERT INTO Professor_Aluno (fk_Professor_id, fk_Aluno_id) VALUES (%s, %s)",
+                    (professor_id, aluno_id)
+                )
+
+            db.commit()
+            request.session["mensagem"] = "Aula agendada com sucesso!"
+    except pymysql.MySQLError as e:
+        db.rollback()
+        request.session["mensagem"] = f"Erro: não foi possível concluir o agendamento ({str(e)})."
+    finally:
+        db.close()
+
+    return RedirectResponse(url=redirect_url, status_code=303)
 
 
 @app.get("/profPerfil", response_class=HTMLResponse)
 async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_admin)):
     usuario_id = request.session.get("usuario_id")
+    agendamentos_futuros = []
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, registro_drt, cpf, email, fotoPerfil FROM Professor WHERE id = %s", (usuario_id,))
@@ -307,6 +544,17 @@ async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_
                 ORDER BY A.data DESC
             """)
             aulas = cursor.fetchall()
+            cursor.execute("""
+                SELECT AG.id, AG.tipo_aula, AG.data_hora, AG.observacao, AL.nome AS aluno_nome
+                FROM Agendamento_Aula AG
+                INNER JOIN Aluno AL ON AL.id = AG.fk_Aluno_id
+                WHERE AG.fk_Professor_id = %s
+                  AND AG.status = 'agendada'
+                  AND AG.data_hora >= NOW()
+                ORDER BY AG.data_hora ASC, AG.id ASC
+                LIMIT 6
+            """, (usuario_id,))
+            agendamentos_futuros = cursor.fetchall()
     finally:
         db.close()
 
@@ -321,6 +569,18 @@ async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_
         else:
             aula["data_fmt"] = "-"
 
+    for agendamento in agendamentos_futuros:
+        data_hora = agendamento.get("data_hora")
+        if data_hora:
+            if isinstance(data_hora, datetime):
+                agendamento["data_fmt"] = data_hora.strftime("%d/%m/%Y %H:%M")
+            else:
+                agendamento["data_fmt"] = data_hora.strftime("%d/%m/%Y") if hasattr(data_hora, "strftime") else str(data_hora)
+        else:
+            agendamento["data_fmt"] = "Data não informada"
+        tipo_aula = (agendamento.get("tipo_aula") or "").strip().lower()
+        agendamento["tipo_fmt"] = tipo_aula.capitalize() if tipo_aula else "Aula"
+
     mensagem = request.session.pop("mensagem", None)
 
     return templates.TemplateResponse("professores/profPerfil.html", {
@@ -334,6 +594,7 @@ async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_
         "total_alunos": len(alunos),
         "total_professores": len(professores),
         "total_aulas": len(aulas),
+        "agendamentos_futuros": agendamentos_futuros,
         "mensagem": mensagem,
     })
 
@@ -932,15 +1193,70 @@ async def aluno_atualizar_foto(
 
 @app.get("/aulaListar", response_class=HTMLResponse)
 async def listar_aulas(request: Request, db=Depends(get_db), auth=Depends(verify_logged_in)):
+    q = (request.query_params.get("q") or "").strip()
+    professor_id_raw = (request.query_params.get("professor_id") or "").strip()
+    data_inicio = (request.query_params.get("data_inicio") or "").strip()
+    data_fim = (request.query_params.get("data_fim") or "").strip()
+
+    professor_id = professor_id_raw if professor_id_raw.isdigit() else ""
+
+    if data_inicio:
+        try:
+            datetime.strptime(data_inicio, "%Y-%m-%d")
+        except ValueError:
+            data_inicio = ""
+
+    if data_fim:
+        try:
+            datetime.strptime(data_fim, "%Y-%m-%d")
+        except ValueError:
+            data_fim = ""
+
+    filtros = {
+        "q": q,
+        "professor_id": professor_id,
+        "data_inicio": data_inicio,
+        "data_fim": data_fim
+    }
+
+    professores_filtro = []
+    aulas = []
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("""
+            where_clauses = []
+            query_params = []
+
+            if q:
+                termo = f"%{q}%"
+                where_clauses.append("(A.nome LIKE %s OR A.descricao LIKE %s OR P.nome LIKE %s)")
+                query_params.extend([termo, termo, termo])
+
+            if professor_id:
+                where_clauses.append("A.fk_Professor_id = %s")
+                query_params.append(int(professor_id))
+
+            if data_inicio:
+                where_clauses.append("DATE(A.data) >= %s")
+                query_params.append(data_inicio)
+
+            if data_fim:
+                where_clauses.append("DATE(A.data) <= %s")
+                query_params.append(data_fim)
+
+            query = """
                 SELECT A.id, A.nome, A.data, A.descricao, P.nome AS professor_nome
                 FROM Aula A
                 LEFT JOIN Professor P ON A.fk_Professor_id = P.id
-                ORDER BY A.data DESC
-            """)
+            """
+            if where_clauses:
+                query += " WHERE " + " AND ".join(where_clauses)
+
+            query += " ORDER BY A.data DESC"
+            cursor.execute(query, query_params)
             aulas = cursor.fetchall()
+
+            cursor.execute("SELECT id, nome FROM Professor ORDER BY nome")
+            professores_filtro = cursor.fetchall()
     finally:
         db.close()
         
@@ -956,6 +1272,8 @@ async def listar_aulas(request: Request, db=Depends(get_db), auth=Depends(verify
     return templates.TemplateResponse("aulas/aulaListar.html", {
         "request": request,
         "aulas": aulas,
+        "professores_filtro": professores_filtro,
+        "filtros": filtros,
         "hoje": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
         "nome_usuario": request.session.get("nome_usuario"),
         "perfil": request.session.get("perfil"),
@@ -1082,6 +1400,3 @@ async def aula_atualizar_post(
     finally:
         db.close()
     return RedirectResponse(url="/profPerfil", status_code=303)
-
-
-
