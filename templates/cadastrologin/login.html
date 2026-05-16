@@ -7,6 +7,7 @@
     <title>Grip - Login</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link
         href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap"
         rel="stylesheet" />
@@ -77,9 +78,16 @@
                            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
                 </div>
 
-                <div class="campo">
-                    <label for="senha">Senha</label>
-                    <input type="password" id="senha" name="Senha" placeholder="••••••••" required>
+                <div class="grupo-campos">
+                    <div class="campo">
+                        <label for="senha">Senha</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="senha" name="senha" placeholder="••••••••"
+                                pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$"
+                                title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número." required>
+                            <i class="fa-solid fa-eye toggle-password" id="eyeIconSenha"></i>
+                        </div>
+                    </div>
                 </div>
 
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -140,6 +148,29 @@
     <script src="/static/js/sheet.js"></script>
     <script src="/static/js/scriptlogin.js"></script>
     <script src="/static/js/main.js"></script>
+        <script>
+        function configurarOlho(idInput, idOlho) {
+            const input = document.getElementById(idInput);
+            const olho = document.getElementById(idOlho);
+
+            if (input && olho) {
+                olho.addEventListener('click', function () {
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        olho.classList.remove('fa-eye');
+                        olho.classList.add('fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        olho.classList.remove('fa-eye-slash');
+                        olho.classList.add('fa-eye');
+                    }
+                });
+            }
+        }
+
+        configurarOlho('senha', 'eyeIconSenha');
+        configurarOlho('confirmar_senha', 'eyeIconConfirmar');
+    </script>
 </body>
 
 </html>
