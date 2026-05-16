@@ -1,39 +1,26 @@
-{% if mensagem %}
-<div class="modal-overlay aberto" id="globalModal">
+{% set tem_mensagem = mensagem is defined and mensagem %}
+{% set is_error = tem_mensagem and ('Erro' in mensagem or 'inválido' in mensagem or status == 'erro') %}
+<div class="modal-overlay{% if tem_mensagem %} aberto{% endif %}" id="globalModal" data-auto-open="{{ 'true' if tem_mensagem else 'false' }}">
     <div class="modal-card">
-        <button class="modal-close" onclick="fecharModal()">&times;</button>
+        <button class="modal-close" id="modalCloseButton" type="button">&times;</button>
 
-        <div id="modalStatusContainer" class="msg-status {% if 'Erro' in mensagem or 'inválido' in mensagem or 'erro' == status %}msg-error{% else %}msg-info{% endif %}">
-            <div class="msg-ic" id="modalIcon">{% if 'Erro' in mensagem or 'inválido' in mensagem or 'erro' == status %}!{% else %}✓{% endif %}</div>
+        <div id="modalStatusContainer" class="msg-status {% if is_error %}msg-error{% else %}msg-info{% endif %}">
+            <div class="msg-ic" id="modalIcon">{% if is_error %}!{% else %}✓{% endif %}</div>
             <div class="msg-txt">
-                <h4 id="modalTitle">{% if 'Erro' in mensagem or 'inválido' in mensagem or 'erro' == status %}Erro{% else %}Sucesso{% endif %}</h4>
-                <p id="modalDescription">{{ mensagem }}</p>
+                <h4 id="modalTitle">
+                    {% if tem_mensagem %}
+                        {% if is_error %}Erro{% else %}Sucesso{% endif %}
+                    {% else %}
+                        Aviso
+                    {% endif %}
+                </h4>
+                <p id="modalDescription">{% if tem_mensagem %}{{ mensagem }}{% endif %}</p>
             </div>
         </div>
 
-        <div class="confirmar" style="border-top: none; margin-top: 20px;">
-            <button class="btn btn-primary btn-block" id="modalActionButton"
-                onclick="fecharModal()">Entendi</button>
+        <div class="modal-actions">
+            <button class="btn btn-secondary btn-block modal-btn-cancel" id="modalCancelButton" type="button">Cancelar</button>
+            <button class="btn btn-primary btn-block modal-btn-confirm" id="modalActionButton" type="button">Entendi</button>
         </div>
     </div>
 </div>
-
-<script>
-    function fecharModal() {
-        const modal = document.getElementById('globalModal');
-        if (modal) {
-            modal.classList.remove('aberto');
-            setTimeout(() => {
-                modal.style.display = 'none';
-            }, 300);
-        }
-    }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById('globalModal');
-        if (event.target == modal) {
-            fecharModal();
-        }
-    }
-</script>
-{% endif %}

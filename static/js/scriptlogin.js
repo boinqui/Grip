@@ -1,18 +1,23 @@
 document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('loginForm');
+    if (!loginForm) {
+        return;
+    }
 
     loginForm.addEventListener('submit', (e) => {
-        const email = document.getElementById('email').value;
-        const senha = document.getElementById('senha').value;
-
-
+        const emailInput = document.getElementById('email');
+        const email = emailInput ? emailInput.value : '';
         if (!email.includes('@')) {
             e.preventDefault();
-            alert('Por favor, insira um email válido.');
+            if (window.SheetModal) {
+                window.SheetModal.showMessage({
+                    type: 'error',
+                    title: 'Erro',
+                    message: 'Por favor, insira um email válido.',
+                });
+            }
             return;
         }
-
-        console.log('Tentativa de login enviada para:', email);
     });
 
     const inputs = document.querySelectorAll('input');

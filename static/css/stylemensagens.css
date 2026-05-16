@@ -111,13 +111,17 @@
     color: #333;
 }
 
-.confirmar {
+.modal-actions {
     margin-top: 24px;
     display: flex;
-    justify-content: flex-end;
+    gap: 12px;
 }
 
-.btn-block {
+.modal-btn-cancel {
+    display: none;
+}
+
+.modal-actions .btn-block {
     width: 100%;
     padding: 12px;
     border-radius: 12px;

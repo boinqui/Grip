@@ -231,7 +231,7 @@
                                     <div class="acoes-gap">
                                         <a href="/alunoAtualizar?id={{ aluno.id }}" class="acao-btn acao-editar">Editar</a>
                                         <a href="/alunoSenha?id={{ aluno.id }}" class="acao-btn acao-senha">Senha</a>
-                                        <a href="/alunoExcluir?id={{ aluno.id }}" class="acao-btn acao-excluir" onclick="return confirmarExclusao('{{ aluno.nome }}')">Excluir</a>
+                                        <a href="/alunoExcluir?id={{ aluno.id }}" class="acao-btn acao-excluir" data-nome="{{ aluno.nome }}" onclick="return confirmarExclusao(event, this.dataset.nome)">Excluir</a>
                                     </div>
                                 </td>
                             </tr>
@@ -283,7 +283,7 @@
                                     <div class="acoes-gap">
                                         <a href="/profAtualizar?id={{ prof.id }}" class="acao-btn acao-editar">Editar</a>
                                         <a href="/profSenha?id={{ prof.id }}" class="acao-btn acao-senha">Senha</a>
-                                        <a href="/profExcluir?id={{ prof.id }}" class="acao-btn acao-excluir" onclick="return confirmarExclusao('{{ prof.nome }}')">Excluir</a>
+                                        <a href="/profExcluir?id={{ prof.id }}" class="acao-btn acao-excluir" data-nome="{{ prof.nome }}" onclick="return confirmarExclusao(event, this.dataset.nome)">Excluir</a>
                                     </div>
                                 </td>
                             </tr>
@@ -334,7 +334,7 @@
                                 <td class="center">
                                     <div class="acoes-gap">
                                         <a href="/aulaAtualizar?id={{ aula.id }}" class="acao-btn acao-editar">Editar</a>
-                                        <a href="/aulaExcluir?id={{ aula.id }}" class="acao-btn acao-excluir" onclick="return confirmarExclusao('{{ aula.nome }}')">Excluir</a>
+                                        <a href="/aulaExcluir?id={{ aula.id }}" class="acao-btn acao-excluir" data-nome="{{ aula.nome }}" onclick="return confirmarExclusao(event, this.dataset.nome)">Excluir</a>
                                     </div>
                                 </td>
                             </tr>
@@ -440,7 +440,7 @@
                     <p>A exclusão da conta é permanente e não pode ser desfeita. Todos os dados do professor serão removidos do sistema.</p>
                     <a href="/profExcluir?id={{ professor.id if professor else '' }}"
                        class="btn-danger"
-                       onclick="return confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')">
+                       onclick="return confirmarExclusaoConta(event)">
                         Excluir minha conta
                     </a>
                 </div>
@@ -483,6 +483,7 @@
     </footer>
 
     <script src="/static/js/main.js"></script>
+    <script src="/static/js/sheet.js"></script>
     <script>
         function abrirTab(id) {
             document.querySelectorAll('.tab-painel').forEach(p => p.classList.remove('active'));
@@ -508,8 +509,38 @@
             });
         }
 
-        function confirmarExclusao(nome) {
-            return confirm(`Tem certeza que deseja excluir "${nome}"? Esta ação não pode ser desfeita.`);
+        function confirmarExclusao(event, nome) {
+            event.preventDefault();
+            if (!window.SheetModal) return false;
+            const destino = event.currentTarget.getAttribute('href');
+            window.SheetModal.showConfirm({
+                title: 'Confirmar exclusão',
+                message: `Tem certeza que deseja excluir "${nome}"? Esta ação não pode ser desfeita.`,
+                confirmText: 'Excluir',
+                cancelText: 'Cancelar',
+            }).then((confirmado) => {
+                if (confirmado) {
+                    window.location.href = destino;
+                }
+            });
+            return false;
+        }
+
+        function confirmarExclusaoConta(event) {
+            event.preventDefault();
+            if (!window.SheetModal) return false;
+            const destino = event.currentTarget.getAttribute('href');
+            window.SheetModal.showConfirm({
+                title: 'Confirmar exclusão',
+                message: 'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.',
+                confirmText: 'Excluir conta',
+                cancelText: 'Cancelar',
+            }).then((confirmado) => {
+                if (confirmado) {
+                    window.location.href = destino;
+                }
+            });
+            return false;
         }
 
         (function () {

@@ -354,6 +354,7 @@
     </footer>
 
     <script src="/static/js/main.js"></script>
+    <script src="/static/js/sheet.js"></script>
     <script>
         function abrirTab(id) {
             document.querySelectorAll('.tab-painel').forEach(p => p.classList.remove('active'));
@@ -377,9 +378,21 @@
         }
 
         function confirmarExclusao() {
-            if (confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')) {
-                alert('Funcionalidade disponível em breve.');
-            }
+            if (!window.SheetModal) return;
+            window.SheetModal.showConfirm({
+                title: 'Confirmar exclusão',
+                message: 'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.',
+                confirmText: 'Excluir conta',
+                cancelText: 'Cancelar',
+            }).then((confirmado) => {
+                if (confirmado) {
+                    window.SheetModal.showMessage({
+                        type: 'info',
+                        title: 'Aviso',
+                        message: 'Funcionalidade disponível em breve.',
+                    });
+                }
+            });
         }
     </script>
 
