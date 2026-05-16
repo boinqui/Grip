@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Isabella Laurent — Grip Ballet</title>
+    <title>{{ professor.nome if professor else 'Professor' }} — Grip Ballet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -16,10 +16,11 @@
     <link rel="stylesheet" href="/static/css/styleprofessores.css" />
     <link rel="stylesheet" href="/static/css/stylescta.css" />
     <link rel="stylesheet" href="/static/css/stylesindex.css" />
+    <link rel="stylesheet" href="/static/css/stylemensagens.css" />
 </head>
 
 <body>
-
+    {% include 'modal.html' %}
     <header class="header">
         <div class="container nav">
             <a href="/" class="logo">
@@ -59,53 +60,55 @@
         <div class="container caminho">
             <a href="/professores">← Professores</a>
             <span>/</span>
-            <!--DAL PRA-->
-            <span>Nome Do Professor</span>
+            <span>{{ professor.nome if professor else 'Perfil' }}</span>
         </div>
 
         <section class="perfil-hero">
             <div class="container perfil-in">
-
-                <div class="foto-grande">
+                <div class="foto-grande" style="display:flex;align-items:center;justify-content:center;background:linear-gradient(160deg,#ece4ff 0%,#d8ccff 100%);">
+                    {% if professor_foto_b64 %}
+                    <img src="data:image/jpeg;base64,{{ professor_foto_b64 }}" alt="{{ professor.nome }}" style="width:100%;height:100%;object-fit:cover;">
+                    {% else %}
+                    <span style="font-size:5rem;font-weight:600;color:#5b36e0;">{{ professor.nome[0] | upper if professor and professor.nome else 'P' }}</span>
+                    {% endif %}
                     <div class="badge">
-                        <!--DAL PRA-->
-                        <span>★ Nota</span>
+                        <span>{{ total_aulas_agendadas }} agendadas</span>
                     </div>
                 </div>
 
                 <div class="info">
-                    <span class="eyebrow muted">INSTRUTORA PRINCIPAL</span>
-                    <!--DAL PRA-->
-                    <h1>Nome <em>Nome</em></h1>
-                    <span class="cargo grande">Categoria · Técnica Categoria</span>
+                    <span class="eyebrow muted">PROFESSOR(A) GRIP</span>
+                    <h1>
+                        {% if professor and professor.nome and ' ' in professor.nome %}
+                        {% set partes = professor.nome.split(' ', 1) %}
+                        {{ partes[0] }} <em>{{ partes[1] }}</em>
+                        {% else %}
+                        {{ professor.nome if professor else 'Professor(a)' }}
+                        {% endif %}
+                    </h1>
+                    <span class="cargo grande">{{ professor.registro_drt if professor and professor.registro_drt else 'Instrutor(a) especializado(a)' }}</span>
 
                     <p class="bio">
-                        <!--DAL PRA-->
-                        Lorem ipsum dolor, sit amet consectetur adipisicing elit. Ratione a voluptatibus veritatis
-                        recusandae voluptatum cum sunt molestiae quae incidunt delectus repellendus iste repellat
-                        tempora ut laborum, accusamus temporibus? Recusandae, labore?
+                        Aulas personalizadas para evolução técnica, postura e performance. Escolha o tipo de aula,
+                        defina data e horário e confirme seu agendamento em poucos cliques.
                     </p>
 
                     <div class="numeros">
                         <div class="numero">
-                            <!--DAL PRA-->
-                            <strong>Num+</strong>
-                            <span>Anos exp.</span>
-                        </div>
-                        <div class="numero">
-                            <!--DAL PRA-->
-                            <strong>Num</strong>
+                            <strong>{{ total_alunos_unicos }}</strong>
                             <span>Alunos</span>
                         </div>
                         <div class="numero">
-                            <!--DAL PRA-->
-                            <strong>Num+</strong>
-                            <span>Aulas</span>
+                            <strong>{{ total_aulas_agendadas }}</strong>
+                            <span>Aulas Futuras</span>
                         </div>
                         <div class="numero">
-                            <!--DAL PRA-->
-                            <strong>★ Nota</strong>
-                            <span>Avaliação</span>
+                            <strong>{{ 'DRT' if professor and professor.registro_drt else 'Grip' }}</strong>
+                            <span>{{ professor.registro_drt if professor and professor.registro_drt else 'Academy' }}</span>
+                        </div>
+                        <div class="numero">
+                            <strong>Ao Vivo</strong>
+                            <span>Agendamento</span>
                         </div>
                     </div>
 
@@ -116,125 +119,56 @@
             </div>
         </section>
 
-        <section class="sobre">
-            <div class="container sobre-in">
-                <div class="sobre-col">
-                    <span class="eyebrow muted">ESPECIALIDADES</span>
-                    <!--DAL PRA-->
-                    <h2>O que <em>Nome</em> ensina</h2>
-                    <p>Com base na tradição parisiense, seu ensino abrange desde os fundamentos até o refinamento
-                        técnico.</p>
-
-                    <div class="lista-espec">
-                        <div class="espec">
-                            <span class="nivel-ic">✦</span>
-                            <div>
-                                <!--DAL PRA-->
-                                <h4>Nome Técnica</h4>
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quaerat, porro natus
-                                    recusandae quis fugit nesciunt iure voluptate eligendi hic impedit totam architecto,
-                                    dicta, saepe pariatur. Dolor expedita a dolorem minima.</p>
-                            </div>
-                        </div>
-                        <div class="espec">
-                            <span class="nivel-ic">◆</span>
-                            <div>
-                                <!--DAL PRA-->
-                                <h4>Nome Técnica</h4>
-                                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolore dolor officiis
-                                    architecto eius temporibus quas alias suscipit. Repudiandae, consequatur quaerat
-                                    commodi ducimus fugiat esse cum, laboriosam dolorum eveniet asperiores perferendis.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="sobre-col">
-                    <span class="eyebrow muted">NÍVEIS ATENDIDOS</span>
-                    <h2>Para <em>todos os níveis</em></h2>
-                    <div class="niveis">
-                        <div class="nivel">
-                            <span class="nivel-ic">◇</span>
-                            <div>
-                                <h4>Iniciante</h4>
-                                <p>Para quem está começando do zero. Foco em postura e terminologia.</p>
-                            </div>
-                        </div>
-                        <div class="nivel">
-                            <span class="nivel-ic">★</span>
-                            <div>
-                                <h4>Avançado</h4>
-                                <p>Refinamento artístico e preparação profissional.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-           <section class="booking" id="aulas">
+        <section class="booking" id="agenda">
             <div class="container sec-titulo center">
                 <span class="eyebrow muted">AULAS AO VIVO</span>
-                <h2>Agende uma Aula <em>ao Vivo</em></h2>
-                <p>Agende instrução personalizada com nossos professores especialistas para feedback e orientação em
-                    tempo real.</p>
+                <h2>Agende uma Aula com <em>{{ professor.nome if professor else 'Professor(a)' }}</em></h2>
+                <p>Esta página exige login e o agendamento está disponível para conta de aluno.</p>
             </div>
+
             <div class="container reserva">
-                <div class="field">
-                    <label class="rotulo">Tipo de Aula</label>
-                    <div class="tipos">
-                        <label class="opcao active">
-                            <input type="radio" name="class-type" checked />
-                            <span class="ic">◇</span>
-                            <span>Aula em Grupo</span>
-                        </label>
-                        <label class="opcao">
-                            <input type="radio" name="class-type" />
-                            <span class="ic">◆</span>
-                            <span>Aula Particular</span>
-                        </label>
+                <form action="/agendar-aula" method="POST">
+                    <input type="hidden" name="professor_id" value="{{ professor.id if professor else '' }}">
+
+                    <div class="field">
+                        <label class="rotulo">Tipo de Aula</label>
+                        <div class="tipos">
+                            <label class="opcao active" style="cursor:pointer;">
+                                <input type="radio" name="tipo_aula" value="grupo" checked />
+                                <span class="ic">◇</span>
+                                <span>Aula em Grupo</span>
+                            </label>
+                            <label class="opcao" style="cursor:pointer;">
+                                <input type="radio" name="tipo_aula" value="particular" />
+                                <span class="ic">◆</span>
+                                <span>Aula Particular</span>
+                            </label>
+                        </div>
                     </div>
-                </div>
 
-                <div class="field">
-                    <label class="rotulo">Selecione o Professor</label>
-                    <div class="abas">
-                        <button class="tab active">Isabella</button>
-                        <button class="tab">Alexander</button>
-                        <button class="tab">Sofia</button>
-                        <button class="tab">Elena</button>
+                    <div class="field">
+                        <label class="rotulo" for="data_aula">Data</label>
+                        <input id="data_aula" type="date" name="data_aula" min="{{ hoje_data }}" required class="slot" style="width:100%;text-align:left;">
                     </div>
-                </div>
 
-                <div class="field">
-                    <label class="rotulo">Horários Disponíveis</label>
-                    <div class="grade-slots">
-                        <button class="slot active">9:30 - 10:30</button>
-                        <button class="slot">11:00 - 12:00</button>
-                        <button class="slot">14:00 - 15:00</button>
-                        <button class="slot">16:30 - 17:30</button>
+                    <div class="field">
+                        <label class="rotulo" for="hora_aula">Horário</label>
+                        <input id="hora_aula" type="time" name="hora_aula" min="07:00" max="22:00" step="1800" required class="slot" style="width:100%;text-align:left;">
                     </div>
-                </div>
 
-                <button class="btn btn-primary btn-block">Reservar Horário</button>
-            </div>
-        </section>
+                    <div class="field">
+                        <label class="rotulo" for="observacao">Observação (opcional)</label>
+                        <textarea id="observacao" name="observacao" rows="3" class="slot" style="width:100%;resize:vertical;" placeholder="Ex: foco em flexibilidade e postura."></textarea>
+                    </div>
 
-        <section class="cta">
-            <div class="container cta-box">
-                <h2>Comece sua jornada no <em>balé hoje</em></h2>
-                <p>Junte-se a milhares de bailarinos ao redor do mundo que estão descobrindo a sua graça e a arte do
-                    balé com nossos instrutores especializados.</p>
-                <div class="cta-btns">
-                    <a href="/cadastro" class="btn btn-secondary">Começar Teste Gratuito</a>
-                    <a href="/planos" class="btn btn-secondary">Visualizar Planos</a>
-                </div>
-                <ul class="cta-lista">
-                    <li>✓ Teste de 14 dias</li>
-                    <li>✓ Sem cartão de crédito</li>
-                    <li>✓ Cancele a qualquer momento</li>
-                </ul>
+                    {% if pode_agendar %}
+                    <button type="submit" class="btn btn-primary btn-block">Reservar Horário</button>
+                    {% else %}
+                    <button type="button" class="btn btn-secondary btn-block" disabled title="Somente alunos podem agendar">
+                        Somente aluno pode agendar
+                    </button>
+                    {% endif %}
+                </form>
             </div>
         </section>
     </main>
@@ -272,6 +206,8 @@
     </footer>
 
     <script src="/static/js/scriptprofessores.js"></script>
+    <script src="/static/js/main.js"></script>
+    <script src="/static/js/sheet.js"></script>
 </body>
 
 </html>

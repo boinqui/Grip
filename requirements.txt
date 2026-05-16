@@ -8,5 +8,5 @@ pymysql~=1.1.1
 starlette~=0.45.3
 cryptography~=44.0.2
 python-multipart~=0.0.20
-pregex~=2.1.2
+pregex~=2.3.3
 validate-docbr~=1.10.0

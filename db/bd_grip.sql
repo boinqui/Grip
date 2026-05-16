@@ -33,6 +33,19 @@ CREATE TABLE Professor_Aluno (
     fk_Aluno_id INTEGER
 );
 
+CREATE TABLE Agendamento_Aula (
+    id INTEGER PRIMARY KEY AUTO_INCREMENT,
+    fk_Aluno_id INTEGER NOT NULL,
+    fk_Professor_id INTEGER NOT NULL,
+    tipo_aula VARCHAR(30) NOT NULL,
+    data_hora DATETIME NOT NULL,
+    observacao VARCHAR(255),
+    status VARCHAR(20) NOT NULL DEFAULT 'agendada',
+    criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uq_agendamento_prof_horario (fk_Professor_id, data_hora),
+    UNIQUE KEY uq_agendamento_aluno_horario (fk_Aluno_id, data_hora)
+);
+
 
 ALTER TABLE Aula ADD CONSTRAINT FK_Aula_2
     FOREIGN KEY (fk_Professor_id)
@@ -47,6 +60,16 @@ ALTER TABLE Professor_Aluno ADD CONSTRAINT FK_Professor_Aluno_2
     FOREIGN KEY (fk_Aluno_id)
     REFERENCES Aluno (id)
     ON DELETE SET NULL;
+
+ALTER TABLE Agendamento_Aula ADD CONSTRAINT FK_Agendamento_Aula_Aluno
+    FOREIGN KEY (fk_Aluno_id)
+    REFERENCES Aluno (id)
+    ON DELETE CASCADE;
+
+ALTER TABLE Agendamento_Aula ADD CONSTRAINT FK_Agendamento_Aula_Professor
+    FOREIGN KEY (fk_Professor_id)
+    REFERENCES Professor (id)
+    ON DELETE CASCADE;
 
 ALTER TABLE Aluno ADD COLUMN fotoPerfil MEDIUMBLOB;
 ALTER TABLE Professor ADD COLUMN fotoPerfil MEDIUMBLOB;
@@ -72,5 +95,7 @@ INSERT INTO Aluno (id, nome, cpf, telefone, email, senha) VALUES
 INSERT INTO Professor_Aluno (fk_Professor_id, fk_Aluno_id) VALUES
 (1, 1);
 
-SELECT * FROM Professor;
+INSERT INTO Agendamento_Aula (fk_Aluno_id, fk_Professor_id, tipo_aula, data_hora, observacao, status) VALUES
+(1, 1, 'particular', '2026-04-10 14:00:00', 'Aula focada em postura e equilíbrio', 'agendada');
 
+SELECT * FROM Professor;
