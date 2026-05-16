@@ -84,7 +84,12 @@
                            pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
                 </div>
 
-                <!-- CORREÇÃO 1: Adicionado grupo-campos aqui para Telefone e CPF ficarem alinhados lado a lado -->
+                 <div class="campo">
+                    <label for="data_nascimento">Data de nascimento</label>
+                    <input type="date" id="data_nascimento" name="data_nascimento" required>
+
+                 </div>
+
                 <div class="grupo-campos">
                     <div class="campo">
                         <label for="telefone">Telefone</label>
@@ -199,6 +204,22 @@
         configurarOlho('senha', 'eyeIconSenha');
         configurarOlho('confirmar_senha', 'eyeIconConfirmar');
     </script>
+    <script>
+    const birthdateInput = document.getElementById('data_nascimento');
+    
+    if (birthdateInput) {
+        const today = new Date();
+        const yearToday = today.getFullYear(); 
+        const monthToday = String(today.getMonth() + 1).padStart(2, '0');
+        const dayToday = String(today.getDate()).padStart(2, '0');
+        
+        const maxYear = yearToday - 18;
+        birthdateInput.max = `${maxYear}-${monthToday}-${dayToday}`;
+        
+        const minYear = yearToday - 100;
+        birthdateInput.min = `${minYear}-${monthToday}-${dayToday}`;
+    }
+</script>
 </body>
 
 </html>

@@ -253,6 +253,12 @@
                                     value="{{ aluno.cpf if aluno else '' }}"
                                     placeholder="000.000.000-00" disabled />
                             </div>
+                            <div class="form-campo">
+                                <label for="data_nascimento">Data de Nascimento</label>
+                                <input type="text" id="data_nascimento" name="data_nascimento"
+                                    value="{{ aluno.data_nascimento if aluno else '' }}"
+                                    placeholder="00/00/0000" disabled />
+                            </div>
                             <div class="form-campo full">
                                 <label for="bio">Sobre mim <span class="label-opcional">(opcional)</span></label>
                                 <textarea id="bio" name="bio" placeholder="Conte um pouco sobre sua relação com o ballet…"></textarea>
@@ -316,6 +322,8 @@
                     <button class="btn-danger" onclick="confirmarExclusao()">Excluir minha conta</button>
                 </div>
 
+                <form id="formExcluirConta" action="/alunoExcluirConta" method="POST" style="display:none;"></form>
+
             </div>
         </div>
 
@@ -378,7 +386,12 @@
         }
 
         function confirmarExclusao() {
-            if (!window.SheetModal) return;
+            if (!window.SheetModal) {
+                if (confirm('Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.')) {
+                    document.getElementById('formExcluirConta').submit();
+                }
+                return;
+            }
             window.SheetModal.showConfirm({
                 title: 'Confirmar exclusão',
                 message: 'Tem certeza que deseja excluir sua conta? Esta ação não pode ser desfeita.',
@@ -386,11 +399,7 @@
                 cancelText: 'Cancelar',
             }).then((confirmado) => {
                 if (confirmado) {
-                    window.SheetModal.showMessage({
-                        type: 'info',
-                        title: 'Aviso',
-                        message: 'Funcionalidade disponível em breve.',
-                    });
+                    document.getElementById('formExcluirConta').submit();
                 }
             });
         }

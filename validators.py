@@ -3,6 +3,7 @@ import re
 from pregex.core.classes import AnyDigit, AnyLetter, AnyButWhitespace, AnyBetween, AnyWhitespace
 from pregex.core.quantifiers import AtLeast, Exactly
 from pregex.core.operators import Either
+from datetime import date
 
 cpf_validator = CPF()
 
@@ -43,3 +44,19 @@ def validate_name(name: str) -> bool:
         AnyBetween('ø', 'ÿ'), AnyWhitespace()
     )
     return AtLeast(letras, 1).is_exact_match(name)
+
+def validate_birthday(birthday: str) -> bool:
+    try:
+
+        birth_date = date.fromisoformat(birthday)
+    except (ValueError, TypeError):
+        return False
+        
+    today = date.today()
+
+    age = today.year - birth_date.year - ((today.month, today.day) < (birth_date.month, birth_date.day))
+    
+    MIN_AGE = 18
+    MAX_AGE = 100
+    
+    return MIN_AGE <= age <= MAX_AGE

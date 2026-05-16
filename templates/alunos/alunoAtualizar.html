@@ -69,24 +69,31 @@
                 <div class="admin-campo">
                     <label>Nome completo</label>
                     <input type="text" name="nome" value="{{ aluno.nome }}" required
-                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" title="O nome deve conter apenas letras.">
+                        pattern="[{{ regex_nome }}" title="O nome deve conter apenas letras.">
                 </div>
 
                 <div class="admin-campo">
                     <label>CPF</label>
-                    <input type="text" value="{{ aluno.cpf }}" disabled>
+                    <input type="text" value="{{ aluno.cpf }}" placeholder="000.000.000-00"
+                        pattern="{{ regex_cpf }}" title="O CPF deve estar no formato 000.000.000-00." required disabled>
                 </div>
 
                 <div class="admin-campo">
                     <label>Telefone</label>
                     <input type="tel" name="telefone" value="{{ aluno.telefone }}" required
-                        pattern="\(?\d{2}\)?\s?9?\d{4}-?\d{4}">
+                        pattern="{{ regex_telefone }}" title="O telefone deve estar no formato (41) 99999-9999.">
                 </div>
 
                 <div class="admin-campo">
                     <label>E-mail</label>
                     <input type="email" name="email" value="{{ aluno.email }}" required
-                        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+                        pattern="{{ regex_email }}" title="O e-mail deve estar no formato user@example.com">
+                </div>
+
+                <div class="admin-campo">
+                    <label>Data de Nascimento</label>
+                    <input type="date" name="data_nascimento" value="{{ aluno.data_nascimento }}" required
+                        pattern="{{ regex_data_nascimento }}">
                 </div>
 
                 <div class="form-acoes">

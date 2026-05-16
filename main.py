@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import secrets
 from mangum import Mangum
-from validators import validate_email, validate_cpf, validate_phone, validate_password, validate_drt, validate_name
+from validators import validate_email, validate_cpf, validate_phone, validate_password, validate_drt, validate_name, validate_birthday
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -185,7 +185,7 @@ async def sobre_page(request: Request, db=Depends(get_db)):
 async def login(
     request: Request,
     Email: str = Form(...),
-    Senha: str = Form(...),
+    senha: str = Form(...),
     db=Depends(get_db)
 ):
     try:
@@ -194,7 +194,7 @@ async def login(
             cursor.execute("SELECT id, nome, senha FROM Professor WHERE email = %s", (Email,))
             professor = cursor.fetchone()
             
-            if professor and verify_password(Senha, professor["senha"]):
+            if professor and verify_password(senha, professor["senha"]):
                 request.session["user_logged_in"] = True
                 request.session["usuario_id"] = professor["id"]
                 request.session["nome_usuario"] = professor["nome"]
@@ -205,7 +205,7 @@ async def login(
             cursor.execute("SELECT id, nome, senha FROM Aluno WHERE email = %s", (Email,))
             aluno = cursor.fetchone()
 
-            if aluno and verify_password(Senha, aluno["senha"]):
+            if aluno and verify_password(senha, aluno["senha"]):
                 request.session["user_logged_in"] = True
                 request.session["usuario_id"] = aluno["id"]
                 request.session["nome_usuario"] = aluno["nome"]
@@ -244,7 +244,7 @@ async def aluno_perfil(request: Request, db=Depends(get_db), auth=Depends(verify
     plano_status = "sem_plano"
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT id, nome, cpf, telefone, email, fotoPerfil FROM Aluno WHERE id = %s", (usuario_id,))
+            cursor.execute("SELECT id, nome, cpf, telefone, email, fotoPerfil, data_nascimento FROM Aluno WHERE id = %s", (usuario_id,))
             aluno = cursor.fetchone()
             cursor.execute("""
                 SELECT A.id, A.nome, A.data, A.descricao, P.nome AS professor_nome
@@ -287,7 +287,7 @@ async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome, registro_drt, cpf, email, fotoPerfil FROM Professor WHERE id = %s", (usuario_id,))
             professor = cursor.fetchone()
-            cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno ORDER BY nome")
+            cursor.execute("SELECT id, nome, cpf, telefone, email, data_nascimento FROM Aluno ORDER BY nome")
             alunos = cursor.fetchall()
             cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor ORDER BY nome")
             professores = cursor.fetchall()
@@ -347,6 +347,7 @@ async def cadastrar_usuario(
     confirmar_senha: str = Form(None),
     cpf: str = Form(...),
     telefone: str = Form(...),
+    data_nascimento: str = Form(...),
     db=Depends(get_db)
 ):
     try:
@@ -375,6 +376,10 @@ async def cadastrar_usuario(
             request.session["mensagem"] = "Telefone inválido"
             return RedirectResponse(url="/cadastro", status_code=303)
 
+        if not validate_birthday(data_nascimento):
+            request.session["mensagem"] = "Data de Nascimento inválida"
+            return RedirectResponse(url="/cadastro", status_code=303)
+
         #parte do banco
         with db.cursor() as cursor:
             cursor.execute("SELECT id FROM Aluno WHERE email = %s", (email,))
@@ -384,8 +389,8 @@ async def cadastrar_usuario(
 
             senha_hash = hash_password(senha)
             cursor.execute(
-                "INSERT INTO Aluno (nome, cpf, telefone, email, senha) VALUES (%s, %s, %s, %s, %s)",
-                (nome, cpf, telefone, email, senha_hash)
+                "INSERT INTO Aluno (nome, cpf, telefone, email, senha, data_nascimento) VALUES (%s, %s, %s, %s, %s, %s)",
+                (nome, cpf, telefone, email, senha_hash, data_nascimento)
             )
             db.commit()
             request.session["mensagem"] = "Aluno cadastrado com sucesso! Você já pode realizar login."
@@ -647,7 +652,7 @@ async def prof_senha_post(
 async def listar_alunos(request: Request, db=Depends(get_db), auth=Depends(verify_logged_in)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno ORDER BY nome")
+            cursor.execute("SELECT id, nome, cpf, telefone, email, data_nascimento FROM Aluno ORDER BY nome")
             alunos = cursor.fetchall()
     finally:
         db.close()
@@ -680,6 +685,7 @@ async def aluno_incluir_post(
     telefone: str = Form(...),
     email: str = Form(...),
     senha: str = Form(...),
+    data_nascimento: str = Form(...),
     db=Depends(get_db),
     auth=Depends(verify_admin)
 ):
@@ -706,6 +712,10 @@ async def aluno_incluir_post(
             request.session["mensagem"] = "Telefone inválido"
             return RedirectResponse(url="/alunoIncluir", status_code=303)
 
+        if not validate_birthday(data_nascimento):
+            request.session["mensagem"] = "Data de Nascimento inválida"
+            return RedirectResponse(url="/alunoIncluir", status_code=303)
+
         #banco
         with db.cursor() as cursor:
             senha_hash = hash_password(senha)
@@ -726,7 +736,7 @@ async def aluno_incluir_post(
 async def aluno_excluir(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno WHERE id = %s", (id,))
+            cursor.execute("SELECT id, nome, cpf, telefone, email, data_nascimento FROM Aluno WHERE id = %s", (id,))
             aluno = cursor.fetchone()
     finally:
         db.close()
@@ -791,8 +801,6 @@ async def aluno_atualizar_post(
             request.session["mensagem"] = "Telefone inválido"
             return RedirectResponse(url="/alunoAtualizar", status_code=303)
 
-
-
         with db.cursor() as cursor:
             #att cpf e senha nao é aqui
             cursor.execute(
@@ -844,6 +852,26 @@ async def aluno_senha_post(
     finally:
         db.close()
     return RedirectResponse(url="/profPerfil", status_code=303)
+
+@app.post("/alunoExcluirConta")
+async def aluno_excluir_conta(
+    request: Request,
+    db=Depends(get_db),
+    auth=Depends(verify_logged_in)
+):
+    usuario_id = request.session.get("usuario_id")
+    try:
+        with db.cursor() as cursor:
+            cursor.execute("DELETE FROM Aluno WHERE id = %s", (usuario_id,))
+            db.commit()
+        request.session.clear()
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao excluir conta: {str(e)}"
+        return RedirectResponse(url="/alunoPerfil", status_code=303)
+    finally:
+        db.close()
+    return RedirectResponse(url="/", status_code=303)
+
 
 @app.post("/alunoAtualizarFoto")
 async def aluno_atualizar_foto(
