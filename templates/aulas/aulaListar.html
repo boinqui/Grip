@@ -61,6 +61,19 @@
                 <p>{{ hoje }}</p>
             </div>
             <div class="admin-search">
+                <form method="get" action="/aulaListar" class="admin-search">
+                    <input type="text" name="q" placeholder="Buscar aula, descrição ou professor..." value="{{ filtros.q if filtros else '' }}" />
+                    <select name="professor_id" aria-label="Filtrar por professor">
+                        <option value="">Todos os professores</option>
+                        {% for prof in professores_filtro %}
+                        <option value="{{ prof.id }}" {% if filtros and filtros.professor_id == (prof.id|string) %}selected{% endif %}>{{ prof.nome }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="date" name="data_inicio" value="{{ filtros.data_inicio if filtros else '' }}" />
+                    <input type="date" name="data_fim" value="{{ filtros.data_fim if filtros else '' }}" />
+                    <button type="submit" class="btn btn-primary btn-sm">Filtrar</button>
+                    <a href="/aulaListar" class="btn btn-secondary btn-sm">Limpar</a>
+                </form>
                 {% if perfil == "admin" %}
                 <a href="/aulaIncluir" class="btn btn-primary btn-sm">+ Nova</a>
                 {% endif %}
