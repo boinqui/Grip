@@ -62,47 +62,46 @@
             </div>
         </div>
 
-        <div class="form-card">
-            <form action="/alunoAtualizar" method="POST" class="admin-form">
-                <input type="hidden" name="id" value="{{ aluno.id }}">
+            <div class="form-card">
+                <form id="alunoAtualizarForm" action="/alunoAtualizar" method="POST" class="admin-form">
+                    <input type="hidden" name="id" value="{{ aluno.id }}">
 
-                <div class="admin-campo">
-                    <label>Nome completo</label>
-                    <input type="text" name="nome" value="{{ aluno.nome }}" required
-                        pattern="[{{ regex_nome }}" title="O nome deve conter apenas letras.">
-                </div>
+                    <div class="admin-campo">
+                        <label>Nome completo</label>
+                        <input type="text" id="nome" name="nome" value="{{ aluno.nome }}">
+                        <span class="campo-erro" id="erro-nome"></span>
+                    </div>
 
-                <div class="admin-campo">
-                    <label>CPF</label>
-                    <input type="text" value="{{ aluno.cpf }}" placeholder="000.000.000-00"
-                        pattern="{{ regex_cpf }}" title="O CPF deve estar no formato 000.000.000-00." required disabled>
-                </div>
+                    <div class="admin-campo">
+                        <label>CPF</label>
+                        <input type="text" name="cpf" value="{{ aluno.cpf }}" placeholder="000.000.000-00" readonly>
+                    </div>
 
-                <div class="admin-campo">
-                    <label>Telefone</label>
-                    <input type="tel" name="telefone" value="{{ aluno.telefone }}" required
-                        pattern="{{ regex_telefone }}" title="O telefone deve estar no formato (41) 99999-9999.">
-                </div>
+                    <div class="admin-campo">
+                        <label>Telefone</label>
+                        <input type="tel" id="telefone" name="telefone" value="{{ aluno.telefone }}">
+                        <span class="campo-erro" id="erro-telefone"></span>
+                    </div>
 
-                <div class="admin-campo">
-                    <label>E-mail</label>
-                    <input type="email" name="email" value="{{ aluno.email }}" required
-                        pattern="{{ regex_email }}" title="O e-mail deve estar no formato user@example.com">
-                </div>
+                    <div class="admin-campo">
+                        <label>E-mail</label>
+                        <input type="email" id="email" name="email" value="{{ aluno.email }}">
+                        <span class="campo-erro" id="erro-email"></span>
+                    </div>
 
-                <div class="admin-campo">
-                    <label>Data de Nascimento</label>
-                    <input type="date" name="data_nascimento" value="{{ aluno.data_nascimento }}" required
-                        pattern="{{ regex_data_nascimento }}">
-                </div>
+                    <div class="admin-campo">
+                        <label>Data de Nascimento</label>
+                        <input type="date" id="data_nascimento" name="data_nascimento" value="{{ aluno.data_nascimento }}">
+                        <span class="campo-erro" id="erro-data"></span>
+                    </div>
 
-                <div class="form-acoes">
-                    <button type="submit" class="btn btn-primary">Salvar</button>
-                    <a href="/alunoListar" class="btn btn-secondary">Cancelar</a>
-                </div>
+                    <div class="form-acoes">
+                        <button type="submit" class="btn btn-primary">Salvar</button>
+                        <a href="/alunoListar" class="btn btn-secondary">Cancelar</a>
+                    </div>
 
-            </form>
-        </div>
+                </form>
+            </div>
 
     </div>
 
@@ -137,5 +136,64 @@
             <p>© 2026 Grip. Todos os direitos reservados.</p>
         </div>
     </footer>
+
+    <script>
+    const birthdateInput = document.getElementById('data_nascimento');
+    if (birthdateInput) {
+        const today = new Date();
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const d = String(today.getDate()).padStart(2, '0');
+        birthdateInput.max = `${y - 18}-${m}-${d}`;
+        birthdateInput.min = `${y - 100}-${m}-${d}`;
+    }
+
+    document.getElementById('alunoAtualizarForm').addEventListener('submit', function(e) {
+        let valido = true;
+
+        function mostrarErro(id, msg) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = msg;
+            el.classList.add('visivel');
+        }
+        function limparErro(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = '';
+            el.classList.remove('visivel');
+        }
+
+        const nome = document.getElementById('nome');
+        const telefone = document.getElementById('telefone');
+        const email = document.getElementById('email');
+        const data = document.getElementById('data_nascimento');
+
+        if (!nome || !/^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$/.test(nome.value.trim())) {
+            mostrarErro('erro-nome', 'Nome deve conter apenas letras.'); valido = false;
+        } else { limparErro('erro-nome'); }
+
+        if (!telefone || !/^\(\d{2}\)\s\d{4,5}-\d{4}$/.test(telefone.value)) {
+            mostrarErro('erro-telefone', 'Informe um telefone válido: (41) 99999-9999.'); valido = false;
+        } else { limparErro('erro-telefone'); }
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+            mostrarErro('erro-email', 'Informe um e-mail válido.'); valido = false;
+        } else { limparErro('erro-email'); }
+
+        if (!data || !data.value) {
+            mostrarErro('erro-data', 'Informe a data de nascimento.'); valido = false;
+        } else {
+            const nasc = new Date(data.value);
+            const hoje = new Date();
+            const idade = hoje.getFullYear() - nasc.getFullYear();
+            if (idade < 18 || idade > 100) {
+                mostrarErro('erro-data', 'Idade deve estar entre 18 e 100 anos.'); valido = false;
+            } else { limparErro('erro-data'); }
+        }
+
+        if (!valido) e.preventDefault();
+    });
+    </script>
 </body>
 </html>

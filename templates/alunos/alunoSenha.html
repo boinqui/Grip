@@ -64,14 +64,13 @@
         </div>
 
         <div class="form-card">
-            <form action="/alunoSenha" method="POST" class="admin-form">
+            <form id="alunoSenhaForm" action="/alunoSenha" method="POST" class="admin-form">
                 <input type="hidden" name="id" value="{{ aluno.id }}">
 
                 <div class="admin-campo">
                     <label for="nova_senha">Nova Senha</label>
-                    <input type="password" name="nova_senha" id="nova_senha" required
-                        pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$"
-                        title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número.">
+                    <input type="password" name="nova_senha" id="nova_senha">
+                    <span class="campo-erro" id="erro-senha"></span>
                 </div>
 
                 <div class="form-acoes">
@@ -114,5 +113,20 @@
             <p>© 2026 Grip. Todos os direitos reservados.</p>
         </div>
     </footer>
+    <script>
+    document.getElementById('alunoSenhaForm').addEventListener('submit', function(e) {
+        const senha = document.getElementById('nova_senha');
+        const erro = document.getElementById('erro-senha');
+
+        if (!senha || senha.value.length < 8 || !/[A-Za-z]/.test(senha.value) || !/\d/.test(senha.value)) {
+            erro.textContent = 'A senha deve ter pelo menos 8 caracteres, uma letra e um número.';
+            erro.classList.add('visivel');
+            e.preventDefault();
+        } else {
+            erro.textContent = '';
+            erro.classList.remove('visivel');
+        }
+    });
+    </script>
 </body>
 </html>

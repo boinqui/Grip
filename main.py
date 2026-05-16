@@ -40,6 +40,14 @@ DB_CONFIG = {
 PASSWORD_ALGORITHM = "pbkdf2_sha256"
 PASSWORD_ITERATIONS = 390000
 
+REGEX_PATTERNS = {
+    "regex_nome": r"[A-Za-zÀ-ÖØ-öø-ÿ\s]+",
+    "regex_cpf": r"\d{3}\.\d{3}\.\d{3}-\d{2}",
+    "regex_telefone": r"\(\d{2}\)\s?\d{4,5}-\d{4}",
+    "regex_email": r"[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}",
+    "regex_data_nascimento": r"\d{4}-\d{2}-\d{2}",
+}
+
 
 def get_db():
     return pymysql.connect(**DB_CONFIG)
@@ -162,7 +170,8 @@ async def login_get(request: Request):
     return templates.TemplateResponse("cadastrologin/login.html", {
         "request": request,
         "mensagem": mensagem,
-        "status": "erro" if mensagem else None
+        "status": "erro" if mensagem and mensagem.startswith("Erro:") else ("sucesso" 
+  if mensagem else None)     
     })
 
 @app.get("/aulas", response_class=HTMLResponse)
@@ -647,6 +656,11 @@ async def cadastrar_usuario(
             if cursor.fetchone():
                 request.session["mensagem"] = "Erro: Este e-mail já está em uso!"
                 return RedirectResponse(url="/cadastro", status_code=303)
+            
+            cursor.execute("SELECT id FROM Aluno WHERE cpf = %s", (cpf,))
+            if cursor.fetchone():
+                request.session["mensagem"] = "Erro: Este CPF já está em uso!"
+                return RedirectResponse(url="/cadastro", status_code=303)
 
             senha_hash = hash_password(senha)
             cursor.execute(
@@ -934,7 +948,8 @@ async def listar_alunos(request: Request, db=Depends(get_db), auth=Depends(verif
 async def aluno_incluir(request: Request, auth=Depends(verify_admin)):
     return templates.TemplateResponse("alunos/alunoIncluir.html", {
         "request": request,
-        "nome_usuario": request.session.get("nome_usuario")
+        "nome_usuario": request.session.get("nome_usuario"),
+        **REGEX_PATTERNS
     })
 
 
@@ -1026,14 +1041,15 @@ async def aluno_excluir_post(request: Request, id: int = Form(...), db=Depends(g
 async def aluno_atualizar(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT id, nome, cpf, telefone, email FROM Aluno WHERE id = %s", (id,))
+            cursor.execute("SELECT id, nome, cpf, telefone, email, data_nascimento FROM Aluno WHERE id = %s", (id,))
             aluno = cursor.fetchone()
     finally:
         db.close()
     return templates.TemplateResponse("alunos/alunoAtualizar.html", {
         "request": request,
         "aluno": aluno,
-        "nome_usuario": request.session.get("nome_usuario")
+        "nome_usuario": request.session.get("nome_usuario"),
+        **REGEX_PATTERNS
     })
 
 

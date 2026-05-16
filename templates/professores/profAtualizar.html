@@ -63,13 +63,13 @@
         </div>
 
         <div class="form-card">
-            <form action="/profAtualizar" method="POST" class="admin-form">
+            <form id="profAtualizarForm" action="/profAtualizar" method="POST" class="admin-form">
                 <input type="hidden" name="id" value="{{ prof.id }}">
 
                 <div class="admin-campo">
                     <label>Nome</label>
-                    <input type="text" name="nome" value="{{ prof.nome }}" required
-                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" title="O nome deve conter apenas letras.">
+                    <input type="text" id="nome" name="nome" value="{{ prof.nome }}">
+                    <span class="campo-erro" id="erro-nome"></span>
                 </div>
 
                 <div class="admin-campo">
@@ -84,7 +84,8 @@
 
                 <div class="admin-campo">
                     <label>E-mail</label>
-                    <input type="email" name="email" value="{{ prof.email }}" required>
+                    <input type="email" id="email" name="email" value="{{ prof.email }}">
+                    <span class="campo-erro" id="erro-email"></span>
                 </div>
 
                 <div class="form-acoes">
@@ -128,5 +129,36 @@
             <p>© 2026 Grip. Todos os direitos reservados.</p>
         </div>
     </footer>
+    <script>
+    document.getElementById('profAtualizarForm').addEventListener('submit', function(e) {
+        let valido = true;
+
+        function mostrarErro(id, msg) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = msg;
+            el.classList.add('visivel');
+        }
+        function limparErro(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = '';
+            el.classList.remove('visivel');
+        }
+
+        const nome = document.getElementById('nome');
+        const email = document.getElementById('email');
+
+        if (!nome || !/^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$/.test(nome.value.trim())) {
+            mostrarErro('erro-nome', 'Nome deve conter apenas letras.'); valido = false;
+        } else { limparErro('erro-nome'); }
+
+        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
+            mostrarErro('erro-email', 'Informe um e-mail válido.'); valido = false;
+        } else { limparErro('erro-email'); }
+
+        if (!valido) e.preventDefault();
+    });
+    </script>
 </body>
 </html>

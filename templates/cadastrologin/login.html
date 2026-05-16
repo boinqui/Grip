@@ -74,19 +74,18 @@
             <form id="loginForm" action="/login" method="POST" class="form">
                 <div class="campo">
                     <label for="email">Email</label>
-                    <input type="email" id="email" name="Email" placeholder="seu@email.com" 
-                           pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" required>
+                    <input type="email" id="email" name="Email" placeholder="seu@email.com">
+                    <span class="campo-erro" id="erro-email"></span>
                 </div>
 
                 <div class="grupo-campos">
                     <div class="campo">
                         <label for="senha">Senha</label>
                         <div class="input-wrapper">
-                            <input type="password" id="senha" name="senha" placeholder="••••••••"
-                                pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$"
-                                title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número." required>
+                            <input type="password" id="senha" name="senha" placeholder="••••••••">
                             <i class="fa-solid fa-eye toggle-password" id="eyeIconSenha"></i>
                         </div>
+                        <span class="campo-erro" id="erro-senha"></span>
                     </div>
                 </div>
 
