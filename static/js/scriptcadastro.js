@@ -1,5 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('cadastroForm');
+    if (!form) {
+        return;
+    }
+
     const senha = document.getElementById('senha');
     const confirmarSenha = document.getElementById('confirmar_senha');
     const telefone = document.getElementById('telefone');
@@ -53,17 +57,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (senha.value !== confirmarSenha.value) {
             e.preventDefault();
-            alert('As senhas não coincidem!');
+            if (window.SheetModal) {
+                window.SheetModal.showMessage({
+                    type: 'error',
+                    title: 'Erro',
+                    message: 'As senhas não coincidem!',
+                });
+            }
             return;
         }
 
         if (senha.value.length < 8) {
             e.preventDefault();
-            alert('A senha deve ter pelo menos 8 caracteres.');
+            if (window.SheetModal) {
+                window.SheetModal.showMessage({
+                    type: 'error',
+                    title: 'Erro',
+                    message: 'A senha deve ter pelo menos 8 caracteres.',
+                });
+            }
             return;
         }
-
-        console.log('Formulário enviado com sucesso!');
     });
 
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
