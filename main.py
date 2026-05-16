@@ -1149,15 +1149,70 @@ async def aluno_atualizar_foto(
 
 @app.get("/aulaListar", response_class=HTMLResponse)
 async def listar_aulas(request: Request, db=Depends(get_db), auth=Depends(verify_logged_in)):
+    q = (request.query_params.get("q") or "").strip()
+    professor_id_raw = (request.query_params.get("professor_id") or "").strip()
+    data_inicio = (request.query_params.get("data_inicio") or "").strip()
+    data_fim = (request.query_params.get("data_fim") or "").strip()
+
+    professor_id = professor_id_raw if professor_id_raw.isdigit() else ""
+
+    if data_inicio:
+        try:
+            datetime.strptime(data_inicio, "%Y-%m-%d")
+        except ValueError:
+            data_inicio = ""
+
+    if data_fim:
+        try:
+            datetime.strptime(data_fim, "%Y-%m-%d")
+        except ValueError:
+            data_fim = ""
+
+    filtros = {
+        "q": q,
+        "professor_id": professor_id,
+        "data_inicio": data_inicio,
+        "data_fim": data_fim
+    }
+
+    professores_filtro = []
+    aulas = []
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("""
+            where_clauses = []
+            query_params = []
+
+            if q:
+                termo = f"%{q}%"
+                where_clauses.append("(A.nome LIKE %s OR A.descricao LIKE %s OR P.nome LIKE %s)")
+                query_params.extend([termo, termo, termo])
+
+            if professor_id:
+                where_clauses.append("A.fk_Professor_id = %s")
+                query_params.append(int(professor_id))
+
+            if data_inicio:
+                where_clauses.append("DATE(A.data) >= %s")
+                query_params.append(data_inicio)
+
+            if data_fim:
+                where_clauses.append("DATE(A.data) <= %s")
+                query_params.append(data_fim)
+
+            query = """
                 SELECT A.id, A.nome, A.data, A.descricao, P.nome AS professor_nome
                 FROM Aula A
                 LEFT JOIN Professor P ON A.fk_Professor_id = P.id
-                ORDER BY A.data DESC
-            """)
+            """
+            if where_clauses:
+                query += " WHERE " + " AND ".join(where_clauses)
+
+            query += " ORDER BY A.data DESC"
+            cursor.execute(query, query_params)
             aulas = cursor.fetchall()
+
+            cursor.execute("SELECT id, nome FROM Professor ORDER BY nome")
+            professores_filtro = cursor.fetchall()
     finally:
         db.close()
         
@@ -1173,6 +1228,8 @@ async def listar_aulas(request: Request, db=Depends(get_db), auth=Depends(verify
     return templates.TemplateResponse("aulas/aulaListar.html", {
         "request": request,
         "aulas": aulas,
+        "professores_filtro": professores_filtro,
+        "filtros": filtros,
         "hoje": datetime.now().strftime("%d/%m/%Y %H:%M:%S"),
         "nome_usuario": request.session.get("nome_usuario"),
         "perfil": request.session.get("perfil"),
