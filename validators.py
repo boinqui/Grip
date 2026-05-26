@@ -1,21 +1,17 @@
 from validate_docbr import CPF
 import re
-from pregex.core.classes import AnyDigit, AnyLetter, AnyButWhitespace, AnyBetween, AnyWhitespace
+from pregex.core.classes import AnyDigit, AnyBetween, AnyWhitespace
 from pregex.core.quantifiers import AtLeast, Exactly
 from pregex.core.operators import Either
 from datetime import date
 
 cpf_validator = CPF()
+EMAIL_PATTERN = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
+AULA_NOME_PATTERN = re.compile(r"^[A-Za-zÀ-ÖØ-öø-ÿ0-9\s']+$")
 
 def validate_email(email: str) -> bool:
-    pattern = (
-        AtLeast(AnyButWhitespace(), 1) +
-        '@' +
-        AtLeast(AnyButWhitespace(), 1) +
-        '.' +
-        AtLeast(AnyLetter(), 2)
-    )
-    return pattern.is_exact_match(email)
+    email = (email or "").strip()
+    return EMAIL_PATTERN.fullmatch(email) is not None
 
 def validate_cpf(cpf: str) -> bool:
     return cpf_validator.validate(cpf)
@@ -38,12 +34,18 @@ def validate_name(name: str) -> bool:
     name = name.strip()
     if not name:
         return False
+    if not any(char.isalpha() for char in name):
+        return False
     letras = Either(
         AnyBetween('A', 'Z'), AnyBetween('a', 'z'),
         AnyBetween('À', 'Ö'), AnyBetween('Ø', 'ö'),
-        AnyBetween('ø', 'ÿ'), AnyWhitespace()
+        AnyBetween('ø', 'ÿ'), AnyWhitespace(), "'"
     )
     return AtLeast(letras, 1).is_exact_match(name)
+
+def validate_aula_nome(nome: str) -> bool:
+    nome = (nome or "").strip()
+    return AULA_NOME_PATTERN.fullmatch(nome) is not None
 
 def validate_birthday(birthday: str) -> bool:
     try:

@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import secrets
 from mangum import Mangum
-from validators import validate_email, validate_cpf, validate_phone, validate_password, validate_drt, validate_name, validate_birthday
+from validators import validate_email, validate_cpf, validate_phone, validate_password, validate_drt, validate_name, validate_aula_nome, validate_birthday
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
@@ -41,10 +41,10 @@ PASSWORD_ALGORITHM = "pbkdf2_sha256"
 PASSWORD_ITERATIONS = 390000
 
 REGEX_PATTERNS = {
-    "regex_nome": r"[A-Za-zÀ-ÖØ-öø-ÿ\s]+",
-    "regex_cpf": r"\d{3}\.\d{3}\.\d{3}-\d{2}",
-    "regex_telefone": r"\(\d{2}\)\s?\d{4,5}-\d{4}",
-    "regex_email": r"[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}",
+    "regex_nome": r"[A-Za-zÀ-ÖØ-öø-ÿ\s']+",
+    "regex_cpf": r"\d{3}\.?\d{3}\.?\d{3}-?\d{2}",
+    "regex_telefone": r"\(?\d{2}\)?\s?9\d{4}-?\d{4}",
+    "regex_email": r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
     "regex_data_nascimento": r"\d{4}-\d{2}-\d{2}",
 }
 
@@ -163,6 +163,7 @@ async def login_get(request: Request):
         return RedirectResponse(url="/alunoPerfil", status_code=303)
 
     mensagem = request.session.pop("mensagem", None)
+    form_data = request.session.pop("login_form", None)
     login_error = request.session.pop("login_error", None)
     if not mensagem and login_error:
         mensagem = login_error if login_error.startswith("Erro:") else f"Erro: {login_error}"
@@ -170,6 +171,7 @@ async def login_get(request: Request):
     return templates.TemplateResponse("cadastrologin/login.html", {
         "request": request,
         "mensagem": mensagem,
+        "form_data": form_data,
         "status": "erro" if mensagem and mensagem.startswith("Erro:") else ("sucesso" 
   if mensagem else None)     
     })
@@ -247,6 +249,7 @@ async def login(
             professor = cursor.fetchone()
             
             if professor and verify_password(senha, professor["senha"]):
+                request.session.pop("login_form", None)
                 request.session["user_logged_in"] = True
                 request.session["usuario_id"] = professor["id"]
                 request.session["nome_usuario"] = professor["nome"]
@@ -258,6 +261,7 @@ async def login(
             aluno = cursor.fetchone()
 
             if aluno and verify_password(senha, aluno["senha"]):
+                request.session.pop("login_form", None)
                 request.session["user_logged_in"] = True
                 request.session["usuario_id"] = aluno["id"]
                 request.session["nome_usuario"] = aluno["nome"]
@@ -266,8 +270,10 @@ async def login(
                 return RedirectResponse(url="/alunoPerfil", status_code=303)
 
             if not professor and not aluno:
+                request.session["login_form"] = {"email": Email}
                 request.session["mensagem"] = "Erro: Conta não encontrada."
             else:
+                request.session["login_form"] = {"email": Email}
                 request.session["mensagem"] = "Erro: E-mail ou senha incorretos."
             return RedirectResponse(url="/login", status_code=303)
 
@@ -582,6 +588,19 @@ async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_
         agendamento["tipo_fmt"] = tipo_aula.capitalize() if tipo_aula else "Aula"
 
     mensagem = request.session.pop("mensagem", None)
+    mensagem_tab = None
+    if mensagem:
+        mensagem_lower = mensagem.lower()
+        if "aula" in mensagem_lower:
+            mensagem_tab = "aulas"
+        elif "aluno" in mensagem_lower:
+            mensagem_tab = "alunos"
+        elif "professor" in mensagem_lower:
+            mensagem_tab = "professores"
+        elif "senha" in mensagem_lower or "foto" in mensagem_lower:
+            mensagem_tab = "configuracoes"
+        else:
+            mensagem_tab = "visao-geral"
 
     return templates.TemplateResponse("professores/profPerfil.html", {
         "request": request,
@@ -596,15 +615,18 @@ async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_
         "total_aulas": len(aulas),
         "agendamentos_futuros": agendamentos_futuros,
         "mensagem": mensagem,
+        "mensagem_tab": mensagem_tab,
     })
 
 
 @app.get("/cadastro", response_class=HTMLResponse)
 async def cadastro_page(request: Request):
     mensagem = request.session.pop("mensagem", None)
+    form_data = request.session.pop("cadastro_form", None)
     return templates.TemplateResponse("cadastrologin/cadastro.html", {
         "request": request,
-        "mensagem": mensagem
+        "mensagem": mensagem,
+        "form_data": form_data
     })
 
 
@@ -618,47 +640,74 @@ async def cadastrar_usuario(
     cpf: str = Form(...),
     telefone: str = Form(...),
     data_nascimento: str = Form(...),
+    termos: str | None = Form(None),
     db=Depends(get_db)
 ):
     try:
+        form_snapshot = {
+            "nome": nome,
+            "email": email,
+            "telefone": telefone,
+            "cpf": cpf,
+            "data_nascimento": data_nascimento,
+            "termos": bool(termos),
+        }
+
+        def stash_form():
+            request.session["cadastro_form"] = form_snapshot
+
         if confirmar_senha and senha != confirmar_senha:
+            stash_form()
             request.session["mensagem"] = "Erro: As senhas não coincidem!"
             return RedirectResponse(url="/cadastro", status_code=303)
         
         #colocando regex aqui
         if not validate_name(nome):
+            stash_form()
             request.session["mensagem"] = "Nome inválido"
             return RedirectResponse(url="/cadastro", status_code=303)
         
         if not validate_email(email):
+            stash_form()
             request.session["mensagem"] = "Email inválido"
             return RedirectResponse(url="/cadastro", status_code=303)
         
         if not validate_password(senha):
+            stash_form()
             request.session["mensagem"] = "Senha inválida"
             return RedirectResponse(url="/cadastro", status_code=303)
         
         if not validate_cpf(cpf):
+            stash_form()
             request.session["mensagem"] = "CPF inválido"
             return RedirectResponse(url="/cadastro", status_code=303)
 
         if not validate_phone(telefone):
+            stash_form()
             request.session["mensagem"] = "Telefone inválido"
             return RedirectResponse(url="/cadastro", status_code=303)
 
         if not validate_birthday(data_nascimento):
+            stash_form()
             request.session["mensagem"] = "Data de Nascimento inválida"
+            return RedirectResponse(url="/cadastro", status_code=303)
+
+        if not termos:
+            stash_form()
+            request.session["mensagem"] = "Erro: Você precisa aceitar os termos para continuar."
             return RedirectResponse(url="/cadastro", status_code=303)
 
         #parte do banco
         with db.cursor() as cursor:
             cursor.execute("SELECT id FROM Aluno WHERE email = %s", (email,))
             if cursor.fetchone():
+                stash_form()
                 request.session["mensagem"] = "Erro: Este e-mail já está em uso!"
                 return RedirectResponse(url="/cadastro", status_code=303)
             
             cursor.execute("SELECT id FROM Aluno WHERE cpf = %s", (cpf,))
             if cursor.fetchone():
+                stash_form()
                 request.session["mensagem"] = "Erro: Este CPF já está em uso!"
                 return RedirectResponse(url="/cadastro", status_code=303)
 
@@ -667,11 +716,26 @@ async def cadastrar_usuario(
                 "INSERT INTO Aluno (nome, cpf, telefone, email, senha, data_nascimento) VALUES (%s, %s, %s, %s, %s, %s)",
                 (nome, cpf, telefone, email, senha_hash, data_nascimento)
             )
+            aluno_id = cursor.lastrowid
             db.commit()
-            request.session["mensagem"] = "Aluno cadastrado com sucesso! Você já pode realizar login."
-            return RedirectResponse(url="/login", status_code=303)
+            request.session.pop("cadastro_form", None)
+            request.session["user_logged_in"] = True
+            request.session["usuario_id"] = aluno_id
+            request.session["nome_usuario"] = nome
+            request.session["email_usuario"] = email
+            request.session["perfil"] = "user"
+            request.session["mensagem"] = "Aluno cadastrado com sucesso!"
+            return RedirectResponse(url="/alunoPerfil", status_code=303)
 
     except Exception as e:
+        request.session["cadastro_form"] = {
+            "nome": nome,
+            "email": email,
+            "telefone": telefone,
+            "cpf": cpf,
+            "data_nascimento": data_nascimento,
+            "termos": bool(termos),
+        }
         request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
         return RedirectResponse(url="/cadastro", status_code=303)
     finally:
@@ -996,8 +1060,8 @@ async def aluno_incluir_post(
         with db.cursor() as cursor:
             senha_hash = hash_password(senha)
             cursor.execute(
-                "INSERT INTO Aluno (nome, cpf, telefone, email, senha) VALUES (%s, %s, %s, %s, %s)",
-                (nome, cpf, telefone, email, senha_hash)
+                "INSERT INTO Aluno (nome, cpf, telefone, email, senha, data_nascimento) VALUES (%s, %s, %s, %s, %s, %s)",
+                (nome, cpf, telefone, email, senha_hash, data_nascimento)
             )
             db.commit()
         request.session["mensagem"] = "Aluno cadastrado com sucesso!"
@@ -1060,6 +1124,7 @@ async def aluno_atualizar_post(
     nome: str = Form(...),
     telefone: str = Form(...),
     email: str = Form(...),
+    data_nascimento: str = Form(...),
     db=Depends(get_db),
     auth=Depends(verify_admin)
 ):
@@ -1078,11 +1143,15 @@ async def aluno_atualizar_post(
             request.session["mensagem"] = "Telefone inválido"
             return RedirectResponse(url="/alunoAtualizar", status_code=303)
 
+        if not validate_birthday(data_nascimento):
+            request.session["mensagem"] = "Data de Nascimento inválida"
+            return RedirectResponse(url="/alunoAtualizar", status_code=303)
+
         with db.cursor() as cursor:
             #att cpf e senha nao é aqui
             cursor.execute(
-                "UPDATE Aluno SET nome=%s, telefone=%s, email=%s WHERE id=%s",
-                (nome, telefone, email, id)
+                "UPDATE Aluno SET nome=%s, telefone=%s, email=%s, data_nascimento=%s WHERE id=%s",
+                (nome, telefone, email, data_nascimento, id)
             )
             db.commit()
         request.session["mensagem"] = "Cadastro do aluno atualizado com sucesso!"
@@ -1307,6 +1376,10 @@ async def aula_incluir_post(
     auth=Depends(verify_admin)
 ):
     try:
+        if not validate_aula_nome(nome):
+            request.session["mensagem"] = "Nome da aula inválido"
+            return RedirectResponse(url="/aulaIncluir", status_code=303)
+
         with db.cursor() as cursor:
             cursor.execute(
                 "INSERT INTO Aula (nome, data, descricao, fk_Professor_id) VALUES (%s, %s, %s, %s)",
@@ -1388,6 +1461,10 @@ async def aula_atualizar_post(
     auth=Depends(verify_admin)
 ):
     try:
+        if not validate_aula_nome(nome):
+            request.session["mensagem"] = "Nome da aula inválido"
+            return RedirectResponse(url="/aulaAtualizar", status_code=303)
+
         with db.cursor() as cursor:
             cursor.execute(
                 "UPDATE Aula SET nome=%s, data=%s, descricao=%s, fk_Professor_id=%s WHERE id=%s",

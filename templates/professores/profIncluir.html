@@ -67,31 +67,37 @@
 
                 <div class="admin-campo">
                     <label>Nome</label>
-                    <input type="text" id="nome" name="nome">
+                    <input type="text" id="nome" name="nome" required
+                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" title="O nome deve conter apenas letras.">
                     <span class="campo-erro" id="erro-nome"></span>
                 </div>
 
                 <div class="admin-campo">
                     <label>Registro DRT</label>
-                    <input type="text" id="registro_drt" name="registro_drt" placeholder="DRT-0000">
+                    <input type="text" id="registro_drt" name="registro_drt" placeholder="DRT-0000" required
+                        pattern="DRT-\d+" title="O registro deve seguir o formato DRT-1234">
                     <span class="campo-erro" id="erro-drt"></span>
                 </div>
 
                 <div class="admin-campo">
                     <label>CPF</label>
-                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14">
+                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14"
+                        pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}">
                     <span class="campo-erro" id="erro-cpf"></span>
                 </div>
 
                 <div class="admin-campo">
                     <label>E-mail</label>
-                    <input type="email" id="email" name="email">
+                    <input type="email" id="email" name="email" required
+                        pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$">
                     <span class="campo-erro" id="erro-email"></span>
                 </div>
 
                 <div class="admin-campo">
                     <label>Senha</label>
-                    <input type="password" id="senha" name="senha">
+                    <input type="password" id="senha" name="senha" required
+                        pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+                        title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número.">
                     <span class="campo-erro" id="erro-senha"></span>
                 </div>
 

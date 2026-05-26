@@ -4,10 +4,14 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
+    const nome = document.getElementById('nome');
+    const email = document.getElementById('email');
+    const dataNasc = document.getElementById('data_nascimento');
     const senha = document.getElementById('senha');
     const confirmarSenha = document.getElementById('confirmar_senha');
     const telefone = document.getElementById('telefone');
     const cpf = document.getElementById('cpf');
+    const termos = document.getElementById('termos');
 
     const formatarCpf = (valor) => {
         const digitos = valor.replace(/\D/g, '').slice(0, 11);
@@ -46,91 +50,159 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function mostrarErro(id, msg) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.textContent = msg;
-        el.classList.add('visivel');
-    }
+    const mostrarErro = (mensagem) => {
+        if (window.SheetModal) {
+            window.SheetModal.showMessage({
+                type: 'error',
+                title: 'Erro',
+                message: mensagem,
+            });
+        }
+    };
 
-    function limparErro(id) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.textContent = '';
-        el.classList.remove('visivel');
-    }
+    const validarPattern = (input) => {
+        const pattern = input.getAttribute('pattern');
+        if (!pattern) {
+            return true;
+        }
+        const source = pattern.startsWith('^') && pattern.endsWith('$')
+            ? pattern
+            : `^(?:${pattern})$`;
+        const regex = new RegExp(source);
+        return regex.test(input.value.trim());
+    };
+
+    const validarCampo = (input, mensagemObrigatorio, mensagemInvalido) => {
+        if (!input) {
+            return null;
+        }
+        const valor = input.value.trim();
+        if (input.required && !valor) {
+            return mensagemObrigatorio;
+        }
+        if (valor && !validarPattern(input)) {
+            return mensagemInvalido || input.getAttribute('title') || 'Valor inválido.';
+        }
+        return null;
+    };
+
+    const validarCpf = (valor) => {
+        const digitos = valor.replace(/\D/g, '');
+        if (digitos.length !== 11) {
+            return false;
+        }
+        if (/^(\d)\1+$/.test(digitos)) {
+            return false;
+        }
+        let soma = 0;
+        for (let i = 0; i < 9; i += 1) {
+            soma += parseInt(digitos.charAt(i), 10) * (10 - i);
+        }
+        let resto = (soma * 10) % 11;
+        if (resto === 10) resto = 0;
+        if (resto !== parseInt(digitos.charAt(9), 10)) {
+            return false;
+        }
+        soma = 0;
+        for (let i = 0; i < 10; i += 1) {
+            soma += parseInt(digitos.charAt(i), 10) * (11 - i);
+        }
+        resto = (soma * 10) % 11;
+        if (resto === 10) resto = 0;
+        return resto === parseInt(digitos.charAt(10), 10);
+    };
+
+    const validarDataNascimento = () => {
+        if (!dataNasc || !dataNasc.value) {
+            return 'Informe sua data de nascimento.';
+        }
+        const nasc = new Date(dataNasc.value);
+        if (Number.isNaN(nasc.getTime())) {
+            return 'Data de nascimento inválida.';
+        }
+        const hoje = new Date();
+        const idade = hoje.getFullYear() - nasc.getFullYear() -
+            ((hoje.getMonth(), hoje.getDate()) < (nasc.getMonth(), nasc.getDate()) ? 1 : 0);
+        if (idade < 18) {
+            return 'Você deve ter pelo menos 18 anos.';
+        }
+        if (idade > 100) {
+            return 'Data de nascimento inválida.';
+        }
+        return null;
+    };
 
     form.addEventListener('submit', (e) => {
-        if (cpf) cpf.value = formatarCpf(cpf.value);
-        if (telefone) telefone.value = formatarTelefone(telefone.value);
-
-        let valido = true;
-        const nome = document.getElementById('nome');
-        const email = document.getElementById('email');
-        const dataNasc = document.getElementById('data_nascimento');
-        const termos = document.getElementById('termos');
-
-        // Nome
-        if (!nome || !/^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$/.test(nome.value.trim())) {
-            mostrarErro('erro-nome', 'Nome deve conter apenas letras.');
-            valido = false;
-        } else { limparErro('erro-nome'); }
-
-        // Email
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-            mostrarErro('erro-email', 'Informe um e-mail válido.');
-            valido = false;
-        } else { limparErro('erro-email'); }
-
-        // Data de nascimento
-        if (!dataNasc || !dataNasc.value) {
-            mostrarErro('erro-data', 'Informe sua data de nascimento.');
-            valido = false;
-        } else {
-            const nasc = new Date(dataNasc.value);
-            const hoje = new Date();
-            const idade = hoje.getFullYear() - nasc.getFullYear() -
-                ((hoje.getMonth(), hoje.getDate()) < (nasc.getMonth(), nasc.getDate()) ? 1 : 0);
-            if (idade < 18) {
-                mostrarErro('erro-data', 'Você deve ter pelo menos 18 anos.');
-                valido = false;
-            } else if (idade > 100) {
-                mostrarErro('erro-data', 'Data de nascimento inválida.');
-                valido = false;
-            } else { limparErro('erro-data'); }
+        if (cpf) {
+            cpf.value = formatarCpf(cpf.value);
         }
 
-        // Telefone
-        if (!telefone || !/^\(\d{2}\)\s\d{4,5}-\d{4}$/.test(telefone.value)) {
-            mostrarErro('erro-telefone', 'Informe um telefone válido: (41) 99999-9999.');
-            valido = false;
-        } else { limparErro('erro-telefone'); }
+        if (telefone) {
+            telefone.value = formatarTelefone(telefone.value);
+        }
 
-        // CPF
-        if (!cpf || !/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf.value)) {
-            mostrarErro('erro-cpf', 'Informe um CPF válido: 000.000.000-00.');
-            valido = false;
-        } else { limparErro('erro-cpf'); }
+        const erroNome = validarCampo(nome, 'Informe seu nome completo.', 'O nome deve conter apenas letras.');
+        if (erroNome) {
+            e.preventDefault();
+            mostrarErro(erroNome);
+            return;
+        }
 
-        // Senha
-        if (!senha || senha.value.length < 8 || !/[A-Za-z]/.test(senha.value) || !/\d/.test(senha.value)) {
-            mostrarErro('erro-senha', 'A senha deve ter pelo menos 8 caracteres, uma letra e um número.');
-            valido = false;
-        } else { limparErro('erro-senha'); }
+        const erroEmail = validarCampo(email, 'Informe seu email.', 'Email inválido.');
+        if (erroEmail) {
+            e.preventDefault();
+            mostrarErro(erroEmail);
+            return;
+        }
 
-        // Confirmar senha
-        if (!confirmarSenha || confirmarSenha.value !== senha.value) {
-            mostrarErro('erro-confirmar', 'As senhas não coincidem.');
-            valido = false;
-        } else { limparErro('erro-confirmar'); }
+        const erroData = validarDataNascimento();
+        if (erroData) {
+            e.preventDefault();
+            mostrarErro(erroData);
+            return;
+        }
 
-        // Termos
-        if (!termos || !termos.checked) {
-            mostrarErro('erro-termos', 'Você precisa aceitar os termos para continuar.');
-            valido = false;
-        } else { limparErro('erro-termos'); }
+        const erroTelefone = validarCampo(telefone, 'Informe seu telefone.', 'Telefone inválido.');
+        if (erroTelefone) {
+            e.preventDefault();
+            mostrarErro(erroTelefone);
+            return;
+        }
 
-        if (!valido) e.preventDefault();
+        const erroCpf = validarCampo(cpf, 'Informe seu CPF.', 'CPF inválido.');
+        if (erroCpf) {
+            e.preventDefault();
+            mostrarErro(erroCpf);
+            return;
+        }
+        if (cpf && !validarCpf(cpf.value)) {
+            e.preventDefault();
+            mostrarErro('CPF inválido.');
+            return;
+        }
+
+        const erroSenha = validarCampo(
+            senha,
+            'Informe uma senha.',
+            'A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número.'
+        );
+        if (erroSenha) {
+            e.preventDefault();
+            mostrarErro(erroSenha);
+            return;
+        }
+
+        if (senha && confirmarSenha && senha.value !== confirmarSenha.value) {
+            e.preventDefault();
+            mostrarErro('As senhas não coincidem!');
+            return;
+        }
+
+        if (termos && !termos.checked) {
+            e.preventDefault();
+            mostrarErro('Você precisa aceitar os termos para continuar.');
+            return;
+        }
     });
 
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

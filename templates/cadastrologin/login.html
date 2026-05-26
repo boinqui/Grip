@@ -71,18 +71,20 @@
                 <p class="sub">Entre para continuar sua jornada no ballet</p>
             </div>
 
-            <form id="loginForm" action="/login" method="POST" class="form">
+            <form id="loginForm" action="/login" method="POST" class="form" novalidate>
                 <div class="campo">
-                    <label for="email">Email</label>
-                    <input type="email" id="email" name="Email" placeholder="seu@email.com">
+                    <label for="email">Email <span class="required-indicator">*</span></label>
+                    <input type="email" id="email" name="Email" placeholder="seu@email.com"
+                        pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" required
+                        value="{{ form_data.email if form_data else '' }}">
                     <span class="campo-erro" id="erro-email"></span>
                 </div>
 
                 <div class="grupo-campos">
                     <div class="campo">
-                        <label for="senha">Senha</label>
+                        <label for="senha">Senha <span class="required-indicator">*</span></label>
                         <div class="input-wrapper">
-                            <input type="password" id="senha" name="senha" placeholder="••••••••">
+                            <input type="password" id="senha" name="senha" placeholder="••••••••" required>
                             <i class="fa-solid fa-eye toggle-password" id="eyeIconSenha"></i>
                         </div>
                         <span class="campo-erro" id="erro-senha"></span>

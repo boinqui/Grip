@@ -4,36 +4,48 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    function mostrarErro(id, msg) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.textContent = msg;
-        el.classList.add('visivel');
-    }
+    const mostrarErro = (mensagem) => {
+        if (window.SheetModal) {
+            window.SheetModal.showMessage({
+                type: 'error',
+                title: 'Erro',
+                message: mensagem,
+            });
+        }
+    };
 
-    function limparErro(id) {
-        const el = document.getElementById(id);
-        if (!el) return;
-        el.textContent = '';
-        el.classList.remove('visivel');
-    }
+    const validarPattern = (input) => {
+        const pattern = input.getAttribute('pattern');
+        if (!pattern) {
+            return true;
+        }
+        const source = pattern.startsWith('^') && pattern.endsWith('$')
+            ? pattern
+            : `^(?:${pattern})$`;
+        const regex = new RegExp(source);
+        return regex.test(input.value.trim());
+    };
 
     loginForm.addEventListener('submit', (e) => {
-        let valido = true;
-        const email = document.getElementById('email');
-        const senha = document.getElementById('senha');
+        const emailInput = document.getElementById('email');
+        const senhaInput = document.getElementById('senha');
 
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-            mostrarErro('erro-email', 'Informe um e-mail válido.');
-            valido = false;
-        } else { limparErro('erro-email'); }
+        if (!emailInput || !emailInput.value.trim()) {
+            e.preventDefault();
+            mostrarErro('Informe seu email.');
+            return;
+        }
 
-        if (!senha || senha.value.trim() === '') {
-            mostrarErro('erro-senha', 'Informe sua senha.');
-            valido = false;
-        } else { limparErro('erro-senha'); }
+        if (!validarPattern(emailInput)) {
+            e.preventDefault();
+            mostrarErro('Informe um email válido.');
+            return;
+        }
 
-        if (!valido) e.preventDefault();
+        if (!senhaInput || !senhaInput.value.trim()) {
+            e.preventDefault();
+            mostrarErro('Informe sua senha.');
+        }
     });
 
     const inputs = document.querySelectorAll('input');
@@ -42,7 +54,7 @@ document.addEventListener('DOMContentLoaded', () => {
             input.parentElement.style.transform = 'translateY(-2px)';
             input.parentElement.style.transition = 'transform 0.3s ease';
         });
-        
+
         input.addEventListener('blur', () => {
             input.parentElement.style.transform = 'translateY(0)';
         });

@@ -137,6 +137,10 @@
                     <h2>Visão <em>Geral</em></h2>
                 </div>
 
+                {% if mensagem and mensagem_tab == 'visao-geral' %}
+                <div class="flash sucesso visivel">{{ mensagem }}</div>
+                {% endif %}
+
                 <div class="stats-grid">
                     <div class="stat-card">
                         <p class="stat-eyebrow">Total</p>
@@ -153,6 +157,40 @@
                         <p class="stat-valor">{{ total_aulas | default(0) }}</p>
                         <p class="stat-label">Aulas registradas</p>
                     </div>
+                </div>
+
+                <div class="sec-titulo-sm">
+                    <span class="eyebrow muted">AGENDA</span>
+                    <h2>Agendamentos <em>Futuros</em></h2>
+                    <p>Aulas já reservadas pelos alunos para os próximos horários.</p>
+                </div>
+
+                <div class="lista-aulas">
+                    {% if agendamentos_futuros %}
+                    {% for agendamento in agendamentos_futuros %}
+                    <div class="item-aula">
+                        <div class="aula-ic">{{ agendamento.aluno_nome[0] | upper if agendamento.aluno_nome else 'A' }}</div>
+                        <div class="aula-info">
+                            <h4>Aula {{ agendamento.tipo_fmt }}</h4>
+                            <p>
+                                {{ agendamento.data_fmt }}
+                                {% if agendamento.aluno_nome %} · Aluno: {{ agendamento.aluno_nome }}{% endif %}
+                                {% if agendamento.observacao %} · {{ agendamento.observacao }}{% endif %}
+                            </p>
+                        </div>
+                        <span class="aula-badge confirmada">Agendada</span>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="item-aula">
+                        <div class="aula-ic">!</div>
+                        <div class="aula-info">
+                            <h4>Nenhum agendamento futuro</h4>
+                            <p>Você ainda não possui aulas futuras reservadas por alunos.</p>
+                        </div>
+                        <span class="aula-badge pendente">Sem agenda</span>
+                    </div>
+                    {% endif %}
                 </div>
 
             </div>
@@ -172,8 +210,8 @@
                     </div>
                 </div>
 
-                {% if mensagem %}
-                <div id="flashMsg" class="flash sucesso visivel">{{ mensagem }}</div>
+                {% if mensagem and mensagem_tab == 'alunos' %}
+                <div class="flash sucesso visivel">{{ mensagem }}</div>
                 {% endif %}
 
                 <div class="table-wrap">
@@ -228,6 +266,9 @@
                     </div>
                 </div>
 
+                {% if mensagem and mensagem_tab == 'professores' %}
+                <div class="flash sucesso visivel">{{ mensagem }}</div>
+                {% endif %}
                 <div class="table-wrap">
                     <table id="tabelaProfessores">
                         <thead>
@@ -280,6 +321,9 @@
                     </div>
                 </div>
 
+                {% if mensagem and mensagem_tab == 'aulas' %}
+                <div class="flash sucesso visivel">{{ mensagem }}</div>
+                {% endif %}
                 <div class="table-wrap">
                     <table id="tabelaAulas">
                         <thead>
@@ -326,7 +370,9 @@
                     <p>Atualize seus dados pessoais e credenciais de acesso.</p>
                 </div>
 
-                <div id="flashMsg" class="flash"></div>
+                {% if mensagem and mensagem_tab == 'configuracoes' %}
+                <div class="flash sucesso visivel">{{ mensagem }}</div>
+                {% endif %}
 
                 <!-- Formulário de Foto do Professor -->
                 <div class="card-perfil card-mb">
@@ -475,6 +521,13 @@
                 tr.style.display = !t || texto.includes(t) ? '' : 'none';
             });
         }
+
+        (function () {
+            const mensagemTab = "{{ mensagem_tab or '' }}";
+            if (mensagemTab) {
+                abrirTab(mensagemTab);
+            }
+        })();
 
         function confirmarExclusao(event, nome) {
             event.preventDefault();
