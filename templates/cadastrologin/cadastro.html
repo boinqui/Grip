@@ -75,7 +75,7 @@
                 <div class="campo">
                     <label for="nome">Nome completo <span class="required-indicator">*</span></label>
                     <input type="text" id="nome" name="nome" placeholder="Seu nome completo"
-                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" title="O nome deve conter apenas letras." required
+                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ']+(\s+[A-Za-zÀ-ÖØ-öø-ÿ']+)+" title="Informe nome e sobrenome." required
                         value="{{ form_data.nome if form_data else '' }}">
                     <span class="campo-erro" id="erro-nome"></span>
                 </div>

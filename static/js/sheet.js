@@ -1,3 +1,21 @@
+window.SheetModal = {
+    showFieldError(id, message) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = message;
+        el.classList.add('visivel');
+    },
+    clearFieldError(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = '';
+        el.classList.remove('visivel');
+    },
+    showMessage() { return Promise.resolve(false); },
+    showConfirm() { return Promise.resolve(false); },
+    close() {},
+};
+
 (function () {
     const modal = document.getElementById('globalModal');
     if (!modal) {

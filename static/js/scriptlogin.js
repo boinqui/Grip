@@ -4,48 +4,39 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    const mostrarErro = (mensagem) => {
-        if (window.SheetModal) {
-            window.SheetModal.showMessage({
-                type: 'error',
-                title: 'Erro',
-                message: mensagem,
-            });
-        }
+    const mostrarErro = (id, mensagem) => {
+        if (window.SheetModal) window.SheetModal.showFieldError(id, mensagem);
+    };
+    const limparErro = (id) => {
+        if (window.SheetModal) window.SheetModal.clearFieldError(id);
     };
 
     const validarPattern = (input) => {
         const pattern = input.getAttribute('pattern');
-        if (!pattern) {
-            return true;
-        }
-        const source = pattern.startsWith('^') && pattern.endsWith('$')
-            ? pattern
-            : `^(?:${pattern})$`;
-        const regex = new RegExp(source);
-        return regex.test(input.value.trim());
+        if (!pattern) return true;
+        const source = pattern.startsWith('^') && pattern.endsWith('$') ? pattern : `^(?:${pattern})$`;
+        return new RegExp(source).test(input.value.trim());
     };
 
     loginForm.addEventListener('submit', (e) => {
         const emailInput = document.getElementById('email');
         const senhaInput = document.getElementById('senha');
 
-        if (!emailInput || !emailInput.value.trim()) {
-            e.preventDefault();
-            mostrarErro('Informe seu email.');
-            return;
-        }
+        ['erro-email', 'erro-senha'].forEach(limparErro);
 
-        if (!validarPattern(emailInput)) {
-            e.preventDefault();
-            mostrarErro('Informe um email válido.');
-            return;
+        let valido = true;
+
+        if (!emailInput || !emailInput.value.trim()) {
+            mostrarErro('erro-email', 'Informe seu email.'); valido = false;
+        } else if (!validarPattern(emailInput)) {
+            mostrarErro('erro-email', 'Informe um email válido.'); valido = false;
         }
 
         if (!senhaInput || !senhaInput.value.trim()) {
-            e.preventDefault();
-            mostrarErro('Informe sua senha.');
+            mostrarErro('erro-senha', 'Informe sua senha.'); valido = false;
         }
+
+        if (!valido) e.preventDefault();
     });
 
     const inputs = document.querySelectorAll('input');

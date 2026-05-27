@@ -50,14 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    const mostrarErro = (mensagem) => {
-        if (window.SheetModal) {
-            window.SheetModal.showMessage({
-                type: 'error',
-                title: 'Erro',
-                message: mensagem,
-            });
-        }
+    const mostrarErro = (id, mensagem) => {
+        if (window.SheetModal) window.SheetModal.showFieldError(id, mensagem);
+    };
+    const limparErro = (id) => {
+        if (window.SheetModal) window.SheetModal.clearFieldError(id);
     };
 
     const validarPattern = (input) => {
@@ -133,76 +130,41 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     form.addEventListener('submit', (e) => {
-        if (cpf) {
-            cpf.value = formatarCpf(cpf.value);
-        }
+        if (cpf) cpf.value = formatarCpf(cpf.value);
+        if (telefone) telefone.value = formatarTelefone(telefone.value);
 
-        if (telefone) {
-            telefone.value = formatarTelefone(telefone.value);
-        }
+        ['erro-nome', 'erro-email', 'erro-data', 'erro-telefone', 'erro-cpf', 'erro-senha', 'erro-confirmar', 'erro-termos'].forEach(limparErro);
 
-        const erroNome = validarCampo(nome, 'Informe seu nome completo.', 'O nome deve conter apenas letras.');
-        if (erroNome) {
-            e.preventDefault();
-            mostrarErro(erroNome);
-            return;
-        }
+        let valido = true;
+
+        const erroNome = validarCampo(nome, 'Informe seu nome completo.', 'Informe nome e sobrenome (apenas letras).');
+        if (erroNome) { mostrarErro('erro-nome', erroNome); valido = false; }
 
         const erroEmail = validarCampo(email, 'Informe seu email.', 'Email inválido.');
-        if (erroEmail) {
-            e.preventDefault();
-            mostrarErro(erroEmail);
-            return;
-        }
+        if (erroEmail) { mostrarErro('erro-email', erroEmail); valido = false; }
 
         const erroData = validarDataNascimento();
-        if (erroData) {
-            e.preventDefault();
-            mostrarErro(erroData);
-            return;
-        }
+        if (erroData) { mostrarErro('erro-data', erroData); valido = false; }
 
         const erroTelefone = validarCampo(telefone, 'Informe seu telefone.', 'Telefone inválido.');
-        if (erroTelefone) {
-            e.preventDefault();
-            mostrarErro(erroTelefone);
-            return;
-        }
+        if (erroTelefone) { mostrarErro('erro-telefone', erroTelefone); valido = false; }
 
         const erroCpf = validarCampo(cpf, 'Informe seu CPF.', 'CPF inválido.');
-        if (erroCpf) {
-            e.preventDefault();
-            mostrarErro(erroCpf);
-            return;
-        }
-        if (cpf && !validarCpf(cpf.value)) {
-            e.preventDefault();
-            mostrarErro('CPF inválido.');
-            return;
-        }
+        if (erroCpf) { mostrarErro('erro-cpf', erroCpf); valido = false; }
+        else if (cpf && cpf.value && !validarCpf(cpf.value)) { mostrarErro('erro-cpf', 'CPF inválido.'); valido = false; }
 
-        const erroSenha = validarCampo(
-            senha,
-            'Informe uma senha.',
-            'A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número.'
-        );
-        if (erroSenha) {
-            e.preventDefault();
-            mostrarErro(erroSenha);
-            return;
-        }
+        const erroSenha = validarCampo(senha, 'Informe uma senha.', 'A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número.');
+        if (erroSenha) { mostrarErro('erro-senha', erroSenha); valido = false; }
 
         if (senha && confirmarSenha && senha.value !== confirmarSenha.value) {
-            e.preventDefault();
-            mostrarErro('As senhas não coincidem!');
-            return;
+            mostrarErro('erro-confirmar', 'As senhas não coincidem!'); valido = false;
         }
 
         if (termos && !termos.checked) {
-            e.preventDefault();
-            mostrarErro('Você precisa aceitar os termos para continuar.');
-            return;
+            mostrarErro('erro-termos', 'Você precisa aceitar os termos para continuar.'); valido = false;
         }
+
+        if (!valido) e.preventDefault();
     });
 
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {

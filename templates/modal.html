@@ -1,5 +1,5 @@
 {% set tem_mensagem = mensagem is defined and mensagem %}
-{% set is_error = tem_mensagem and ('Erro' in mensagem or 'inválido' in mensagem or status == 'erro') %}
+{% set is_error = tem_mensagem and ('Erro' in mensagem or 'inválid' in mensagem or status == 'erro') %}
 <div class="modal-overlay{% if tem_mensagem %} aberto{% endif %}" id="globalModal" data-auto-open="{{ 'true' if tem_mensagem else 'false' }}">
     <div class="modal-card">
         <button class="modal-close" id="modalCloseButton" type="button">&times;</button>

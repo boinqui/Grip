@@ -629,7 +629,7 @@ async def cadastro_page(request: Request):
     return templates.TemplateResponse("cadastrologin/cadastro.html", {
         "request": request,
         "mensagem": mensagem,
-        "form_data": form_data
+        "form_data": form_data,
     })
 
 
@@ -646,8 +646,8 @@ async def cadastrar_usuario(
     termos: Optional[str] = Form(None),
     db=Depends(get_db)
 ):
-    try:
-        form_snapshot = {
+    def stash_form():
+        request.session["cadastro_form"] = {
             "nome": nome,
             "email": email,
             "telefone": telefone,
@@ -656,43 +656,25 @@ async def cadastrar_usuario(
             "termos": bool(termos),
         }
 
-        def stash_form():
-            request.session["cadastro_form"] = form_snapshot
+    try:
+        if not data_nascimento:
+            stash_form()
+            request.session["mensagem"] = "Erro: Informe sua data de nascimento."
+            return RedirectResponse(url="/cadastro", status_code=303)
 
-        if confirmar_senha and senha != confirmar_senha:
+        if not senha:
             stash_form()
-            request.session["mensagem"] = "Erro: As senhas não coincidem!"
+            request.session["mensagem"] = "Erro: Informe uma senha."
             return RedirectResponse(url="/cadastro", status_code=303)
-        
-        #colocando regex aqui
-        if not validate_name(nome):
+
+        if len(nome.strip().split()) < 2:
             stash_form()
-            request.session["mensagem"] = "Nome inválido"
+            request.session["mensagem"] = "Erro: Informe nome e sobrenome."
             return RedirectResponse(url="/cadastro", status_code=303)
-        
-        if not validate_email(email):
-            stash_form()
-            request.session["mensagem"] = "Email inválido"
-            return RedirectResponse(url="/cadastro", status_code=303)
-        
-        if not validate_password(senha):
-            stash_form()
-            request.session["mensagem"] = "Senha inválida"
-            return RedirectResponse(url="/cadastro", status_code=303)
-        
+
         if not validate_cpf(cpf):
             stash_form()
-            request.session["mensagem"] = "CPF inválido"
-            return RedirectResponse(url="/cadastro", status_code=303)
-
-        if not validate_phone(telefone):
-            stash_form()
-            request.session["mensagem"] = "Telefone inválido"
-            return RedirectResponse(url="/cadastro", status_code=303)
-
-        if not validate_birthday(data_nascimento):
-            stash_form()
-            request.session["mensagem"] = "Data de Nascimento inválida"
+            request.session["mensagem"] = "Erro: CPF inválido."
             return RedirectResponse(url="/cadastro", status_code=303)
 
         if not termos:
@@ -700,14 +682,13 @@ async def cadastrar_usuario(
             request.session["mensagem"] = "Erro: Você precisa aceitar os termos para continuar."
             return RedirectResponse(url="/cadastro", status_code=303)
 
-        #parte do banco
         with db.cursor() as cursor:
             cursor.execute("SELECT id FROM Aluno WHERE email = %s", (email,))
             if cursor.fetchone():
                 stash_form()
                 request.session["mensagem"] = "Erro: Este e-mail já está em uso!"
                 return RedirectResponse(url="/cadastro", status_code=303)
-            
+
             cursor.execute("SELECT id FROM Aluno WHERE cpf = %s", (cpf,))
             if cursor.fetchone():
                 stash_form()
@@ -721,7 +702,6 @@ async def cadastrar_usuario(
             )
             aluno_id = cursor.lastrowid
             db.commit()
-            request.session.pop("cadastro_form", None)
             request.session["user_logged_in"] = True
             request.session["usuario_id"] = aluno_id
             request.session["nome_usuario"] = nome
@@ -731,14 +711,7 @@ async def cadastrar_usuario(
             return RedirectResponse(url="/alunoPerfil", status_code=303)
 
     except Exception as e:
-        request.session["cadastro_form"] = {
-            "nome": nome,
-            "email": email,
-            "telefone": telefone,
-            "cpf": cpf,
-            "data_nascimento": data_nascimento,
-            "termos": bool(termos),
-        }
+        stash_form()
         request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
         return RedirectResponse(url="/cadastro", status_code=303)
     finally:
