@@ -1,9 +1,12 @@
+from __future__ import annotations
 import pymysql
 import base64
 import hashlib
 import hmac
 import secrets
+from typing import Optional 
 from mangum import Mangum
+
 from validators import validate_email, validate_cpf, validate_phone, validate_password, validate_drt, validate_name, validate_aula_nome, validate_birthday
 from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
@@ -33,7 +36,7 @@ templates = Jinja2Templates(directory="templates")
 DB_CONFIG = {
     "host": "localhost",
     "user": "root",
-    "password": "dudumysql",
+    "password": "carlamysql",
     "database": "grip"
 }
 
@@ -367,7 +370,7 @@ async def aluno_perfil(request: Request, db=Depends(get_db), auth=Depends(verify
 @app.get("/professor-perfil", response_class=HTMLResponse)
 async def professor_perfil_publico(
     request: Request,
-    id: int | None = None,
+    id: Optional[int] = None,
     db=Depends(get_db),
     auth=Depends(verify_logged_in)
 ):
@@ -640,7 +643,7 @@ async def cadastrar_usuario(
     cpf: str = Form(...),
     telefone: str = Form(...),
     data_nascimento: str = Form(...),
-    termos: str | None = Form(None),
+    termos: Optional[str] = Form(None),
     db=Depends(get_db)
 ):
     try:
