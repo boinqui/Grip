@@ -10,11 +10,11 @@
 
 
 .msg-info {
-    background: #f3eeff;
+    background: #DEC1FF;
     border-color: #dcd0ff;
-    color: #5b36e0;
+    color: #624CAB;
 }
-.msg-info .msg-ic { background: #6c47ff; color: #fff; }
+.msg-info .msg-ic { background: #624CAB; color: #fff; }
 
 .msg-warning {
     background: #fff9f0;

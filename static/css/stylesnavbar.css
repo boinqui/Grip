@@ -17,8 +17,8 @@
 
 .navbar { display: flex; gap: 36px; font-size: 15px; color: #4a4761; }
 .navbar a { transition: color 0.2s ease; }
-.navbar a:hover { color: #5b36e0; }
-.navbar a.ativo { color: #5b36e0; font-weight: 500; }
+.navbar a:hover { color: #624CAB; }
+.navbar a.ativo { color: #624CAB; font-weight: 500; }
 
 /*Hamburger*/
 .nav-toggle {
@@ -27,7 +27,7 @@
 }
 .nav-toggle span {
     display: block; width: 22px; height: 2px;
-    background: #1a1830; border-radius: 2px;
+    background: #343633; border-radius: 2px;
     transition: transform 0.25s ease, opacity 0.2s ease;
 }
 .nav-toggle.aberto span:nth-child(1) { transform: translateY(7px) rotate(45deg); }

@@ -22,7 +22,7 @@
 }
 
 .blur1 {
-    background: linear-gradient(135deg, #7c5cff 0%, #b9a4ff 100%);
+    background: linear-gradient(135deg, #7860c0 0%, #DEC1FF 100%);
     filter: blur(64px);
     opacity: 0.18;
     top: -100px;
@@ -32,7 +32,7 @@
 }
 
 .blur2 {
-    background: linear-gradient(135deg, #b9a4ff 0%, #F2BFF0 100%);
+    background: linear-gradient(135deg, #DEC1FF 0%, #F2BFF0 100%);
     filter: blur(64px);
     opacity: 0.1;
     bottom: -100px;
@@ -57,10 +57,10 @@
     width: 100%;
     max-width: 475px;
     background: white;
-    border: 1px solid rgba(124, 92, 255, 0.12);
+    border: 1px solid rgba(98, 76, 171, 0.12);
     border-radius: 24px;
     padding: 2rem;
-    box-shadow: 0 10px 40px rgba(124, 92, 255, 0.08);
+    box-shadow: 0 10px 40px rgba(98, 76, 171, 0.08);
     text-align: center;
 }
 
@@ -70,7 +70,7 @@
     width: 48px;
     height: 48px;
     border-radius: 16px;
-    background: linear-gradient(135deg, #7c5cff 0%, #b9a4ff 100%);
+    background: linear-gradient(135deg, #7860c0 0%, #DEC1FF 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -96,7 +96,7 @@
     gap: 0.4rem;
 }
 
-.campo label { font-size: 0.875rem; font-weight: 500; color: #1a1830; }
+.campo label { font-size: 0.875rem; font-weight: 500; color: #343633; }
 
 .required-indicator {
     color: #dc2626;
@@ -107,19 +107,19 @@
     width: 100%;
     padding: 0.75rem 1rem;
     background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(124, 92, 255, 0.2);
+    border: 1px solid rgba(98, 76, 171, 0.2);
     border-radius: 12px;
     font-size: 0.875rem;
     font-family: inherit;
-    color: #1a1830;
+    color: #343633;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .campo input:focus {
     background: #fff;
-    border-color: #7c5cff;
-    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.14);
+    border-color: #7860c0;
+    box-shadow: 0 0 0 3px rgba(98, 76, 171, 0.14);
 }
 
 .termos {
@@ -130,7 +130,7 @@
 }
 
 .termos label { font-size: 0.75rem; font-weight: 500; line-height: 1.5; }
-.termos a { color: #6c47ff; text-decoration: none; }
+.termos a { color: #624CAB; text-decoration: none; }
 .termos a:hover { text-decoration: underline; }
 
 .divisor {
@@ -149,7 +149,7 @@
 .divisor span { padding: 0 1rem; font-size: 12px; color: #8b8aa1; }
 
 .link { font-size: 0.875rem; color: #8b8aa1; }
-.link a { color: #6c47ff; font-weight: 500; text-decoration: none; }
+.link a { color: #624CAB; font-weight: 500; text-decoration: none; }
 .link a:hover { text-decoration: underline; }
 
 .copy { margin-top: 2rem; font-size: 12px; color: #8b8aa1; }
@@ -191,7 +191,7 @@
 }
 
 .toggle-password:hover {
-    color: #7c5cff;
+    color: #7860c0;
 }
 
 /* Container que junta os dois campos */

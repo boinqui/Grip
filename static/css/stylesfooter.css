@@ -10,18 +10,18 @@
 .social { display: flex; gap: 12px; }
 .social a {
     width: 36px; height: 36px; border-radius: 10px;
-    background: #f3eeff; color: #5b36e0;
+    background: #DEC1FF; color: #624CAB;
     display: grid; place-items: center;
     transition: background 0.2s ease, color 0.2s ease;
 }
-.social a:hover { background: #6c47ff; color: #fff; }
+.social a:hover { background: #624CAB; color: #fff; }
 
 .col h4 {
     font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
-    margin-bottom: 16px; letter-spacing: 0.1em; text-transform: uppercase; color: #1a1830;
+    margin-bottom: 16px; letter-spacing: 0.1em; text-transform: uppercase; color: #343633;
 }
 .col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: #4a4761; }
-.col a:hover { color: #5b36e0; }
+.col a:hover { color: #624CAB; }
 
 .rodape-base {
     display: flex; justify-content: space-between; align-items: center;

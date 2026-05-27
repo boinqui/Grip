@@ -12,7 +12,7 @@ body {
     margin: 0;
     font-family: 'Inter', sans-serif;
     background: #f7f5fb;
-    color: #1f1d2b;
+    color: #343633;
     line-height: 1.55;
 }
 
@@ -39,7 +39,7 @@ button {
 h1, h2, h3, h4 {
     font-family: 'Playfair Display', Georgia, serif;
     font-weight: 600;
-    color: #1a1830;
+    color: #343633;
     letter-spacing: -0.01em;
     margin: 0;
 }
@@ -47,7 +47,7 @@ h1, h2, h3, h4 {
 h1 em, h2 em, h3 em {
     font-style: italic;
     font-weight: 500;
-    color: #6c47ff;
+    color: #624CAB;
 }
 
 p {
@@ -61,8 +61,8 @@ p {
     gap: 6px;
     padding: 6px 14px;
     border-radius: 999px;
-    background: rgba(124, 92, 255, 0.12);
-    color: #5b36e0;
+    background: rgba(98, 76, 171, 0.12);
+    color: #624CAB;
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.18em;
@@ -137,24 +137,24 @@ main > section {
 }
 
 .btn-primary {
-    background: #6c47ff;
+    background: #624CAB;
     color: #fff;
-    box-shadow: 0 10px 24px rgba(108, 71, 255, 0.32);
+    box-shadow: 0 10px 24px rgba(98, 76, 171, 0.32);
 }
 
 .btn-primary:hover {
-    background: #5b36e0;
+    background: #624CAB;
     transform: translateY(-1px);
 }
 
 .btn-secondary {
     background: #fff;
-    color: #5b36e0;
+    color: #624CAB;
     border: 1px solid #ece8f5;
 }
 
 .btn-secondary:hover {
-    border-color: #b9a4ff;
+    border-color: #DEC1FF;
     background: #f7f5fb;
     transform: translateY(-1px);
 }

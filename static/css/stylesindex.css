@@ -1,7 +1,7 @@
 /*HERO FULLSCREEN*/
 
 .hero-fullscreen {
-    background-image: url('/static/images/background.png');
+    background-image: url('/static/images/background.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -80,7 +80,7 @@
 .num {
     font-family: 'Playfair Display', serif;
     font-size: 1.75rem;
-    color: #1a1830;
+    color: #343633;
     font-weight: 600;
     display: block;
 }
@@ -156,8 +156,8 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: #f3eeff;
-    color: #6c47ff;
+    background: #DEC1FF;
+    color: #624CAB;
     display: grid;
     place-items: center;
     font-size: 18px;
@@ -221,7 +221,7 @@
 .cargo-home {
     display: block;
     font-size: 12px;
-    color: #6c47ff;
+    color: #624CAB;
     margin: 4px 0 10px;
     letter-spacing: 0.04em;
 }
@@ -287,7 +287,7 @@
     display: block;
     font-size: 13px;
     font-weight: 500;
-    color: #1a1830;
+    color: #343633;
     margin-bottom: 12px;
 }
 
@@ -306,7 +306,7 @@
     border: 1px solid #ece8f5;
     cursor: pointer;
     font-weight: 500;
-    color: #1a1830;
+    color: #343633;
 }
 
 .opcao input {
@@ -317,16 +317,16 @@
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background: #f3eeff;
-    color: #6c47ff;
+    background: #DEC1FF;
+    color: #624CAB;
     display: grid;
     place-items: center;
     font-size: 16px;
 }
 
 .opcao.active {
-    border-color: #7c5cff;
-    background: #f3eeff;
+    border-color: #7860c0;
+    background: #DEC1FF;
 }
 
 .abas {
@@ -347,7 +347,7 @@
 
 .tab.active {
     background: #fff;
-    color: #1a1830;
+    color: #343633;
     box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
 }
 
@@ -368,13 +368,13 @@
 }
 
 .slot:hover {
-    border-color: #b9a4ff;
+    border-color: #DEC1FF;
 }
 
 .slot.active {
-    background: #f3eeff;
-    border-color: #7c5cff;
-    color: #5b36e0;
+    background: #DEC1FF;
+    border-color: #7860c0;
+    color: #624CAB;
 }
 
 
@@ -425,14 +425,14 @@
 .preco .price {
     font-family: 'Playfair Display', serif;
     font-size: 1rem;
-    color: #1a1830;
+    color: #343633;
     font-weight: 600;
 }
 
 .preco .price em {
     font-style: italic;
     font-size: 2.4rem;
-    color: #1a1830;
+    color: #343633;
     margin-left: 2px;
 }
 
@@ -458,7 +458,7 @@
 }
 
 .plano-dest {
-    background: linear-gradient(170deg, #6c47ff, #5b36e0);
+    background: linear-gradient(170deg, #624CAB, #624CAB);
     color: #fff;
     border: none;
     box-shadow: 0 30px 60px rgba(70, 50, 140, 0.18);
@@ -479,7 +479,7 @@
 
 .plano-dest .btn-primary {
     background: #fff;
-    color: #5b36e0;
+    color: #624CAB;
     box-shadow: none;
 }
 
@@ -529,7 +529,7 @@
 .depo p {
     font-size: 15px;
     line-height: 1.65;
-    color: #1a1830;
+    color: #343633;
 }
 
 .autor {
@@ -539,7 +539,7 @@
 
 .autor strong {
     font-size: 14px;
-    color: #1a1830;
+    color: #343633;
 }
 
 .autor span {

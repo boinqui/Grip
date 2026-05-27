@@ -29,11 +29,11 @@
 .admin-search select {
     padding: 10px 16px;
     border-radius: 12px;
-    border: 1px solid rgba(124, 92, 255, 0.2);
+    border: 1px solid rgba(98, 76, 171, 0.2);
     background: #fff;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
-    color: #1a1830;
+    color: #343633;
     outline: none;
     width: 240px;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -41,8 +41,8 @@
 
 .admin-search input:focus,
 .admin-search select:focus {
-    border-color: #7c5cff;
-    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.14);
+    border-color: #7860c0;
+    box-shadow: 0 0 0 3px rgba(98, 76, 171, 0.14);
 }
 
 .table-wrap {
@@ -92,7 +92,7 @@ table tbody tr:hover { background: #f7f5fb; }
 
 table .nome-cell {
     font-weight: 600;
-    color: #1a1830;
+    color: #343633;
 }
 
 .acao-btn {
@@ -106,7 +106,7 @@ table .nome-cell {
 }
 .acao-btn:hover { opacity: 0.8; }
 
-.acao-editar  { background: #f3eeff; color: #5b36e0; }
+.acao-editar  { background: #DEC1FF; color: #624CAB; }
 .acao-senha   { background: #dcfce7; color: #16a34a; }
 .acao-excluir { background: #fee2e2; color: #dc2626; }
 
@@ -142,7 +142,7 @@ table .nome-cell {
     font-family: 'Playfair Display', serif;
     font-size: 2.4rem;
     font-weight: 700;
-    color: #1a1830;
+    color: #343633;
     line-height: 1;
 }
 
@@ -153,16 +153,16 @@ table .nome-cell {
 }
 
 .avatar {
-    background: #6c47ff;
+    background: #624CAB;
 }
 
 .plano-badge {
-    background: #6c47ff;
+    background: #624CAB;
     box-shadow: none;
 }
 
 .plano-badge.admin {
-    background: #1a1830;
+    background: #343633;
     color: #fff;
     box-shadow: none;
 }
@@ -200,7 +200,7 @@ table .nome-cell {
 }
 
 .breadcrumb a:hover {
-    color: #6c47ff;
+    color: #624CAB;
 }
 
 
@@ -230,7 +230,7 @@ table .nome-cell {
 .admin-campo label {
     font-size: 14px;
     font-weight: 500;
-    color: #1a1830;
+    color: #343633;
 }
 
 .admin-campo input,
@@ -238,11 +238,11 @@ table .nome-cell {
 .admin-campo textarea {
     width: 100%;
     padding: 10px 14px;
-    border: 1px solid rgba(124, 92, 255, 0.2);
+    border: 1px solid rgba(98, 76, 171, 0.2);
     border-radius: 12px;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
-    color: #1a1830;
+    color: #343633;
     background: #fff;
     outline: none;
     transition: border-color 0.2s, box-shadow 0.2s;
@@ -251,8 +251,8 @@ table .nome-cell {
 .admin-campo input:focus,
 .admin-campo select:focus,
 .admin-campo textarea:focus {
-    border-color: #7c5cff;
-    box-shadow: 0 0 0 3px rgba(124, 92, 255, 0.14);
+    border-color: #7860c0;
+    box-shadow: 0 0 0 3px rgba(98, 76, 171, 0.14);
 }
 
 .admin-campo textarea {
@@ -302,7 +302,7 @@ table .nome-cell {
 
 .delete-info span {
     font-weight: 600;
-    color: #1a1830;
+    color: #343633;
     margin-right: 6px;
 }
 
