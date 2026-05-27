@@ -5,12 +5,12 @@
 }
 
 .cta-box {
-    background: linear-gradient(135deg, #624CAB, #8a74c4);
+    background: linear-gradient(135deg, #9869F4, #FEBAFF);
     color: #fff;
     border-radius: 28px;
     text-align: center;
     padding: 60px 40px;
-    box-shadow: 0 30px 60px rgba(70, 50, 140, 0.18);
+    box-shadow: 0 30px 60px rgba(102, 64, 238, 0.18);
 }
 
 .cta-box h2 {

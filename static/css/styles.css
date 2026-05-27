@@ -11,7 +11,7 @@ html {
 body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background: #f7f5fb;
+    background: #F4F6FF;
     color: #343633;
     line-height: 1.55;
 }
@@ -47,7 +47,7 @@ h1, h2, h3, h4 {
 h1 em, h2 em, h3 em {
     font-style: italic;
     font-weight: 500;
-    color: #624CAB;
+    color: #9869F4;
 }
 
 p {
@@ -61,8 +61,8 @@ p {
     gap: 6px;
     padding: 6px 14px;
     border-radius: 999px;
-    background: rgba(98, 76, 171, 0.12);
-    color: #624CAB;
+    background: rgba(102, 64, 238, 0.12);
+    color: #9869F4;
     font-size: 12px;
     font-weight: 500;
     letter-spacing: 0.18em;
@@ -137,24 +137,24 @@ main > section {
 }
 
 .btn-primary {
-    background: #624CAB;
+    background: #9869F4;
     color: #fff;
-    box-shadow: 0 10px 24px rgba(98, 76, 171, 0.32);
+    box-shadow: 0 10px 24px rgba(102, 64, 238, 0.32);
 }
 
 .btn-primary:hover {
-    background: #624CAB;
+    background: #7a4ed4;
     transform: translateY(-1px);
 }
 
 .btn-secondary {
     background: #fff;
-    color: #624CAB;
-    border: 1px solid #ece8f5;
+    color: #9869F4;
+    border: 1px solid #e8d4ff;
 }
 
 .btn-secondary:hover {
-    border-color: #DEC1FF;
-    background: #f7f5fb;
+    border-color: #FEBAFF;
+    background: #F4F6FF;
     transform: translateY(-1px);
 }

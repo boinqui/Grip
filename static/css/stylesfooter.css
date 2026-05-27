@@ -1,5 +1,5 @@
 /* ── Footer ── */
-.rodape { background: #fff; border-top: 1px solid #ece8f5; padding: 70px 0 30px; }
+.rodape { background: #fff; border-top: 1px solid #e8d4ff; padding: 70px 0 30px; }
 
 .rodape-in {
     display: grid; grid-template-columns: 1.4fr repeat(3, 1fr); gap: 50px;
@@ -10,22 +10,22 @@
 .social { display: flex; gap: 12px; }
 .social a {
     width: 36px; height: 36px; border-radius: 10px;
-    background: #DEC1FF; color: #624CAB;
+    background: #FEBAFF; color: #343633;
     display: grid; place-items: center;
     transition: background 0.2s ease, color 0.2s ease;
 }
-.social a:hover { background: #624CAB; color: #fff; }
+.social a:hover { background: #9869F4; color: #fff; }
 
 .col h4 {
     font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
     margin-bottom: 16px; letter-spacing: 0.1em; text-transform: uppercase; color: #343633;
 }
 .col ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 14px; color: #4a4761; }
-.col a:hover { color: #624CAB; }
+.col a:hover { color: #9869F4; }
 
 .rodape-base {
     display: flex; justify-content: space-between; align-items: center;
-    margin-top: 50px; padding-top: 24px; border-top: 1px solid #ece8f5;
+    margin-top: 50px; padding-top: 24px; border-top: 1px solid #e8d4ff;
     font-size: 13px; color: #8b8aa1;
 }
 

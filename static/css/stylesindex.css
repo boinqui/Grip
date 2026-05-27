@@ -147,8 +147,8 @@
     padding: 22px 24px;
     background: #fff;
     border-radius: 18px;
-    border: 1px solid #ece8f5;
-    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    border: 1px solid #e8d4ff;
+    box-shadow: 0 4px 18px rgba(102, 64, 238, 0.06);
 }
 
 .pilar-ic {
@@ -156,8 +156,8 @@
     width: 44px;
     height: 44px;
     border-radius: 12px;
-    background: #DEC1FF;
-    color: #624CAB;
+    background: #FFE566;
+    color: #343633;
     display: grid;
     place-items: center;
     font-size: 18px;
@@ -188,8 +188,8 @@
     background: #fff;
     border-radius: 18px;
     overflow: hidden;
-    border: 1px solid #ece8f5;
-    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    border: 1px solid #e8d4ff;
+    box-shadow: 0 4px 18px rgba(102, 64, 238, 0.06);
     transition: transform 0.25s ease, box-shadow 0.25s ease;
     text-decoration: none;
     color: inherit;
@@ -199,7 +199,7 @@
 
 .card-home:hover {
     transform: translateY(-4px);
-    box-shadow: 0 18px 40px rgba(70, 50, 140, 0.10);
+    box-shadow: 0 18px 40px rgba(102, 64, 238, 0.10);
 }
 
 .foto-home {
@@ -221,7 +221,7 @@
 .cargo-home {
     display: block;
     font-size: 12px;
-    color: #624CAB;
+    color: #9869F4;
     margin: 4px 0 10px;
     letter-spacing: 0.04em;
 }
@@ -273,8 +273,8 @@
 .reserva {
     background: #fff;
     border-radius: 26px;
-    border: 1px solid #ece8f5;
-    box-shadow: 0 18px 40px rgba(70, 50, 140, 0.10);
+    border: 1px solid #e8d4ff;
+    box-shadow: 0 18px 40px rgba(102, 64, 238, 0.10);
     padding: 38px;
     max-width: 880px;
 }
@@ -303,7 +303,7 @@
     gap: 14px;
     padding: 18px 20px;
     border-radius: 12px;
-    border: 1px solid #ece8f5;
+    border: 1px solid #e8d4ff;
     cursor: pointer;
     font-weight: 500;
     color: #343633;
@@ -317,16 +317,16 @@
     width: 36px;
     height: 36px;
     border-radius: 10px;
-    background: #DEC1FF;
-    color: #624CAB;
+    background: #FFE566;
+    color: #343633;
     display: grid;
     place-items: center;
     font-size: 16px;
 }
 
 .opcao.active {
-    border-color: #7860c0;
-    background: #DEC1FF;
+    border-color: #b085f5;
+    background: #FEBAFF;
 }
 
 .abas {
@@ -348,7 +348,7 @@
 .tab.active {
     background: #fff;
     color: #343633;
-    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    box-shadow: 0 4px 18px rgba(102, 64, 238, 0.06);
 }
 
 .grade-slots {
@@ -360,7 +360,7 @@
 .slot {
     padding: 14px 18px;
     border-radius: 12px;
-    background: #f7f5fb;
+    background: #F4F6FF;
     border: 1px solid transparent;
     color: #4a4761;
     font-weight: 500;
@@ -368,13 +368,13 @@
 }
 
 .slot:hover {
-    border-color: #DEC1FF;
+    border-color: #FEBAFF;
 }
 
 .slot.active {
-    background: #DEC1FF;
-    border-color: #7860c0;
-    color: #624CAB;
+    background: #FEBAFF;
+    border-color: #b085f5;
+    color: #343633;
 }
 
 
@@ -394,10 +394,10 @@
 .plano {
     position: relative;
     background: #fff;
-    border: 1px solid #ece8f5;
+    border: 1px solid #e8d4ff;
     border-radius: 26px;
     padding: 34px 28px;
-    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    box-shadow: 0 4px 18px rgba(102, 64, 238, 0.06);
     display: flex;
     flex-direction: column;
 }
@@ -458,10 +458,10 @@
 }
 
 .plano-dest {
-    background: linear-gradient(170deg, #624CAB, #624CAB);
+    background: linear-gradient(170deg, #9869F4, #7a4ed4);
     color: #fff;
     border: none;
-    box-shadow: 0 30px 60px rgba(70, 50, 140, 0.18);
+    box-shadow: 0 30px 60px rgba(102, 64, 238, 0.18);
     transform: scale(1.03);
 }
 
@@ -479,7 +479,7 @@
 
 .plano-dest .btn-primary {
     background: #fff;
-    color: #624CAB;
+    color: #9869F4;
     box-shadow: none;
 }
 
@@ -511,10 +511,10 @@
 
 .depo {
     background: #fff;
-    border: 1px solid #ece8f5;
+    border: 1px solid #e8d4ff;
     border-radius: 18px;
     padding: 28px;
-    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    box-shadow: 0 4px 18px rgba(102, 64, 238, 0.06);
     display: flex;
     flex-direction: column;
     gap: 18px;

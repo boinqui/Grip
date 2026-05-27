@@ -29,7 +29,7 @@
 .admin-search select {
     padding: 10px 16px;
     border-radius: 12px;
-    border: 1px solid rgba(98, 76, 171, 0.2);
+    border: 1px solid rgba(102, 64, 238, 0.2);
     background: #fff;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
@@ -41,15 +41,15 @@
 
 .admin-search input:focus,
 .admin-search select:focus {
-    border-color: #7860c0;
-    box-shadow: 0 0 0 3px rgba(98, 76, 171, 0.14);
+    border-color: #b085f5;
+    box-shadow: 0 0 0 3px rgba(102, 64, 238, 0.14);
 }
 
 .table-wrap {
     overflow-x: auto;
     border-radius: 18px;
-    border: 1px solid #ece8f5;
-    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    border: 1px solid #e8d4ff;
+    box-shadow: 0 4px 18px rgba(102, 64, 238, 0.06);
 }
 
 table {
@@ -60,8 +60,8 @@ table {
 }
 
 table thead {
-    background: #f7f5fb;
-    border-bottom: 1px solid #ece8f5;
+    background: #F4F6FF;
+    border-bottom: 1px solid #e8d4ff;
 }
 
 table th {
@@ -88,7 +88,7 @@ table td.center { text-align: center; }
 
 table tbody tr:last-child td { border-bottom: none; }
 
-table tbody tr:hover { background: #f7f5fb; }
+table tbody tr:hover { background: #F4F6FF; }
 
 table .nome-cell {
     font-weight: 600;
@@ -106,7 +106,7 @@ table .nome-cell {
 }
 .acao-btn:hover { opacity: 0.8; }
 
-.acao-editar  { background: #DEC1FF; color: #624CAB; }
+.acao-editar  { background: #FEBAFF; color: #343633; }
 .acao-senha   { background: #dcfce7; color: #16a34a; }
 .acao-excluir { background: #fee2e2; color: #dc2626; }
 
@@ -124,8 +124,8 @@ table .nome-cell {
 .stat-card {
     background: #fff;
     border-radius: 18px;
-    border: 1px solid #ece8f5;
-    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    border: 1px solid #e8d4ff;
+    box-shadow: 0 4px 18px rgba(102, 64, 238, 0.06);
     padding: 24px 28px;
 }
 
@@ -153,11 +153,11 @@ table .nome-cell {
 }
 
 .avatar {
-    background: #624CAB;
+    background: #9869F4;
 }
 
 .plano-badge {
-    background: #624CAB;
+    background: #9869F4;
     box-shadow: none;
 }
 
@@ -200,7 +200,7 @@ table .nome-cell {
 }
 
 .breadcrumb a:hover {
-    color: #624CAB;
+    color: #9869F4;
 }
 
 
@@ -209,8 +209,8 @@ table .nome-cell {
 .form-card {
     background: #fff;
     border-radius: 18px;
-    border: 1px solid #ece8f5;
-    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    border: 1px solid #e8d4ff;
+    box-shadow: 0 4px 18px rgba(102, 64, 238, 0.06);
     padding: 32px;
     max-width: 600px;
 }
@@ -238,7 +238,7 @@ table .nome-cell {
 .admin-campo textarea {
     width: 100%;
     padding: 10px 14px;
-    border: 1px solid rgba(98, 76, 171, 0.2);
+    border: 1px solid rgba(102, 64, 238, 0.2);
     border-radius: 12px;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
@@ -251,8 +251,8 @@ table .nome-cell {
 .admin-campo input:focus,
 .admin-campo select:focus,
 .admin-campo textarea:focus {
-    border-color: #7860c0;
-    box-shadow: 0 0 0 3px rgba(98, 76, 171, 0.14);
+    border-color: #b085f5;
+    box-shadow: 0 0 0 3px rgba(102, 64, 238, 0.14);
 }
 
 .admin-campo textarea {
@@ -273,8 +273,8 @@ table .nome-cell {
 .delete-card {
     background: #fff;
     border-radius: 18px;
-    border: 1px solid #ece8f5;
-    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    border: 1px solid #e8d4ff;
+    box-shadow: 0 4px 18px rgba(102, 64, 238, 0.06);
     padding: 32px;
     max-width: 600px;
 }
@@ -290,7 +290,7 @@ table .nome-cell {
     flex-direction: column;
     gap: 10px;
     padding: 20px;
-    background: #f7f5fb;
+    background: #F4F6FF;
     border-radius: 12px;
     margin-bottom: 28px;
 }

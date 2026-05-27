@@ -6,8 +6,8 @@
     font-size: 14px;
     color: #8b8aa1;
 }
-.caminho a { color: #624CAB; font-weight: 500; }
-.caminho a:hover { color: #624CAB; }
+.caminho a { color: #9869F4; font-weight: 500; }
+.caminho a:hover { color: #9869F4; }
 
 .perfil-hero {
     padding: 48px 0 60px;
@@ -31,7 +31,7 @@
     width: 160px;
     height: 160px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #7860c0 0%, #DEC1FF 100%);
+    background: linear-gradient(135deg, #b085f5 0%, #FEBAFF 100%);
     display: grid;
     place-items: center;
     font-family: 'Playfair Display', serif;
@@ -39,7 +39,7 @@
     font-weight: 600;
     color: #fff;
     flex-shrink: 0;
-    box-shadow: 0 12px 32px rgba(98, 76, 171, 0.28);
+    box-shadow: 0 12px 32px rgba(102, 64, 238, 0.28);
     position: relative;
     overflow: hidden;
 }
@@ -62,19 +62,19 @@
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    background: linear-gradient(135deg, #624CAB, #8a74c4);
+    background: linear-gradient(135deg, #9869F4, #FEBAFF);
     color: #fff;
-    box-shadow: 0 4px 14px rgba(98, 76, 171, 0.3);
+    box-shadow: 0 4px 14px rgba(102, 64, 238, 0.3);
 }
 
 .plano-badge.basico {
-    background: #DEC1FF;
-    color: #624CAB;
+    background: #FEBAFF;
+    color: #343633;
     box-shadow: none;
 }
 
 .plano-badge.profissional {
-    background: linear-gradient(135deg, #624CAB, #8a74c4);
+    background: linear-gradient(135deg, #9869F4, #FEBAFF);
     color: #fff;
 }
 
@@ -120,8 +120,8 @@
     display: flex;
     gap: 32px;
     padding: 22px 0;
-    border-top: 1px solid #ece8f5;
-    border-bottom: 1px solid #ece8f5;
+    border-top: 1px solid #e8d4ff;
+    border-bottom: 1px solid #e8d4ff;
     flex-wrap: wrap;
 }
 
@@ -155,8 +155,8 @@
 
 .tabs-wrap {
     background: #fff;
-    border-top: 1px solid #ece8f5;
-    border-bottom: 1px solid #ece8f5;
+    border-top: 1px solid #e8d4ff;
+    border-bottom: 1px solid #e8d4ff;
     position: sticky;
     top: 62px;
     z-index: 20;
@@ -182,8 +182,8 @@
     white-space: nowrap;
     transition: color 0.2s, border-color 0.2s;
 }
-.tab-btn:hover { color: #624CAB; }
-.tab-btn.active { color: #624CAB; border-bottom-color: #624CAB; }
+.tab-btn:hover { color: #9869F4; }
+.tab-btn.active { color: #9869F4; border-bottom-color: #9869F4; }
 
 .tab-painel { display: none; padding: 64px 0 100px; }
 .tab-painel.active { display: block; }
@@ -209,8 +209,8 @@
 .card-perfil {
     background: #fff;
     border-radius: 18px;
-    border: 1px solid #ece8f5;
-    box-shadow: 0 4px 18px rgba(70, 50, 140, 0.06);
+    border: 1px solid #e8d4ff;
+    box-shadow: 0 4px 18px rgba(102, 64, 238, 0.06);
     padding: 28px;
 }
 
@@ -233,20 +233,20 @@
     align-items: center;
     gap: 16px;
     padding: 18px 20px;
-    background: #f7f5fb;
+    background: #F4F6FF;
     border-radius: 14px;
-    border: 1px solid #ece8f5;
+    border: 1px solid #e8d4ff;
     transition: border-color 0.2s, box-shadow 0.2s;
 }
-.item-aula:hover { border-color: #DEC1FF; box-shadow: 0 4px 14px rgba(98, 76, 171, 0.08); }
+.item-aula:hover { border-color: #FEBAFF; box-shadow: 0 4px 14px rgba(102, 64, 238, 0.08); }
 
 .aula-ic {
     flex-shrink: 0;
     width: 46px;
     height: 46px;
     border-radius: 12px;
-    background: #DEC1FF;
-    color: #624CAB;
+    background: #FEBAFF;
+    color: #343633;
     display: grid;
     place-items: center;
     font-size: 13px;
@@ -283,7 +283,7 @@
 
 .aula-badge.confirmada { background: #dcfce7; color: #16a34a; }
 .aula-badge.pendente { background: #fef9c3; color: #ca8a04; }
-.aula-badge.concluida { background: #DEC1FF; color: #624CAB; }
+.aula-badge.concluida { background: #FEBAFF; color: #343633; }
 
 .nivel-bloco {
     display: flex;
@@ -330,7 +330,7 @@
 .form-campo textarea {
     padding: 12px 16px;
     border-radius: 12px;
-    border: 1px solid rgba(98, 76, 171, 0.2);
+    border: 1px solid rgba(102, 64, 238, 0.2);
     background: #fff;
     font-family: 'Inter', sans-serif;
     font-size: 14px;
@@ -342,12 +342,12 @@
 .form-campo input:focus,
 .form-campo select:focus,
 .form-campo textarea:focus {
-    border-color: #7860c0;
-    box-shadow: 0 0 0 3px rgba(98, 76, 171, 0.14);
+    border-color: #b085f5;
+    box-shadow: 0 0 0 3px rgba(102, 64, 238, 0.14);
 }
 
 .form-campo input:disabled {
-    background: #f7f5fb;
+    background: #F4F6FF;
     color: #8b8aa1;
     cursor: not-allowed;
 }
@@ -360,7 +360,7 @@
     justify-content: space-between;
     gap: 16px;
     padding-top: 24px;
-    border-top: 1px solid #ece8f5;
+    border-top: 1px solid #e8d4ff;
     flex-wrap: wrap;
 }
 
@@ -448,8 +448,8 @@
 }
 
 .plano-status {
-    background: #DEC1FF;
-    color: #624CAB;
+    background: #FEBAFF;
+    color: #343633;
     padding: 4px 12px;
     border-radius: 999px;
     font-size: 11px;
@@ -489,7 +489,7 @@
     color: #4a4761;
 }
 
-.plano-check { color: #624CAB; }
+.plano-check { color: #9869F4; }
 
 .form-campo-col1 { grid-column: 1; }
 

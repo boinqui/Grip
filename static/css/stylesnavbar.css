@@ -17,8 +17,8 @@
 
 .navbar { display: flex; gap: 36px; font-size: 15px; color: #4a4761; }
 .navbar a { transition: color 0.2s ease; }
-.navbar a:hover { color: #624CAB; }
-.navbar a.ativo { color: #624CAB; font-weight: 500; }
+.navbar a:hover { color: #9869F4; }
+.navbar a.ativo { color: #9869F4; font-weight: 500; }
 
 /*Hamburger*/
 .nav-toggle {
@@ -44,6 +44,6 @@
         background: rgba(247, 245, 251, 0.98); backdrop-filter: blur(14px);
         border-bottom: 1px solid rgba(0, 0, 0, 0.06);
         padding: 24px 28px; gap: 22px; font-size: 16px; z-index: 100;
-        box-shadow: 0 8px 24px rgba(70, 50, 140, 0.08);
+        box-shadow: 0 8px 24px rgba(102, 64, 238, 0.08);
     }
 }
