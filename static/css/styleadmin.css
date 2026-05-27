@@ -170,12 +170,16 @@ table .nome-cell {
 @media (max-width: 980px) {
     .stats-grid { grid-template-columns: 1fr 1fr; }
     .atalhos-grid { grid-template-columns: 1fr 1fr; }
+    .admin-page { padding: 32px 0 60px; }
 }
 
 @media (max-width: 600px) {
     .stats-grid { grid-template-columns: 1fr; }
     .atalhos-grid { grid-template-columns: 1fr 1fr; }
     .admin-search input { width: 100%; }
+    .admin-page { padding: 24px 0 48px; }
+    .form-card { padding: 24px; }
+    .delete-card { padding: 24px; }
 }
 
 

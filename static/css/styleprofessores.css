@@ -52,8 +52,8 @@
 
 
 .secao {
-    padding-bottom: 110px !important;
-    padding-top: 0 !important;
+    padding-bottom: 110px;
+    padding-top: 0;
 }
 
 .grade {
@@ -206,7 +206,7 @@
 .caminho a:hover { color: #5b36e0; }
 
 .perfil-hero {
-    padding: 48px 0 80px !important;
+    padding: 48px 0 80px;
 }
 
 .perfil-in {
@@ -396,7 +396,7 @@
 }
 
 .agenda {
-    padding: 110px 0 !important;
+    padding: 110px 0;
 }
 
 .agenda-box {
@@ -503,15 +503,19 @@
 .avaliacoes {
     background: #ffffff;
     border-top: 1px solid #ece8f5;
-    padding: 110px 0 !important;
+    padding: 110px 0;
 }
 
 @media (max-width: 980px) {
     .grade { grid-template-columns: repeat(2, 1fr); }
+    .perfil-hero { padding: 32px 0 48px; }
     .perfil-in { grid-template-columns: 1fr; gap: 36px; }
     .foto-grande { max-width: 340px; aspect-ratio: 1/1; }
     .numeros { grid-template-columns: repeat(2, 1fr); }
     .sobre-in { grid-template-columns: 1fr; gap: 48px; padding: 60px 0; }
+    .agenda { padding: 60px 0; }
+    .avaliacoes { padding: 60px 0; }
+    .secao { padding-bottom: 60px; }
 }
 
 @media (max-width: 600px) {
@@ -520,9 +524,14 @@
     .numeros { grid-template-columns: repeat(2, 1fr); }
     .acoes { flex-direction: column; }
     .acoes .btn { width: 100%; }
+    .perfil-hero { padding: 24px 0 32px; }
+    .dias { grid-template-columns: repeat(3, 1fr); gap: 4px; }
     .dia { font-size: 12px; padding: 10px 4px; }
     .horas { grid-template-columns: 1fr; }
     .agenda-box { padding: 24px 20px; }
+    .agenda { padding: 40px 0; }
+    .avaliacoes { padding: 40px 0; }
+    .secao { padding-bottom: 40px; }
     .confirmar { flex-direction: column; align-items: flex-start; }
     .confirmar .btn { width: 100%; }
 }
