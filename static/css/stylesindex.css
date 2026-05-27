@@ -1,3 +1,19 @@
+/*HERO FULLSCREEN*/
+
+.hero-fullscreen {
+    background-image: url('/static/images/background.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 60px 24px 80px;
+}
+
+.hero-fullscreen .hero-box {
+    max-width: 560px;
+    grid-template-columns: 1fr;
+    margin-left: 0;
+}
+
 /*HERO*/
 
 .hero {
@@ -8,7 +24,8 @@
     display: grid;
     grid-template-columns: 1.05fr 1fr;
     gap: 52px;
-    background: linear-gradient(135deg, #ece6ff 0%, #f6f1ff 60%, #efe8fb 100%);
+    background: rgba(255, 255, 255, 0.75);
+    backdrop-filter: blur(4px);
     border-radius: 32px;
     padding: 56px;
     overflow: hidden;
