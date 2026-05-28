@@ -1,160 +1,164 @@
 /*RESET & BASE*/
 
-*, *::before, *::after {
-    box-sizing: border-box;
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 html {
-    scroll-behavior: smooth;
+  scroll-behavior: smooth;
 }
 
 body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background: #F4F6FF;
-    color: #343633;
-    line-height: 1.55;
+  margin: 0;
+  font-family: "Inter", sans-serif;
+  background: #f4f6ff;
+  color: #343633;
+  line-height: 1.55;
 }
 
 img {
-    display: block;
-    max-width: 100%;
+  display: block;
+  max-width: 100%;
 }
 
 a {
-    color: inherit;
-    text-decoration: none;
+  color: inherit;
+  text-decoration: none;
 }
 
 button {
-    font: inherit;
-    cursor: pointer;
-    border: none;
-    background: none;
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
 }
-
 
 /*TIPOGRAFIA*/
 
-h1, h2, h3, h4 {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-weight: 600;
-    color: #343633;
-    letter-spacing: -0.01em;
-    margin: 0;
+h1,
+h2,
+h3,
+h4 {
+  font-family: "Playfair Display", Georgia, serif;
+  font-weight: 600;
+  color: #343633;
+  letter-spacing: -0.01em;
+  margin: 0;
 }
 
-h1 em, h2 em, h3 em {
-    font-style: italic;
-    font-weight: 500;
-    color: #9869F4;
+h1 em,
+h2 em,
+h3 em {
+  font-style: italic;
+  font-weight: 500;
+  color: CB91F9;
 }
 
 p {
-    margin: 0;
-    color: #4a4761;
+  margin: 0;
+  color: #4a4761;
 }
 
 .eyebrow {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    border-radius: 999px;
-    background: rgba(102, 64, 238, 0.12);
-    color: #9869F4;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(102, 64, 238, 0.12);
+  color: #9869f4;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
 }
 
 .eyebrow.muted {
-    background: transparent;
-    padding: 0;
-    color: #8b8aa1;
-    letter-spacing: 0.28em;
-    font-size: 11px;
+  background: transparent;
+  padding: 0;
+  color: #8b8aa1;
+  letter-spacing: 0.28em;
+  font-size: 11px;
 }
 
 .sec-titulo {
-    max-width: 640px;
-    margin-bottom: 58px;
+  max-width: 640px;
+  margin-bottom: 58px;
 }
 
 .sec-titulo.center {
-    text-align: center;
-    margin-left: auto;
-    margin-right: auto;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .sec-titulo h2 {
-    font-size: clamp(1.8rem, 3vw, 2.6rem);
-    margin: 18px 0 14px;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  margin: 18px 0 14px;
 }
 
 .sec-titulo p {
-    color: #8b8aa1;
+  color: #8b8aa1;
 }
-
 
 /*LAYOUT*/
 
 .container {
-    width: 100%;
-    max-width: 1180px;
-    margin: 0 auto;
-    padding: 0 28px;
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 28px;
 }
 
 main > section {
-    padding: 110px 0;
+  padding: 110px 0;
 }
-
 
 /*BOTÕES*/
 
 .btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    padding: 13px 26px;
-    border-radius: 12px;
-    font-weight: 500;
-    font-size: 15px;
-    white-space: nowrap;
-    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 13px 26px;
+  border-radius: 12px;
+  font-weight: 500;
+  font-size: 15px;
+  white-space: nowrap;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .btn-sm {
-    padding: 9px 18px;
-    font-size: 14px;
+  padding: 9px 18px;
+  font-size: 14px;
 }
 
 .btn-block {
-    width: 100%;
+  width: 100%;
 }
 
 .btn-primary {
-    background: #9869F4;
-    color: #fff;
-    box-shadow: 0 10px 24px rgba(102, 64, 238, 0.32);
+  background: #9869f4;
+  color: #fff;
+  box-shadow: 0 10px 24px rgba(102, 64, 238, 0.32);
 }
 
 .btn-primary:hover {
-    background: #7a4ed4;
-    transform: translateY(-1px);
+  background: #7a4ed4;
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
-    background: #fff;
-    color: #9869F4;
-    border: 1px solid #e8d4ff;
+  background: #fff;
+  color: #9869f4;
+  border: 1px solid #e8d4ff;
 }
 
 .btn-secondary:hover {
-    border-color: #FEBAFF;
-    background: #F4F6FF;
-    transform: translateY(-1px);
+  border-color: #febaff;
+  background: #f4f6ff;
+  transform: translateY(-1px);
 }

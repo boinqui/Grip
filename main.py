@@ -341,10 +341,14 @@ async def aluno_perfil(request: Request, db=Depends(get_db), auth=Depends(verify
     if aluno and aluno.get("fotoPerfil"):
         foto_b64 = base64.b64encode(aluno["fotoPerfil"]).decode("utf-8")
 
-    aulas = sorted(
-        (aulas_legado or []) + (aulas_agendadas or []),
-        key=lambda aula: (aula.get("data"), aula.get("id", 0))
-    )[:6]
+    from datetime import date as _date
+    def _sort_key(aula):
+        d = aula.get("data")
+        if isinstance(d, _date) and not isinstance(d, datetime):
+            d = datetime(d.year, d.month, d.day)
+        return (d or datetime.min, aula.get("id", 0))
+
+    aulas = sorted((aulas_legado or []) + (aulas_agendadas or []), key=_sort_key)[:6]
 
     for aula in aulas:
         if aula["data"]:
