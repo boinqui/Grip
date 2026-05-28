@@ -55,6 +55,7 @@
     </header>
 
     <main>
+
         <section class="hero-fullscreen">
             <div class="container hero-box">
                 <div class="hero-txt">
@@ -70,7 +71,7 @@
                     </p>
                     <div class="hero-btns">
                         <a href="#planos" class="btn btn-primary">Começar a Aprender Ballet</a>
-                        <a href="#aulas" class="btn btn-secondary">▶ Assistir Introdução</a>
+                        <button type="button" class="btn btn-secondary" onclick="abrirVideoModal()">▶ Assistir Introdução</button>
                     </div>
                     <div class="stats">
                         <div class="stat">
@@ -90,11 +91,10 @@
 
             </div>
         </section>
-
         <section class="philosophy">
             <div class="container fil-grid">
                 <div class="hero-img" style="min-height: 520px;">
-                    <img src="/static/images/dancer-barra.jpg" alt="Bailarina na barra">
+                    <img src="/static/images/ballet-outdoor.jpg" alt="Bailarina">
                 </div>
                 <div style="display:flex;flex-direction:column;gap:32px;">
                     <div>
@@ -147,6 +147,20 @@
         </section>
 
 
+
+        <section style="padding: 80px 24px;" id="aulas">
+            <div class="container">
+                <div class="sec-titulo center" style="margin-bottom: 40px;">
+                    <span class="eyebrow muted">EM MOVIMENTO</span>
+                    <h2>Veja como são nossas <em>Aulas</em></h2>
+                    <p>Uma amostra do ambiente, da técnica e da energia que você vai encontrar no Grip.</p>
+                </div>
+                <video controls preload="none" poster="/static/images/ballet-class-1.jpg"
+                    style="width:100%;max-height:560px;border-radius:20px;display:block;object-fit:cover;">
+                    <source src="/static/videos/class.mp4" type="video/mp4">
+                </video>
+            </div>
+        </section>
 
         <section class="pricing" id="planos">
             <div class="container sec-titulo center">
@@ -245,13 +259,13 @@
         <section style="padding: 0;">
             <div class="galeria-strip">
                 <div class="galeria-foto">
-                    <img src="/static/images/dancer-studio.jpg" alt="Bailarina no estúdio">
+                    <img src="/static/images/ballet-class-1.jpg" alt="Aula de ballet">
                 </div>
                 <div class="galeria-foto">
-                    <img src="/static/images/arabesque.jpg" alt="Arabesque">
+                    <img src="/static/images/ballet-dancer.jpg" alt="Bailarina">
                 </div>
                 <div class="galeria-foto">
-                    <img src="/static/images/class-arms.jpg" alt="Aula em grupo">
+                    <img src="/static/images/ballet-performance.jpg" alt="Apresentação">
                 </div>
             </div>
         </section>
@@ -306,7 +320,35 @@
         </div>
     </footer>
 
+    <!-- Modal de vídeo -->
+    <div id="videoModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:9999;align-items:center;justify-content:center;">
+        <button onclick="fecharVideoModal()" style="position:absolute;top:20px;right:28px;background:none;border:none;color:#fff;font-size:2rem;cursor:pointer;line-height:1;">✕</button>
+        <video id="videoModalPlayer" controls style="max-width:90vw;max-height:85vh;border-radius:12px;">
+            <source src="/static/videos/intro.mp4" type="video/mp4">
+        </video>
+    </div>
+
     <script src="/static/js/main.js"></script>
+    <script>
+        function abrirVideoModal() {
+            const modal = document.getElementById('videoModal');
+            modal.style.display = 'flex';
+            document.getElementById('videoModalPlayer').play();
+        }
+        function fecharVideoModal() {
+            const modal = document.getElementById('videoModal');
+            modal.style.display = 'none';
+            const vid = document.getElementById('videoModalPlayer');
+            vid.pause();
+            vid.currentTime = 0;
+        }
+        document.getElementById('videoModal').addEventListener('click', function(e) {
+            if (e.target === this) fecharVideoModal();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') fecharVideoModal();
+        });
+    </script>
 </body>
 
 </html>
