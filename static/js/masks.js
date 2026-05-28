@@ -1,28 +1,43 @@
-function mascaraTelefone(input) {
-    const d = input.value.replace(/\D/g, '').slice(0, 11);
-    if (!d) { input.value = ''; return; }
-    const ddd = d.slice(0, 2);
-    const num = d.slice(2);
-    if (d.length <= 2) { input.value = `(${ddd}`; return; }
-    if (num.length <= 4) { input.value = `(${ddd}) ${num}`; return; }
-    const pre = num.slice(0, num.length - 4);
-    const suf = num.slice(-4);
-    input.value = `(${ddd}) ${pre}-${suf}`;
+function formatarCpf(valor) {
+    const digitos = valor.replace(/\D/g, '').slice(0, 11);
+
+    if (digitos.length <= 3) return digitos;
+    if (digitos.length <= 6) return `${digitos.slice(0, 3)}.${digitos.slice(3)}`;
+    if (digitos.length <= 9) return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6)}`;
+    return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6, 9)}-${digitos.slice(9, 11)}`;
 }
 
-function mascaraCPF(input) {
-    const d = input.value.replace(/\D/g, '').slice(0, 11);
-    if (d.length <= 3) { input.value = d; return; }
-    if (d.length <= 6) { input.value = `${d.slice(0,3)}.${d.slice(3)}`; return; }
-    if (d.length <= 9) { input.value = `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6)}`; return; }
-    input.value = `${d.slice(0,3)}.${d.slice(3,6)}.${d.slice(6,9)}-${d.slice(9,11)}`;
+function formatarTelefone(valor) {
+    const digitos = valor.replace(/\D/g, '').slice(0, 11);
+
+    if (!digitos) return '';
+    if (digitos.length <= 2) return `(${digitos}`;
+
+    const ddd = digitos.slice(0, 2);
+    const numero = digitos.slice(2);
+
+    if (numero.length <= 4) return `(${ddd}) ${numero}`;
+
+    const prefixo = numero.slice(0, numero.length - 4);
+    const sufixo = numero.slice(-4);
+    return `(${ddd}) ${prefixo}-${sufixo}`;
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    document.querySelectorAll('input[data-mask="telefone"]').forEach(function (el) {
-        el.addEventListener('input', function () { mascaraTelefone(el); });
+function aplicarMascaraCpf(input) {
+    if (!input) return;
+    input.addEventListener('input', () => {
+        input.value = formatarCpf(input.value);
     });
-    document.querySelectorAll('input[data-mask="cpf"]').forEach(function (el) {
-        el.addEventListener('input', function () { mascaraCPF(el); });
+}
+
+function aplicarMascaraTelefone(input) {
+    if (!input) return;
+    input.addEventListener('input', () => {
+        input.value = formatarTelefone(input.value);
     });
-});
+}
+
+function initMascaras() {
+    aplicarMascaraCpf(document.getElementById('cpf'));
+    aplicarMascaraTelefone(document.getElementById('telefone'));
+}

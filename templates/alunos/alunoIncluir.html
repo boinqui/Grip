@@ -102,8 +102,8 @@
                 <div class="admin-campo">
                     <label>Senha</label>
                     <input type="password" id="senha" name="senha" required
-                        pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
-                        title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número.">
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"
+                        title="A senha deve ter pelo menos 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial.">
                     <span class="campo-erro" id="erro-senha"></span>
                 </div>
 
@@ -202,14 +202,17 @@
             } else { limparErro('erro-data'); }
         }
 
-        if (!senha || senha.value.length < 8 || !/[A-Za-z]/.test(senha.value) || !/\d/.test(senha.value)) {
-            mostrarErro('erro-senha', 'A senha deve ter pelo menos 8 caracteres, uma letra e um número.'); valido = false;
+        if (!senha || !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/.test(senha.value)) {
+            mostrarErro('erro-senha', 'A senha deve ter pelo menos 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial.'); valido = false;
         } else { limparErro('erro-senha'); }
 
         if (valido) e.target.submit();
     });
     </script>
     <script src="/static/js/masks.js"></script>
+    <script>
+        initMascaras();
+    </script>
     <script src="/static/js/main.js"></script>
 </body>
 </html>
