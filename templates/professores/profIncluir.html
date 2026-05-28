@@ -83,7 +83,8 @@
 
                 <div class="admin-campo">
                     <label>CPF</label>
-                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="11"
+                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14"
+                        data-mask="cpf"
                         pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" value="{{ form_data.cpf if form_data else '' }}">
                     <span class="campo-erro" id="erro-cpf"></span>
                 </div>
@@ -91,6 +92,7 @@
                 <div class="admin-campo">
                     <label>Telefone</label>
                     <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" inputmode="numeric" maxlength="15"
+                        data-mask="telefone"
                         pattern="\(\d{2}\)\s\d{5}-\d{4}" value="{{ form_data.telefone if form_data else '' }}">
                     <span class="campo-erro" id="erro-telefone"></span>
                 </div>
@@ -170,6 +172,7 @@
         </div>
     </footer>
     {% include 'modal.html' %}
+    <script src="/static/js/masks.js"></script>
     <script src="/static/js/sheet.js"></script>
     <script src="/static/js/main.js"></script>
     <script>

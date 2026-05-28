@@ -104,7 +104,7 @@
                 <div class="admin-campo">
                     <label>Telefone</label>
                     <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" inputmode="numeric" maxlength="15"
-                        value="{{ prof.telefone if prof.telefone else '' }}">
+                        data-mask="telefone" value="{{ prof.telefone if prof.telefone else '' }}">
                     <span class="campo-erro" id="erro-telefone"></span>
                 </div>
 
@@ -196,6 +196,7 @@
         if (!valido) e.preventDefault();
     });
     </script>
+    <script src="/static/js/masks.js"></script>
     <script src="/static/js/main.js"></script>
 </body>
 </html>

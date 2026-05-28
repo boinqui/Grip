@@ -367,6 +367,121 @@ async def aluno_perfil(request: Request, db=Depends(get_db), auth=Depends(verify
     })
 
 
+@app.post("/alunoPerfilAtualizar")
+async def aluno_perfil_atualizar_post(
+    request: Request,
+    id: int = Form(...),
+    nome: str = Form(...),
+    email: str = Form(...),
+    telefone: str = Form(""),
+    db=Depends(get_db),
+    auth=Depends(verify_logged_in)
+):
+    usuario_id = request.session.get("usuario_id")
+    if id != usuario_id:
+        raise HTTPException(status_code=403)
+    try:
+        if not validate_name(nome):
+            request.session["mensagem"] = "Nome inválido"
+            return RedirectResponse(url="/alunoPerfil", status_code=303)
+        if not validate_email(email):
+            request.session["mensagem"] = "Email inválido"
+            return RedirectResponse(url="/alunoPerfil", status_code=303)
+        if not validate_phone(telefone):
+            request.session["mensagem"] = "Telefone inválido"
+            return RedirectResponse(url="/alunoPerfil", status_code=303)
+        with db.cursor() as cursor:
+            cursor.execute(
+                "UPDATE Aluno SET nome=%s, email=%s, telefone=%s WHERE id=%s",
+                (nome, email, telefone or None, id)
+            )
+            db.commit()
+        request.session["nome_usuario"] = nome
+        request.session["mensagem"] = "Perfil atualizado com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
+    finally:
+        db.close()
+    return RedirectResponse(url="/alunoPerfil", status_code=303)
+
+
+@app.get("/esqueci-senha", response_class=HTMLResponse)
+async def esqueci_senha_get(request: Request):
+    mensagem = request.session.pop("mensagem", None)
+    return templates.TemplateResponse("cadastrologin/esqueciSenha.html", {
+        "request": request,
+        "mensagem": mensagem,
+        "nome_usuario": request.session.get("nome_usuario"),
+    })
+
+
+@app.post("/esqueci-senha")
+async def esqueci_senha_post(
+    request: Request,
+    email: str = Form(...),
+    tipo: str = Form(...),
+    db=Depends(get_db)
+):
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            tabela = "Professor" if tipo == "professor" else "Aluno"
+            cursor.execute(f"SELECT id FROM {tabela} WHERE email = %s", (email,))
+            user = cursor.fetchone()
+    finally:
+        db.close()
+    if not user:
+        request.session["mensagem"] = "E-mail não encontrado."
+        return RedirectResponse(url="/esqueci-senha", status_code=303)
+    request.session["reset_user_id"] = user["id"]
+    request.session["reset_tipo"] = tipo
+    return RedirectResponse(url="/redefinir-senha", status_code=303)
+
+
+@app.get("/redefinir-senha", response_class=HTMLResponse)
+async def redefinir_senha_get(request: Request):
+    if not request.session.get("reset_user_id"):
+        return RedirectResponse(url="/esqueci-senha", status_code=303)
+    mensagem = request.session.pop("mensagem", None)
+    return templates.TemplateResponse("cadastrologin/redefinirSenha.html", {
+        "request": request,
+        "mensagem": mensagem,
+        "nome_usuario": request.session.get("nome_usuario"),
+    })
+
+
+@app.post("/redefinir-senha")
+async def redefinir_senha_post(
+    request: Request,
+    nova_senha: str = Form(...),
+    confirmar_senha: str = Form(...),
+    db=Depends(get_db)
+):
+    user_id = request.session.get("reset_user_id")
+    tipo = request.session.get("reset_tipo")
+    if not user_id or not tipo:
+        return RedirectResponse(url="/esqueci-senha", status_code=303)
+    if nova_senha != confirmar_senha:
+        request.session["mensagem"] = "As senhas não coincidem."
+        return RedirectResponse(url="/redefinir-senha", status_code=303)
+    if not validate_password(nova_senha):
+        request.session["mensagem"] = "A senha deve ter pelo menos 8 caracteres, uma letra e um número."
+        return RedirectResponse(url="/redefinir-senha", status_code=303)
+    try:
+        with db.cursor() as cursor:
+            tabela = "Professor" if tipo == "professor" else "Aluno"
+            cursor.execute(f"UPDATE {tabela} SET senha=%s WHERE id=%s", (hash_password(nova_senha), user_id))
+            db.commit()
+        request.session.pop("reset_user_id", None)
+        request.session.pop("reset_tipo", None)
+        request.session["mensagem"] = "Senha redefinida com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro: {str(e)}"
+        return RedirectResponse(url="/redefinir-senha", status_code=303)
+    finally:
+        db.close()
+    return RedirectResponse(url="/login", status_code=303)
+
+
 @app.get("/professor-perfil", response_class=HTMLResponse)
 async def professor_perfil_publico(
     request: Request,

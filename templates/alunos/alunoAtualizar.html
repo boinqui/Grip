@@ -81,7 +81,7 @@
                     <div class="admin-campo">
                         <label>Telefone</label>
                         <input type="tel" id="telefone" name="telefone" value="{{ aluno.telefone }}" required
-                            pattern="\(?\d{2}\)?\s?9\d{4}-?\d{4}">
+                            data-mask="telefone" pattern="\(?\d{2}\)?\s?9\d{4}-?\d{4}">
                         <span class="campo-erro" id="erro-telefone"></span>
                     </div>
 
@@ -198,6 +198,7 @@
         if (!valido) e.preventDefault();
     });
     </script>
+    <script src="/static/js/masks.js"></script>
     <script src="/static/js/main.js"></script>
 </body>
 </html>
