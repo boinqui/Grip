@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/static/images/logo_grip.svg" type="image/svg+xml">
     <title>Painel Admin — Grip Ballet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -67,13 +68,13 @@
             <div class="container perfil-in">
 
                 <div class="avatar-wrap">
-                    {% if foto_b64 %}
-                        <img src="data:image/jpeg;base64,{{ foto_b64 }}" alt="Foto de Perfil" style="width: 100%; height: 100%;  max-width: 100px; max-height: 100px;  border-radius: 50%; object-fit: cover;">
-                    {% else %}
-                        <div class="avatar" id="avatarEl">
+                    <div class="avatar" id="avatarEl">
+                        {% if foto_b64 %}
+                            <img src="data:image/jpeg;base64,{{ foto_b64 }}" alt="Foto de Perfil">
+                        {% else %}
                             <span id="avatarIniciais">{{ nome_usuario[0] | upper if nome_usuario else 'P' }}</span>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                    </div>
                     <span class="plano-badge admin">Admin</span>
                 </div>
 
@@ -88,7 +89,10 @@
                     <div class="perfil-meta">
                         <span>{{ professor.email if professor else '' }}</span>
                         {% if professor and professor.registro_drt %}
-                        <span>· DRT {{ professor.registro_drt }}</span>
+                        <span>· DRT {{ professor.registro_drt | replace('DRT-', '') }}</span>
+                        {% endif %}
+                        {% if professor and professor.especialidade %}
+                        <span>· {{ professor.especialidade }}</span>
                         {% endif %}
                     </div>
 
@@ -277,6 +281,7 @@
                                 <th>DRT</th>
                                 <th>CPF</th>
                                 <th>E-mail</th>
+                                <th>Especialidade</th>
                                 <th class="center">Ações</th>
                             </tr>
                         </thead>
@@ -284,9 +289,10 @@
                             {% for prof in professores %}
                             <tr>
                                 <td class="nome-cell">{{ prof.nome }}</td>
-                                <td>{{ prof.registro_drt }}</td>
+                                <td>{{ prof.registro_drt | replace('DRT-', '') if prof.registro_drt else '' }}</td>
                                 <td>{{ prof.cpf }}</td>
                                 <td>{{ prof.email }}</td>
+                                <td>{{ prof.especialidade if prof.especialidade else '—' }}</td>
                                 <td class="center">
                                     <div class="acoes-gap">
                                         <a href="/profAtualizar?id={{ prof.id }}" class="acao-btn acao-editar">Editar</a>
@@ -297,7 +303,7 @@
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="5" class="vazia">Nenhum professor cadastrado.</td>
+                                <td colspan="6" class="vazia">Nenhum professor cadastrado.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -422,10 +428,20 @@
                                     placeholder="seu@email.com" />
                             </div>
                             <div class="form-campo">
+                                <label for="especialidade">Especialidade</label>
+                                <select id="especialidade" name="especialidade">
+                                    <option value="">Selecione...</option>
+                                    <option value="Clássico" {% if professor and professor.especialidade == 'Clássico' %}selected{% endif %}>Clássico</option>
+                                    <option value="Russo" {% if professor and professor.especialidade == 'Russo' %}selected{% endif %}>Russo</option>
+                                    <option value="Contemporâneo" {% if professor and professor.especialidade == 'Contemporâneo' %}selected{% endif %}>Contemporâneo</option>
+                                    <option value="Pas de Dois" {% if professor and professor.especialidade == 'Pas de Dois' %}selected{% endif %}>Pas de Dois</option>
+                                </select>
+                            </div>
+                            <div class="form-campo">
                                 <label for="drt">Registro DRT</label>
                                 <input type="text" id="drt"
-                                    value="{{ professor.registro_drt if professor else '' }}"
-                                    placeholder="Número DRT" disabled />
+                                    value="{{ professor.registro_drt | replace('DRT-', '') if professor and professor.registro_drt else '' }}"
+                                    inputmode="numeric" maxlength="4" placeholder="0000" disabled />
                             </div>
                             <div class="form-campo">
                                 <label for="cpf">CPF</label>

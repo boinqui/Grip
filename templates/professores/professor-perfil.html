@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/static/images/logo_grip.svg" type="image/svg+xml">
     <title>{{ professor.nome if professor else 'Professor' }} — Grip Ballet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -87,6 +88,9 @@
                         {% endif %}
                     </h1>
                     <span class="cargo grande">{{ professor.registro_drt if professor and professor.registro_drt else 'Instrutor(a) especializado(a)' }}</span>
+                    {% if professor and professor.especialidade %}
+                    <span class="cargo grande">Especializado em {{ professor.especialidade }}</span>
+                    {% endif %}
 
                     <p class="bio">
                         Aulas personalizadas para evolução técnica, postura e performance. Escolha o tipo de aula,
@@ -135,12 +139,10 @@
                         <div class="tipos">
                             <label class="opcao active" style="cursor:pointer;">
                                 <input type="radio" name="tipo_aula" value="grupo" checked />
-                                <span class="ic">◇</span>
                                 <span>Aula em Grupo</span>
                             </label>
                             <label class="opcao" style="cursor:pointer;">
                                 <input type="radio" name="tipo_aula" value="particular" />
-                                <span class="ic">◆</span>
                                 <span>Aula Particular</span>
                             </label>
                         </div>

@@ -1,216 +1,273 @@
 .campo-erro {
-    display: none;
-    color: #e53935;
-    font-size: 0.78rem;
-    margin-top: 4px;
+  display: none;
+  color: #e53935;
+  font-size: 0.78rem;
+  margin-top: 4px;
 }
 
 .campo-erro.visivel {
-    display: block;
+  display: block;
 }
 
 .auth {
-    background: linear-gradient(124deg, #F8F7FF 0%, #FFFFFF 100%);
-    position: relative;
+  background: linear-gradient(124deg, #f8f7ff 0%, #ffffff 100%);
+  position: relative;
 }
 
 .blur {
-    position: absolute;
-    border-radius: 50%;
-    z-index: 0;
-    pointer-events: none;
+  position: absolute;
+  border-radius: 50%;
+  z-index: 0;
+  pointer-events: none;
 }
 
 .blur1 {
-    background: linear-gradient(135deg, #b085f5 0%, #FEBAFF 100%);
-    filter: blur(64px);
-    opacity: 0.18;
-    top: -100px;
-    right: -100px;
-    width: 500px;
-    height: 500px;
+  background: linear-gradient(135deg, #b085f5 0%, #febaff 100%);
+  filter: blur(64px);
+  opacity: 0.18;
+  top: -100px;
+  right: -100px;
+  width: 500px;
+  height: 500px;
 }
 
 .blur2 {
-    background: linear-gradient(135deg, #FEBAFF 0%, #F2BFF0 100%);
-    filter: blur(64px);
-    opacity: 0.1;
-    bottom: -100px;
-    left: -100px;
-    width: 400px;
-    height: 400px;
+  background: linear-gradient(135deg, #febaff 0%, #f2bff0 100%);
+  filter: blur(64px);
+  opacity: 0.1;
+  bottom: -100px;
+  left: -100px;
+  width: 400px;
+  height: 400px;
 }
 
 .main {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 3rem 1rem 5rem;
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3rem 1rem 5rem;
 }
 
-.logo-big { margin-bottom: 2rem; }
-.logo-big img { height: 72px; opacity: 0.9; }
+.logo-big {
+  margin-bottom: 2rem;
+}
+.logo-big img {
+  height: 72px;
+  opacity: 0.9;
+}
 
 .card {
-    width: 100%;
-    max-width: 475px;
-    background: white;
-    border: 1px solid rgba(102, 64, 238, 0.12);
-    border-radius: 24px;
-    padding: 2rem;
-    box-shadow: 0 10px 40px rgba(102, 64, 238, 0.08);
-    text-align: center;
+  width: 100%;
+  max-width: 475px;
+  background: white;
+  border: 1px solid rgba(102, 64, 238, 0.12);
+  border-radius: 24px;
+  padding: 2rem;
+  box-shadow: 0 10px 40px rgba(102, 64, 238, 0.08);
+  text-align: center;
 }
 
-.card-top { margin-bottom: 0.5rem; }
+.card-top {
+  margin-bottom: 0.5rem;
+}
 
 .ic {
-    width: 48px;
-    height: 48px;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #b085f5 0%, #FEBAFF 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 1.5rem;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #b085f5 0%, #febaff 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 1.5rem;
 }
 
-.ic img { width: 24px; height: 24px; }
+.ic img {
+  width: 24px;
+  height: 24px;
+}
 
-.card h2 { font-size: 1.75rem; font-weight: 500; margin-bottom: 0.5rem; }
-.sub { font-size: 0.875rem; color: #8b8aa1; margin-bottom: 2rem; }
+.card h2 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+.sub {
+  font-size: 0.875rem;
+  color: #8b8aa1;
+  margin-bottom: 2rem;
+}
 
 .form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.1rem;
-    text-align: left;
-    margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  text-align: left;
+  margin-top: 1.5rem;
 }
 
 .campo {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
 }
 
-.campo label { font-size: 0.875rem; font-weight: 500; color: #343633; }
+.campo label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #343633;
+}
 
 .required-indicator {
-    color: #dc2626;
-    margin-left: 4px;
+  color: #dc2626;
+  margin-left: 4px;
 }
 
 .campo input {
-    width: 100%;
-    padding: 0.75rem 1rem;
-    background: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(102, 64, 238, 0.2);
-    border-radius: 12px;
-    font-size: 0.875rem;
-    font-family: inherit;
-    color: #343633;
-    outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(102, 64, 238, 0.2);
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: #343633;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
 }
 
 .campo input:focus {
-    background: #fff;
-    border-color: #b085f5;
-    box-shadow: 0 0 0 3px rgba(102, 64, 238, 0.14);
+  background: #fff;
+  border-color: #b085f5;
+  box-shadow: 0 0 0 3px rgba(102, 64, 238, 0.14);
 }
 
 .termos {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.75rem;
-    color: #8b8aa1;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  color: #8b8aa1;
 }
 
-.termos label { font-size: 0.75rem; font-weight: 500; line-height: 1.5; }
-.termos a { color: #9869F4; text-decoration: none; }
-.termos a:hover { text-decoration: underline; }
+.termos label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.5;
+}
+.termos a {
+  color: #9869f4;
+  text-decoration: none;
+}
+.termos a:hover {
+  text-decoration: underline;
+}
 
 .divisor {
-    display: flex;
-    align-items: center;
-    margin: 1.75rem 0 1.25rem;
+  display: flex;
+  align-items: center;
+  margin: 1.75rem 0 1.25rem;
 }
 
-.divisor::before, .divisor::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: #e8d4ff;
+.divisor::before,
+.divisor::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #e8d4ff;
 }
 
-.divisor span { padding: 0 1rem; font-size: 12px; color: #8b8aa1; }
+.divisor span {
+  padding: 0 1rem;
+  font-size: 12px;
+  color: #8b8aa1;
+}
 
-.link { font-size: 0.875rem; color: #8b8aa1; }
-.link a { color: #9869F4; font-weight: 500; text-decoration: none; }
-.link a:hover { text-decoration: underline; }
+.link {
+  font-size: 0.875rem;
+  color: #8b8aa1;
+}
+.link a {
+  color: #9869f4;
+  font-weight: 500;
+  text-decoration: none;
+}
+.link a:hover {
+  text-decoration: underline;
+}
 
-.copy { margin-top: 2rem; font-size: 12px; color: #8b8aa1; }
+.copy {
+  margin-top: 2rem;
+  font-size: 12px;
+  color: #8b8aa1;
+}
 
 .aviso {
-    padding: 0.75rem 1rem;
-    border-radius: 10px;
-    font-size: 0.8rem;
-    margin-bottom: 1.25rem;
-    text-align: left;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  margin-bottom: 1.25rem;
+  text-align: left;
 }
 
-.aviso-erro  { background: #fef2f2; color: #dc2626; border: 1px solid #fee2e2; }
-.aviso-ok { background: #f0fdf4; color: #16a34a; border: 1px solid #dcfce7; }
+.aviso-erro {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fee2e2;
+}
+.aviso-ok {
+  background: #f0fdf4;
+  color: #16a34a;
+  border: 1px solid #dcfce7;
+}
 
 .campo {
-    position: relative;
+  position: relative;
 }
 
 .input-wrapper {
-    position: relative;
+  position: relative;
 }
 
 .input-wrapper input {
-    width: 100%;
-    padding-right: 2.5rem;
+  width: 100%;
+  padding-right: 2.5rem;
 }
 
 .toggle-password {
-    position: absolute;
-    right: 14px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #8b8aa1;
-    z-index: 10;
-    font-size: 0.9rem;
-    transition: color 0.2s;
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #8b8aa1;
+  z-index: 10;
+  font-size: 0.9rem;
+  transition: color 0.2s;
 }
 
 .toggle-password:hover {
-    color: #b085f5;
+  color: #b085f5;
 }
 
 /* Container que junta os dois campos */
 .grupo-campos {
-    display: flex;
-    gap: 14px;
-    width: 100%;
+  display: flex;
+  gap: 14px;
+  width: 100%;
 }
 
 /* Garante que cada campo ocupe exatamente a metade do espaço disponível */
 .grupo-campos .campo {
-    flex: 1;
-    position: relative; /* Mantém o olho no lugar certo */
+  flex: 1;
+  position: relative; /* Mantém o olho no lugar certo */
 }
 
 /* Responsividade: Telas menores que 480px (Celulares) empilham os campos */
 @media (max-width: 480px) {
-    .grupo-campos {
-        flex-direction: column;
-        gap: 1.1rem; /* Mantém o mesmo espaçamento do resto do seu formulário */
-    }
+  .grupo-campos {
+    flex-direction: column;
+    gap: 1.1rem; /* Mantém o mesmo espaçamento do resto do seu formulário */
+  }
 }

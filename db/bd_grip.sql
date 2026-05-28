@@ -7,6 +7,7 @@ CREATE TABLE Professor (
     nome VARCHAR(50),
     registro_drt VARCHAR(50),
     cpf VARCHAR(15),
+    telefone VARCHAR(20),
     email VARCHAR(50),
     senha VARCHAR(255)
 );
@@ -105,3 +106,7 @@ SELECT * FROM Professor;
 ALTER TABLE Aluno ADD UNIQUE INDEX uq_aluno_email (email);
 ALTER TABLE Aluno ADD UNIQUE INDEX uq_aluno_cpf (cpf);
 ALTER TABLE Professor ADD UNIQUE INDEX uq_professor_email (email);
+ALTER TABLE Professor ADD COLUMN telefone VARCHAR(20);
+ALTER TABLE Professor ADD COLUMN especialidade VARCHAR(50);
+
+SELECT * FROM Professor;

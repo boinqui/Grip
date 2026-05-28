@@ -99,6 +99,18 @@ window.SheetModal = {
     });
 
     window.SheetModal = {
+        showFieldError(id, message) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = message;
+            el.classList.add('visivel');
+        },
+        clearFieldError(id) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = '';
+            el.classList.remove('visivel');
+        },
         showMessage({
             type = 'info',
             title: modalTitle = 'Aviso',

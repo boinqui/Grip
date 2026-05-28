@@ -80,6 +80,7 @@
                         <th>DRT</th>
                         <th>CPF</th>
                         <th>E-mail</th>
+                        <th>Especialidade</th>
                         {% if perfil == "admin" %}
                         <th class="center">Ações</th>
                         {% endif %}
@@ -89,9 +90,10 @@
                     {% for prof in professores %}
                     <tr>
                         <td class="nome-cell">{{ prof.nome }}</td>
-                        <td>{{ prof.registro_drt }}</td>
+                        <td>{{ prof.registro_drt | replace('DRT-', '') if prof.registro_drt else '' }}</td>
                         <td>{{ prof.cpf }}</td>
                         <td>{{ prof.email }}</td>
+                        <td>{{ prof.especialidade if prof.especialidade else '—' }}</td>
                         {% if perfil == "admin" %}
                         <td>
                             <div class="acoes-gap">
