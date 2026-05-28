@@ -17,6 +17,8 @@ def validate_cpf(cpf: str) -> bool:
     return cpf_validator.validate(cpf)
 
 def validate_phone(phone: str) -> bool:
+    if not phone or not phone.strip():
+        return True
     phone_digits = re.sub(r'\D', '', phone)
     pattern = Exactly(AnyDigit(), 2) + '9' + Exactly(AnyDigit(), 8)
     return pattern.is_exact_match(phone_digits)

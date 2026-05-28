@@ -7,6 +7,7 @@ CREATE TABLE Professor (
     nome VARCHAR(50),
     registro_drt VARCHAR(50),
     cpf VARCHAR(15),
+    telefone VARCHAR(20),
     email VARCHAR(50),
     senha VARCHAR(255)
 );
@@ -98,5 +99,8 @@ INSERT INTO Professor_Aluno (fk_Professor_id, fk_Aluno_id) VALUES
 
 INSERT INTO Agendamento_Aula (fk_Aluno_id, fk_Professor_id, tipo_aula, data_hora, observacao, status) VALUES
 (1, 1, 'particular', '2026-04-10 14:00:00', 'Aula focada em postura e equilíbrio', 'agendada');
+
+ALTER TABLE Professor ADD COLUMN telefone VARCHAR(20);
+ALTER TABLE Professor ADD COLUMN especialidade VARCHAR(50);
 
 SELECT * FROM Professor;

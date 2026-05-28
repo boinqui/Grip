@@ -63,7 +63,7 @@
         </div>
 
         <div class="form-card">
-            <form id="profAtualizarForm" action="/profAtualizar" method="POST" class="admin-form">
+            <form id="profAtualizarForm" action="/profAtualizar" method="POST" class="admin-form" enctype="multipart/form-data" novalidate>
                 <input type="hidden" name="id" value="{{ prof.id }}">
 
                 <div class="admin-campo">
@@ -88,6 +88,33 @@
                     <input type="email" id="email" name="email" value="{{ prof.email }}" required
                         pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$">
                     <span class="campo-erro" id="erro-email"></span>
+                </div>
+
+                <div class="admin-campo">
+                    <label>Especialidade</label>
+                    <select id="especialidade" name="especialidade">
+                        <option value="">Selecione...</option>
+                        <option value="Clássico" {% if prof.especialidade == 'Clássico' %}selected{% endif %}>Clássico</option>
+                        <option value="Russo" {% if prof.especialidade == 'Russo' %}selected{% endif %}>Russo</option>
+                        <option value="Contemporâneo" {% if prof.especialidade == 'Contemporâneo' %}selected{% endif %}>Contemporâneo</option>
+                        <option value="Pas de Deux" {% if prof.especialidade == 'Pas de Deux' %}selected{% endif %}>Pas de Deux</option>
+                    </select>
+                </div>
+
+                <div class="admin-campo">
+                    <label>Telefone</label>
+                    <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" inputmode="numeric" maxlength="15"
+                        value="{{ prof.telefone if prof.telefone else '' }}">
+                    <span class="campo-erro" id="erro-telefone"></span>
+                </div>
+
+                <div class="admin-campo">
+                    <label>Foto de Perfil</label>
+                    {% if foto_b64 %}
+                    <img src="data:image/jpeg;base64,{{ foto_b64 }}" alt="Foto atual" style="width:80px;height:80px;border-radius:50%;object-fit:cover;display:block;margin-bottom:8px;">
+                    {% endif %}
+                    <input type="file" id="fotoPerfil" name="fotoPerfil" accept="image/png, image/jpeg, image/jpg">
+                    <span class="campo-erro" id="erro-foto"></span>
                 </div>
 
                 <div class="form-acoes">
@@ -150,14 +177,21 @@
 
         const nome = document.getElementById('nome');
         const email = document.getElementById('email');
+        const telefone = document.getElementById('telefone');
 
-        if (!nome || !/^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$/.test(nome.value.trim())) {
-            mostrarErro('erro-nome', 'Nome deve conter apenas letras.'); valido = false;
+        if (!nome || !/^[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+(\s+[A-Za-zÀ-ÖØ-öø-ÿ\s'-]+)+$/.test(nome.value.trim())) {
+            mostrarErro('erro-nome', 'Informe nome e sobrenome (apenas letras).'); valido = false;
         } else { limparErro('erro-nome'); }
 
         if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
             mostrarErro('erro-email', 'Informe um e-mail válido.'); valido = false;
         } else { limparErro('erro-email'); }
+
+        const telefoneVal = telefone ? telefone.value.trim() : '';
+        const telefoneDigits = telefoneVal.replace(/\D/g, '');
+        if (telefoneVal && telefoneDigits.length !== 11) {
+            mostrarErro('erro-telefone', 'Informe um celular com DDD. Use (00) 00000-0000.'); valido = false;
+        } else { limparErro('erro-telefone'); }
 
         if (!valido) e.preventDefault();
     });

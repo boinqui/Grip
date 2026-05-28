@@ -90,6 +90,9 @@
                         {% if professor and professor.registro_drt %}
                         <span>· DRT {{ professor.registro_drt | replace('DRT-', '') }}</span>
                         {% endif %}
+                        {% if professor and professor.especialidade %}
+                        <span>· {{ professor.especialidade }}</span>
+                        {% endif %}
                     </div>
 
                     <div class="numeros-perfil">
@@ -277,6 +280,7 @@
                                 <th>DRT</th>
                                 <th>CPF</th>
                                 <th>E-mail</th>
+                                <th>Especialidade</th>
                                 <th class="center">Ações</th>
                             </tr>
                         </thead>
@@ -287,6 +291,7 @@
                                 <td>{{ prof.registro_drt | replace('DRT-', '') if prof.registro_drt else '' }}</td>
                                 <td>{{ prof.cpf }}</td>
                                 <td>{{ prof.email }}</td>
+                                <td>{{ prof.especialidade if prof.especialidade else '—' }}</td>
                                 <td class="center">
                                     <div class="acoes-gap">
                                         <a href="/profAtualizar?id={{ prof.id }}" class="acao-btn acao-editar">Editar</a>
@@ -297,7 +302,7 @@
                             </tr>
                             {% else %}
                             <tr>
-                                <td colspan="5" class="vazia">Nenhum professor cadastrado.</td>
+                                <td colspan="6" class="vazia">Nenhum professor cadastrado.</td>
                             </tr>
                             {% endfor %}
                         </tbody>
@@ -420,6 +425,16 @@
                                 <input type="email" id="email" name="email"
                                     value="{{ professor.email if professor else '' }}"
                                     placeholder="seu@email.com" />
+                            </div>
+                            <div class="form-campo">
+                                <label for="especialidade">Especialidade</label>
+                                <select id="especialidade" name="especialidade">
+                                    <option value="">Selecione...</option>
+                                    <option value="Clássico" {% if professor and professor.especialidade == 'Clássico' %}selected{% endif %}>Clássico</option>
+                                    <option value="Russo" {% if professor and professor.especialidade == 'Russo' %}selected{% endif %}>Russo</option>
+                                    <option value="Contemporâneo" {% if professor and professor.especialidade == 'Contemporâneo' %}selected{% endif %}>Contemporâneo</option>
+                                    <option value="Pas de Dois" {% if professor and professor.especialidade == 'Pas de Dois' %}selected{% endif %}>Pas de Dois</option>
+                                </select>
                             </div>
                             <div class="form-campo">
                                 <label for="drt">Registro DRT</label>

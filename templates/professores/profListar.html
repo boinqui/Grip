@@ -80,6 +80,7 @@
                         <th>DRT</th>
                         <th>CPF</th>
                         <th>E-mail</th>
+                        <th>Especialidade</th>
                         {% if perfil == "admin" %}
                         <th class="center">Ações</th>
                         {% endif %}
@@ -92,6 +93,7 @@
                         <td>{{ prof.registro_drt | replace('DRT-', '') if prof.registro_drt else '' }}</td>
                         <td>{{ prof.cpf }}</td>
                         <td>{{ prof.email }}</td>
+                        <td>{{ prof.especialidade if prof.especialidade else '—' }}</td>
                         {% if perfil == "admin" %}
                         <td>
                             <div class="acoes-gap">

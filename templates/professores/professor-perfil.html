@@ -87,6 +87,9 @@
                         {% endif %}
                     </h1>
                     <span class="cargo grande">{{ professor.registro_drt if professor and professor.registro_drt else 'Instrutor(a) especializado(a)' }}</span>
+                    {% if professor and professor.especialidade %}
+                    <span class="cargo grande">Especializado em {{ professor.especialidade }}</span>
+                    {% endif %}
 
                     <p class="bio">
                         Aulas personalizadas para evolução técnica, postura e performance. Escolha o tipo de aula,
@@ -135,12 +138,10 @@
                         <div class="tipos">
                             <label class="opcao active" style="cursor:pointer;">
                                 <input type="radio" name="tipo_aula" value="grupo" checked />
-                                <span class="ic">◇</span>
                                 <span>Aula em Grupo</span>
                             </label>
                             <label class="opcao" style="cursor:pointer;">
                                 <input type="radio" name="tipo_aula" value="particular" />
-                                <span class="ic">◆</span>
                                 <span>Aula Particular</span>
                             </label>
                         </div>

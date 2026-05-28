@@ -64,7 +64,7 @@
         </div>
 
         <div class="form-card">
-            <form id="profIncluirForm" action="/profIncluir" method="POST" class="admin-form" novalidate>
+            <form id="profIncluirForm" action="/profIncluir" method="POST" class="admin-form" enctype="multipart/form-data" novalidate>
 
                 <div class="admin-campo">
                     <label>Nome</label>
@@ -83,9 +83,16 @@
 
                 <div class="admin-campo">
                     <label>CPF</label>
-                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="11   "
+                    <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="11"
                         pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" value="{{ form_data.cpf if form_data else '' }}">
                     <span class="campo-erro" id="erro-cpf"></span>
+                </div>
+
+                <div class="admin-campo">
+                    <label>Telefone</label>
+                    <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" inputmode="numeric" maxlength="15"
+                        pattern="\(\d{2}\)\s\d{5}-\d{4}" value="{{ form_data.telefone if form_data else '' }}">
+                    <span class="campo-erro" id="erro-telefone"></span>
                 </div>
 
                 <div class="admin-campo">
@@ -101,6 +108,24 @@
                         pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
                         title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número." required>
                     <span class="campo-erro" id="erro-senha"></span>
+                </div>
+
+                <div class="admin-campo">
+                    <label>Especialidade</label>
+                    <select id="especialidade" name="especialidade">
+                        <option value="">Selecione...</option>
+                        <option value="Clássico">Clássico</option>
+                        <option value="Russo">Russo</option>
+                        <option value="Contemporâneo">Contemporâneo</option>
+                        <option value="Pas de Deux">Pas de Deux</option>
+                    </select>
+                    <span class="campo-erro" id="erro-especialidade"></span>
+                </div>
+
+                <div class="admin-campo">
+                    <label>Foto de Perfil</label>
+                    <input type="file" id="fotoPerfil" name="fotoPerfil" accept="image/png, image/jpeg, image/jpg">
+                    <span class="campo-erro" id="erro-foto"></span>
                 </div>
 
                 <div class="form-acoes">
@@ -164,19 +189,20 @@
             el.classList.remove('visivel');
         };
 
-        const nome  = document.getElementById('nome');
-        const drt   = document.getElementById('registro_drt');
-        const cpf   = document.getElementById('cpf');
-        const email = document.getElementById('email');
-        const senha = document.getElementById('senha');
+        const nome     = document.getElementById('nome');
+        const drt      = document.getElementById('registro_drt');
+        const cpf      = document.getElementById('cpf');
+        const telefone = document.getElementById('telefone');
+        const email    = document.getElementById('email');
+        const senha    = document.getElementById('senha');
 
-        ['erro-nome', 'erro-drt', 'erro-cpf', 'erro-email', 'erro-senha'].forEach(limparErro);
+        ['erro-nome', 'erro-drt', 'erro-cpf', 'erro-telefone', 'erro-email', 'erro-senha'].forEach(limparErro);
 
         let valido = true;
 
         const nomeVal = nome.value.trim();
         if (!nomeVal) {
-            mostrarErro('erro-nome', 'Informe o nome do professor.'); valido = false;
+            mostrarErro('erro-nome', 'Informe o nome completo do professor.'); valido = false;
         } else if (!/^[A-Za-zÀ-ÖØ-öø-ÿ']+(\s+[A-Za-zÀ-ÖØ-öø-ÿ']+)+$/.test(nomeVal)) {
             mostrarErro('erro-nome', 'Informe nome e sobrenome (apenas letras).'); valido = false;
         }
@@ -190,9 +216,19 @@
             drt.value = 'DRT-' + drtVal;
         }
 
-        const cpfVal = cpf.value.trim();
+        const telefoneVal = telefone ? telefone.value.trim() : '';
+        const telefoneDigits = telefoneVal.replace(/\D/g, '');
+        if (!telefoneVal) {
+            mostrarErro('erro-telefone', 'Informe o telefone.'); valido = false;
+        } else if (telefoneDigits.length !== 11) {
+            mostrarErro('erro-telefone', 'Informe um celular com DDD. Use (00) 00000-0000.'); valido = false;
+        }
+
+        const cpfVal = cpf ? cpf.value.trim() : '';
         const cpfDigits = cpfVal.replace(/\D/g, '');
-        if (cpfVal && cpfDigits.length !== 11) {
+        if (!cpfVal) {
+            mostrarErro('erro-cpf', 'Informe o CPF.'); valido = false;
+        } else if (cpfDigits.length !== 11) {
             mostrarErro('erro-cpf', 'CPF deve ter 11 dígitos. Use 000.000.000-00.'); valido = false;
         }
 
