@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="/static/css/stylesnavbar.css" />
     <link rel="stylesheet" href="/static/css/stylesfooter.css" />
     <link rel="stylesheet" href="/static/css/styleadmin.css" />
+    <link rel="stylesheet" href="/static/css/stylemensagens.css" />
 </head>
 <body>
     <header class="header">
@@ -63,33 +64,43 @@
         </div>
 
         <div class="form-card">
-            <form id="profIncluirForm" action="/profIncluir" method="POST" class="admin-form">
+            <form id="profIncluirForm" action="/profIncluir" method="POST" class="admin-form" enctype="multipart/form-data" novalidate>
 
                 <div class="admin-campo">
                     <label>Nome</label>
                     <input type="text" id="nome" name="nome" required
-                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" title="O nome deve conter apenas letras.">
+                        pattern="[A-Za-zÀ-ÖØ-öø-ÿ\s']+" title="O nome deve conter apenas letras." required
+                        value="{{ form_data.nome if form_data else '' }}">
                     <span class="campo-erro" id="erro-nome"></span>
                 </div>
 
                 <div class="admin-campo">
                     <label>Registro DRT</label>
-                    <input type="text" id="registro_drt" name="registro_drt" placeholder="DRT-0000" required
-                        pattern="DRT-\d+" title="O registro deve seguir o formato DRT-1234">
+                    <input type="text" id="registro_drt" name="registro_drt" placeholder="0000"
+                        inputmode="numeric" maxlength="4" value="{{ form_data.registro_drt if form_data else '' }}">
                     <span class="campo-erro" id="erro-drt"></span>
                 </div>
 
                 <div class="admin-campo">
                     <label>CPF</label>
                     <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" inputmode="numeric" maxlength="14"
-                        pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}">
+                        data-mask="cpf"
+                        pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}" value="{{ form_data.cpf if form_data else '' }}">
                     <span class="campo-erro" id="erro-cpf"></span>
+                </div>
+
+                <div class="admin-campo">
+                    <label>Telefone</label>
+                    <input type="tel" id="telefone" name="telefone" placeholder="(00) 00000-0000" inputmode="numeric" maxlength="15"
+                        data-mask="telefone"
+                        pattern="\(\d{2}\)\s\d{5}-\d{4}" value="{{ form_data.telefone if form_data else '' }}">
+                    <span class="campo-erro" id="erro-telefone"></span>
                 </div>
 
                 <div class="admin-campo">
                     <label>E-mail</label>
                     <input type="email" id="email" name="email" required
-                        pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$">
+                        pattern="[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" value="{{ form_data.email if form_data else '' }}">
                     <span class="campo-erro" id="erro-email"></span>
                 </div>
 
@@ -97,8 +108,26 @@
                     <label>Senha</label>
                     <input type="password" id="senha" name="senha" required
                         pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
-                        title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número.">
+                        title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número." required>
                     <span class="campo-erro" id="erro-senha"></span>
+                </div>
+
+                <div class="admin-campo">
+                    <label>Especialidade</label>
+                    <select id="especialidade" name="especialidade">
+                        <option value="">Selecione...</option>
+                        <option value="Clássico">Clássico</option>
+                        <option value="Russo">Russo</option>
+                        <option value="Contemporâneo">Contemporâneo</option>
+                        <option value="Pas de Deux">Pas de Deux</option>
+                    </select>
+                    <span class="campo-erro" id="erro-especialidade"></span>
+                </div>
+
+                <div class="admin-campo">
+                    <label>Foto de Perfil</label>
+                    <input type="file" id="fotoPerfil" name="fotoPerfil" accept="image/png, image/jpeg, image/jpg">
+                    <span class="campo-erro" id="erro-foto"></span>
                 </div>
 
                 <div class="form-acoes">
@@ -142,51 +171,94 @@
             <p>© 2026 Grip. Todos os direitos reservados.</p>
         </div>
     </footer>
+    {% include 'modal.html' %}
+    <script src="/static/js/masks.js"></script>
+    <script src="/static/js/sheet.js"></script>
     <script src="/static/js/main.js"></script>
     <script>
     document.getElementById('profIncluirForm').addEventListener('submit', function(e) {
-        let valido = true;
+        e.preventDefault();
 
-        function mostrarErro(id, msg) {
+        const mostrarErro = (id, msg) => {
             const el = document.getElementById(id);
             if (!el) return;
             el.textContent = msg;
             el.classList.add('visivel');
-        }
-        function limparErro(id) {
+        };
+        const limparErro = (id) => {
             const el = document.getElementById(id);
             if (!el) return;
             el.textContent = '';
             el.classList.remove('visivel');
+        };
+
+        const nome     = document.getElementById('nome');
+        const drt      = document.getElementById('registro_drt');
+        const cpf      = document.getElementById('cpf');
+        const telefone = document.getElementById('telefone');
+        const email    = document.getElementById('email');
+        const senha    = document.getElementById('senha');
+
+        ['erro-nome', 'erro-drt', 'erro-cpf', 'erro-telefone', 'erro-email', 'erro-senha'].forEach(limparErro);
+
+        let valido = true;
+
+        const nomeVal = nome.value.trim();
+        if (!nomeVal) {
+            mostrarErro('erro-nome', 'Informe o nome completo do professor.'); valido = false;
+        } else if (!/^[A-Za-zÀ-ÖØ-öø-ÿ']+(\s+[A-Za-zÀ-ÖØ-öø-ÿ']+)+$/.test(nomeVal)) {
+            mostrarErro('erro-nome', 'Informe nome e sobrenome (apenas letras).'); valido = false;
         }
 
-        const nome = document.getElementById('nome');
-        const drt = document.getElementById('registro_drt');
-        const cpf = document.getElementById('cpf');
-        const email = document.getElementById('email');
-        const senha = document.getElementById('senha');
+        const drtVal = drt.value.trim();
+        if (!drtVal) {
+            mostrarErro('erro-drt', 'Informe o número do DRT.'); valido = false;
+        } else if (!/^\d{1,4}$/.test(drtVal)) {
+            mostrarErro('erro-drt', 'Use apenas números (máx. 4 dígitos).'); valido = false;
+        } else {
+            drt.value = 'DRT-' + drtVal;
+        }
 
-        if (!nome || !/^[A-Za-zÀ-ÖØ-öø-ÿ\s']+$/.test(nome.value.trim())) {
-            mostrarErro('erro-nome', 'Nome deve conter apenas letras.'); valido = false;
-        } else { limparErro('erro-nome'); }
+        const telefoneVal = telefone ? telefone.value.trim() : '';
+        const telefoneDigits = telefoneVal.replace(/\D/g, '');
+        if (!telefoneVal) {
+            mostrarErro('erro-telefone', 'Informe o telefone.'); valido = false;
+        } else if (telefoneDigits.length !== 11) {
+            mostrarErro('erro-telefone', 'Informe um celular com DDD. Use (00) 00000-0000.'); valido = false;
+        }
 
-        if (!drt || !/^DRT-\d+$/.test(drt.value.trim())) {
-            mostrarErro('erro-drt', 'Informe um DRT válido: DRT-0000.'); valido = false;
-        } else { limparErro('erro-drt'); }
+        const cpfVal = cpf ? cpf.value.trim() : '';
+        const cpfDigits = cpfVal.replace(/\D/g, '');
+        if (!cpfVal) {
+            mostrarErro('erro-cpf', 'Informe o CPF.'); valido = false;
+        } else if (cpfDigits.length !== 11) {
+            mostrarErro('erro-cpf', 'CPF deve ter 11 dígitos. Use 000.000.000-00.'); valido = false;
+        }
 
-        if (cpf && cpf.value.trim() && !/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf.value)) {
-            mostrarErro('erro-cpf', 'Informe um CPF válido: 000.000.000-00.'); valido = false;
-        } else { limparErro('erro-cpf'); }
+        const emailVal = email.value.trim();
+        if (!emailVal) {
+            mostrarErro('erro-email', 'Informe o e-mail.'); valido = false;
+        } else if (!emailVal.includes('@') || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailVal)) {
+            mostrarErro('erro-email', 'Informe um e-mail válido com @.'); valido = false;
+        }
 
-        if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) {
-            mostrarErro('erro-email', 'Informe um e-mail válido.'); valido = false;
-        } else { limparErro('erro-email'); }
-
-        if (!senha || senha.value.length < 8 || !/[A-Za-z]/.test(senha.value) || !/\d/.test(senha.value)) {
+        if (!senha.value) {
+            mostrarErro('erro-senha', 'Informe uma senha.'); valido = false;
+        } else if (senha.value.length < 8 || !/[A-Za-z]/.test(senha.value) || !/\d/.test(senha.value)) {
             mostrarErro('erro-senha', 'A senha deve ter pelo menos 8 caracteres, uma letra e um número.'); valido = false;
-        } else { limparErro('erro-senha'); }
+        }
 
-        if (!valido) e.preventDefault();
+        if (!valido) return;
+
+        window.SheetModal.showConfirm({
+            type: 'info',
+            title: 'Confirmar cadastro',
+            message: `Deseja cadastrar o professor "${nomeVal}"?`,
+            confirmText: 'Cadastrar',
+            cancelText: 'Cancelar',
+        }).then((confirmado) => {
+            if (confirmado) document.getElementById('profIncluirForm').submit();
+        });
     });
     </script>
 </body>

@@ -1,2 +1,2 @@
 # Grip
-A ordem do dia está na sua tela
+Sua escola online de ballet

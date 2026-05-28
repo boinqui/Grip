@@ -1,50 +1,50 @@
 /*CTA*/
 
 .cta {
-    padding: 60px 0 90px !important;
+  padding: 60px 0 90px !important;
 }
 
 .cta-box {
-    background: linear-gradient(135deg, #9869F4, #FEBAFF);
-    color: #fff;
-    border-radius: 28px;
-    text-align: center;
-    padding: 60px 40px;
-    box-shadow: 0 30px 60px rgba(102, 64, 238, 0.18);
+  background: linear-gradient(135deg, #9869f4, #febaff);
+  color: #fff;
+  border-radius: 28px;
+  text-align: center;
+  padding: 60px 40px;
+  box-shadow: 0 30px 60px rgba(102, 64, 238, 0.18);
 }
 
 .cta-box h2 {
-    color: #fff;
-    font-size: clamp(1.9rem, 3vw, 2.6rem);
-    margin-bottom: 16px;
+  color: #fff;
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+  margin-bottom: 16px;
 }
 
 .cta-box h2 em {
-    color: #fff;
+  color: #fff;
 }
 
 .cta-box > p {
-    color: rgba(255, 255, 255, 0.85);
-    max-width: 580px;
-    margin: 0 auto 28px;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 580px;
+  margin: 0 auto 28px;
 }
 
 .cta-btns {
-    display: flex;
-    justify-content: center;
-    gap: 14px;
-    flex-wrap: wrap;
-    margin-bottom: 28px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
 }
 
 .cta-lista {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    justify-content: center;
-    gap: 28px;
-    flex-wrap: wrap;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.85);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  gap: 28px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.85);
 }

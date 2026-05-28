@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/static/images/logo_grip.svg" type="image/svg+xml">
     <title>Professores — Grip Ballet</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -13,6 +14,7 @@
     <link rel="stylesheet" href="/static/css/styles.css" />
     <link rel="stylesheet" href="/static/css/stylesnavbar.css" />
     <link rel="stylesheet" href="/static/css/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/stylesindex.css" />
     <link rel="stylesheet" href="/static/css/styleprofessores.css" />
     <link rel="stylesheet" href="/static/css/stylescta.css" />
 </head>
@@ -54,6 +56,19 @@
     </header>
 
     <main>
+                <section style="padding: 0 0 24px;">
+            <div class="galeria-strip">
+                <div class="galeria-foto">
+                    <img src="/static/images/ballet-class-2.jpg" alt="Ensaio de ballet">
+                </div>
+                <div class="galeria-foto">
+                    <img src="/static/images/ballet-floor.jpg" alt="Aula no chão">
+                </div>
+                <div class="galeria-foto">
+                    <img src="/static/images/ballet-studio-2.jpg" alt="Aula no estúdio">
+                </div>
+            </div>
+        </section>
         <section class="lista-hero">
             <div class="container lista-hero-in">
                 <span class="eyebrow muted">INSTRUTORES DE CLASSE MUNDIAL</span>
@@ -70,6 +85,8 @@
                 </div>
             </div>
         </section>
+
+
 
         <section class="secao">
             <div class="container grade" id="profs-grid">
@@ -98,7 +115,7 @@
                         </div>
                         <div class="rodape-card">
                             <div class="stats-linha">
-                                <div class="estat"><strong>Perfil</strong><span>atualizado</span></div>
+                                <div class="estat"><strong>+50</strong><span>alunos</span></div>
                             </div>
                             <a href="/professor-perfil?id={{ prof.id }}" class="btn btn-primary btn-sm">Ver Perfil</a>
                         </div>

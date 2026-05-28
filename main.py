@@ -134,7 +134,7 @@ async def home(request: Request, db=Depends(get_db)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("""
-                SELECT id, nome, registro_drt, fotoPerfil
+                SELECT id, nome, registro_drt, especialidade, fotoPerfil
                 FROM Professor
                 ORDER BY nome
                 LIMIT 5
@@ -147,7 +147,7 @@ async def home(request: Request, db=Depends(get_db)):
     for professor in professores_publicos:
         nome = (professor.get("nome") or "").strip()
         professor["iniciais"] = nome[0].upper() if nome else "P"
-        professor["especialidade"] = professor.get("registro_drt") or "Instrutor(a) Grip"
+        professor["especialidade"] = professor.get("especialidade") or "Instrutor(a) Grip"
         foto = professor.get("fotoPerfil")
         professor["foto_b64"] = base64.b64encode(foto).decode("utf-8") if foto else None
 
@@ -194,7 +194,7 @@ async def professores_page(request: Request, db=Depends(get_db)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("""
-                SELECT id, nome, registro_drt, fotoPerfil
+                SELECT id, nome, registro_drt, especialidade, fotoPerfil
                 FROM Professor
                 ORDER BY nome
             """)
@@ -206,7 +206,7 @@ async def professores_page(request: Request, db=Depends(get_db)):
     for professor in professores_publicos:
         nome = (professor.get("nome") or "").strip()
         professor["iniciais"] = nome[0].upper() if nome else "P"
-        professor["especialidade"] = professor.get("registro_drt") or "Instrutor(a) Grip"
+        professor["especialidade"] = professor.get("especialidade") or "Instrutor(a) Grip"
         foto = professor.get("fotoPerfil")
         professor["foto_b64"] = base64.b64encode(foto).decode("utf-8") if foto else None
 
@@ -341,10 +341,14 @@ async def aluno_perfil(request: Request, db=Depends(get_db), auth=Depends(verify
     if aluno and aluno.get("fotoPerfil"):
         foto_b64 = base64.b64encode(aluno["fotoPerfil"]).decode("utf-8")
 
-    aulas = sorted(
-        (aulas_legado or []) + (aulas_agendadas or []),
-        key=lambda aula: (aula.get("data"), aula.get("id", 0))
-    )[:6]
+    from datetime import date as _date
+    def _sort_key(aula):
+        d = aula.get("data")
+        if isinstance(d, _date) and not isinstance(d, datetime):
+            d = datetime(d.year, d.month, d.day)
+        return (d or datetime.min, aula.get("id", 0))
+
+    aulas = sorted((aulas_legado or []) + (aulas_agendadas or []), key=_sort_key)[:6]
 
     for aula in aulas:
         if aula["data"]:
@@ -367,6 +371,121 @@ async def aluno_perfil(request: Request, db=Depends(get_db), auth=Depends(verify
     })
 
 
+@app.post("/alunoPerfilAtualizar")
+async def aluno_perfil_atualizar_post(
+    request: Request,
+    id: int = Form(...),
+    nome: str = Form(...),
+    email: str = Form(...),
+    telefone: str = Form(""),
+    db=Depends(get_db),
+    auth=Depends(verify_logged_in)
+):
+    usuario_id = request.session.get("usuario_id")
+    if id != usuario_id:
+        raise HTTPException(status_code=403)
+    try:
+        if not validate_name(nome):
+            request.session["mensagem"] = "Nome inválido"
+            return RedirectResponse(url="/alunoPerfil", status_code=303)
+        if not validate_email(email):
+            request.session["mensagem"] = "Email inválido"
+            return RedirectResponse(url="/alunoPerfil", status_code=303)
+        if not validate_phone(telefone):
+            request.session["mensagem"] = "Telefone inválido"
+            return RedirectResponse(url="/alunoPerfil", status_code=303)
+        with db.cursor() as cursor:
+            cursor.execute(
+                "UPDATE Aluno SET nome=%s, email=%s, telefone=%s WHERE id=%s",
+                (nome, email, telefone or None, id)
+            )
+            db.commit()
+        request.session["nome_usuario"] = nome
+        request.session["mensagem"] = "Perfil atualizado com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
+    finally:
+        db.close()
+    return RedirectResponse(url="/alunoPerfil", status_code=303)
+
+
+@app.get("/esqueci-senha", response_class=HTMLResponse)
+async def esqueci_senha_get(request: Request):
+    mensagem = request.session.pop("mensagem", None)
+    return templates.TemplateResponse("cadastrologin/esqueciSenha.html", {
+        "request": request,
+        "mensagem": mensagem,
+        "nome_usuario": request.session.get("nome_usuario"),
+    })
+
+
+@app.post("/esqueci-senha")
+async def esqueci_senha_post(
+    request: Request,
+    email: str = Form(...),
+    tipo: str = Form(...),
+    db=Depends(get_db)
+):
+    try:
+        with db.cursor(pymysql.cursors.DictCursor) as cursor:
+            tabela = "Professor" if tipo == "professor" else "Aluno"
+            cursor.execute(f"SELECT id FROM {tabela} WHERE email = %s", (email,))
+            user = cursor.fetchone()
+    finally:
+        db.close()
+    if not user:
+        request.session["mensagem"] = "E-mail não encontrado."
+        return RedirectResponse(url="/esqueci-senha", status_code=303)
+    request.session["reset_user_id"] = user["id"]
+    request.session["reset_tipo"] = tipo
+    return RedirectResponse(url="/redefinir-senha", status_code=303)
+
+
+@app.get("/redefinir-senha", response_class=HTMLResponse)
+async def redefinir_senha_get(request: Request):
+    if not request.session.get("reset_user_id"):
+        return RedirectResponse(url="/esqueci-senha", status_code=303)
+    mensagem = request.session.pop("mensagem", None)
+    return templates.TemplateResponse("cadastrologin/redefinirSenha.html", {
+        "request": request,
+        "mensagem": mensagem,
+        "nome_usuario": request.session.get("nome_usuario"),
+    })
+
+
+@app.post("/redefinir-senha")
+async def redefinir_senha_post(
+    request: Request,
+    nova_senha: str = Form(...),
+    confirmar_senha: str = Form(...),
+    db=Depends(get_db)
+):
+    user_id = request.session.get("reset_user_id")
+    tipo = request.session.get("reset_tipo")
+    if not user_id or not tipo:
+        return RedirectResponse(url="/esqueci-senha", status_code=303)
+    if nova_senha != confirmar_senha:
+        request.session["mensagem"] = "As senhas não coincidem."
+        return RedirectResponse(url="/redefinir-senha", status_code=303)
+    if not validate_password(nova_senha):
+        request.session["mensagem"] = "A senha deve ter pelo menos 8 caracteres, uma letra e um número."
+        return RedirectResponse(url="/redefinir-senha", status_code=303)
+    try:
+        with db.cursor() as cursor:
+            tabela = "Professor" if tipo == "professor" else "Aluno"
+            cursor.execute(f"UPDATE {tabela} SET senha=%s WHERE id=%s", (hash_password(nova_senha), user_id))
+            db.commit()
+        request.session.pop("reset_user_id", None)
+        request.session.pop("reset_tipo", None)
+        request.session["mensagem"] = "Senha redefinida com sucesso!"
+    except Exception as e:
+        request.session["mensagem"] = f"Erro: {str(e)}"
+        return RedirectResponse(url="/redefinir-senha", status_code=303)
+    finally:
+        db.close()
+    return RedirectResponse(url="/login", status_code=303)
+
+
 @app.get("/professor-perfil", response_class=HTMLResponse)
 async def professor_perfil_publico(
     request: Request,
@@ -381,14 +500,14 @@ async def professor_perfil_publico(
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             if id:
                 cursor.execute("""
-                    SELECT id, nome, registro_drt, cpf, email, fotoPerfil
+                    SELECT id, nome, registro_drt, cpf, email, especialidade, fotoPerfil
                     FROM Professor
                     WHERE id = %s
                 """, (id,))
                 professor = cursor.fetchone()
             else:
                 cursor.execute("""
-                    SELECT id, nome, registro_drt, cpf, email, fotoPerfil
+                    SELECT id, nome, registro_drt, cpf, email, especialidade, fotoPerfil
                     FROM Professor
                     ORDER BY nome
                     LIMIT 1
@@ -486,8 +605,8 @@ async def agendar_aula(
                 SELECT id
                 FROM Agendamento_Aula
                 WHERE fk_Professor_id = %s
-                  AND data_hora = %s
-                  AND status = 'agendada'
+                AND data_hora = %s
+                AND status = 'agendada'
                 LIMIT 1
             """, (professor_id, data_hora))
             if cursor.fetchone():
@@ -498,8 +617,8 @@ async def agendar_aula(
                 SELECT id
                 FROM Agendamento_Aula
                 WHERE fk_Aluno_id = %s
-                  AND data_hora = %s
-                  AND status = 'agendada'
+                AND data_hora = %s
+                AND status = 'agendada'
                 LIMIT 1
             """, (aluno_id, data_hora))
             if cursor.fetchone():
@@ -540,11 +659,11 @@ async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_
     agendamentos_futuros = []
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT id, nome, registro_drt, cpf, email, fotoPerfil FROM Professor WHERE id = %s", (usuario_id,))
+            cursor.execute("SELECT id, nome, registro_drt, cpf, email, especialidade, fotoPerfil FROM Professor WHERE id = %s", (usuario_id,))
             professor = cursor.fetchone()
             cursor.execute("SELECT id, nome, cpf, telefone, email, data_nascimento FROM Aluno ORDER BY nome")
             alunos = cursor.fetchall()
-            cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor ORDER BY nome")
+            cursor.execute("SELECT id, nome, registro_drt, cpf, email, especialidade FROM Professor ORDER BY nome")
             professores = cursor.fetchall()
             cursor.execute("""
                 SELECT A.id, A.nome, A.data, A.descricao, P.nome AS professor_nome
@@ -558,8 +677,8 @@ async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_
                 FROM Agendamento_Aula AG
                 INNER JOIN Aluno AL ON AL.id = AG.fk_Aluno_id
                 WHERE AG.fk_Professor_id = %s
-                  AND AG.status = 'agendada'
-                  AND AG.data_hora >= NOW()
+                AND AG.status = 'agendada'
+                AND AG.data_hora >= NOW()
                 ORDER BY AG.data_hora ASC, AG.id ASC
                 LIMIT 6
             """, (usuario_id,))
@@ -610,6 +729,7 @@ async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_
         "nome_usuario": request.session.get("nome_usuario"),
         "perfil": request.session.get("perfil"),
         "professor": professor,
+        "foto_b64": foto_b64,
         "alunos": alunos,
         "professores": professores,
         "aulas": aulas,
@@ -756,10 +876,10 @@ async def prof_atualizar_foto(
 # ── Professor CRUD ────────────────────────────────────────────────────────────
 
 @app.get("/profListar", response_class=HTMLResponse)
-async def listar_professores(request: Request, db=Depends(get_db), auth=Depends(verify_admin)):    
+async def listar_professores(request: Request, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor ORDER BY nome")
+            cursor.execute("SELECT id, nome, registro_drt, cpf, email, especialidade FROM Professor ORDER BY nome")
             professores = cursor.fetchall()
     finally:
         db.close()
@@ -778,9 +898,11 @@ async def listar_professores(request: Request, db=Depends(get_db), auth=Depends(
 
 @app.get("/profIncluir", response_class=HTMLResponse)
 async def prof_incluir(request: Request, auth=Depends(verify_admin)):
+    mensagem = request.session.pop("mensagem", None)
     return templates.TemplateResponse("professores/profIncluir.html", {
         "request": request,
-        "nome_usuario": request.session.get("nome_usuario")
+        "nome_usuario": request.session.get("nome_usuario"),
+        "mensagem": mensagem
     })
 
 
@@ -790,8 +912,11 @@ async def prof_incluir_post(
     nome: str = Form(...),
     registro_drt: str = Form(...),
     cpf: str = Form(""),
+    telefone: str = Form(""),
     email: str = Form(...),
     senha: str = Form(...),
+    especialidade: str = Form(""),
+    fotoPerfil: UploadFile = File(None),
     db=Depends(get_db),
     auth=Depends(verify_admin)
 ):
@@ -809,6 +934,10 @@ async def prof_incluir_post(
         if not validate_password(senha):
             request.session["mensagem"] = "Senha inválida"
             return RedirectResponse(url="/profIncluir", status_code=303)
+
+        if not validate_phone(telefone):
+            request.session["mensagem"] = "Telefone inválido"
+            return RedirectResponse(url="/profIncluir", status_code=303)
         
         if not validate_drt(registro_drt):
             request.session["mensagem"] = "Registro DRT inválido"
@@ -817,9 +946,10 @@ async def prof_incluir_post(
 
         with db.cursor() as cursor:
             senha_hash = hash_password(senha)
+            foto_bytes = await fotoPerfil.read() if fotoPerfil and fotoPerfil.filename else None
             cursor.execute(
-                "INSERT INTO Professor (nome, registro_drt, cpf, email, senha) VALUES (%s, %s, %s, %s, %s)",
-                (nome, registro_drt, cpf, email, senha_hash)
+                "INSERT INTO Professor (nome, registro_drt, cpf, telefone, email, senha, especialidade, fotoPerfil) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (nome, registro_drt, cpf, telefone, email, senha_hash, especialidade or None, foto_bytes)
             )
             db.commit()
         request.session["mensagem"] = "Professor cadastrado com sucesso!"
@@ -834,7 +964,7 @@ async def prof_incluir_post(
 async def prof_excluir(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor WHERE id = %s", (id,))
+            cursor.execute("SELECT id, nome, registro_drt, cpf, telefone, email, fotoPerfil FROM Professor WHERE id = %s", (id,))
             professor = cursor.fetchone()
     finally:
         db.close()
@@ -863,13 +993,18 @@ async def prof_excluir_post(request: Request, id: int = Form(...), db=Depends(ge
 async def prof_atualizar(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
-            cursor.execute("SELECT id, nome, registro_drt, cpf, email FROM Professor WHERE id = %s", (id,))
+            cursor.execute("SELECT id, nome, registro_drt, cpf, telefone, email, especialidade, fotoPerfil FROM Professor WHERE id = %s", (id,))
             professor = cursor.fetchone()
     finally:
         db.close()
+    foto_b64 = None
+    if professor and professor.get("fotoPerfil"):
+        import base64
+        foto_b64 = base64.b64encode(professor["fotoPerfil"]).decode("utf-8")
     return templates.TemplateResponse("professores/profAtualizar.html", {
         "request": request,
         "prof": professor,
+        "foto_b64": foto_b64,
         "nome_usuario": request.session.get("nome_usuario")
     })
 
@@ -880,6 +1015,9 @@ async def prof_atualizar_post(
     id: int = Form(...),
     nome: str = Form(...),
     email: str = Form(...),
+    telefone: str = Form(""),
+    especialidade: str = Form(""),
+    fotoPerfil: UploadFile = File(None),
     db=Depends(get_db),
     auth=Depends(verify_admin)
 ):
@@ -887,20 +1025,32 @@ async def prof_atualizar_post(
 
         if not validate_name(nome):
             request.session["mensagem"] = "Nome inválido"
-            return RedirectResponse(url="/profAtualizar", status_code=303)
-        
+            return RedirectResponse(url=f"/profAtualizar?id={id}", status_code=303)
+
         if not validate_email(email):
             request.session["mensagem"] = "Email inválido"
-            return RedirectResponse(url="/profAtualizar", status_code=303)
-        
+            return RedirectResponse(url=f"/profAtualizar?id={id}", status_code=303)
+
+        if not validate_phone(telefone):
+            request.session["mensagem"] = "Telefone inválido"
+            return RedirectResponse(url=f"/profAtualizar?id={id}", status_code=303)
 
         with db.cursor() as cursor:
             # Não atualizamos registro_drt, cpf e senha aqui
-            cursor.execute(
-                "UPDATE Professor SET nome=%s, email=%s WHERE id=%s",
-                (nome, email, id)
-            )
+            foto_bytes = await fotoPerfil.read() if fotoPerfil and fotoPerfil.filename else None
+            if foto_bytes:
+                cursor.execute(
+                    "UPDATE Professor SET nome=%s, email=%s, telefone=%s, especialidade=%s, fotoPerfil=%s WHERE id=%s",
+                    (nome, email, telefone, especialidade or None, foto_bytes, id)
+                )
+            else:
+                cursor.execute(
+                    "UPDATE Professor SET nome=%s, email=%s, telefone=%s, especialidade=%s WHERE id=%s",
+                    (nome, email, telefone, especialidade or None, id)
+                )
             db.commit()
+        if id == request.session.get("usuario_id"):
+            request.session["nome_usuario"] = nome
         request.session["mensagem"] = "Cadastro do professor atualizado com sucesso!"
     except Exception as e:
         request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
@@ -911,10 +1061,6 @@ async def prof_atualizar_post(
 @app.get("/profSenha", response_class=HTMLResponse)
 async def prof_senha(request: Request, id: int, db=Depends(get_db), auth=Depends(verify_admin)):
     try:
-
-        
-        
-
         with db.cursor(pymysql.cursors.DictCursor) as cursor:
             cursor.execute("SELECT id, nome FROM Professor WHERE id = %s", (id,))
             professor = cursor.fetchone()

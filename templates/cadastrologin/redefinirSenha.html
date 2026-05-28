@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/static/images/logo_grip.svg" type="image/svg+xml">
+    <title>Redefinir Senha — Grip</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="/static/css/stylesnavbar.css" />
+    <link rel="stylesheet" href="/static/css/stylesfooter.css" />
+    <link rel="stylesheet" href="/static/css/stylecadastro.css">
+    <link rel="stylesheet" href="/static/css/stylemensagens.css">
+</head>
+<body class="auth-page">
+    <div class="blur blur1"></div>
+    <div class="blur blur2"></div>
+
+    <header class="header">
+        <div class="container nav">
+            <a href="/" class="logo">
+                <img src="/static/images/logo_grip.svg" alt="logo grip">
+            </a>
+            <nav class="navbar" aria-label="Navegação principal">
+                <a href="/">Home</a>
+                <a href="/aulas">Aulas</a>
+                <a href="/professores">Professores</a>
+                <a href="/planos">Planos</a>
+                <a href="/sobre">Sobre</a>
+            </nav>
+            <button class="nav-toggle" aria-label="Abrir menu" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
+            <a href="/login" class="btn btn-primary btn-sm">Entrar</a>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="logo-big">
+            <img src="/static/images/logo_grip.svg" alt="Grip Logo">
+        </div>
+
+        <div class="card">
+            <div class="card-top">
+                <h2>Nova senha</h2>
+                <p class="sub">Escolha uma senha segura para sua conta</p>
+            </div>
+
+            {% if mensagem %}
+            <div class="campo-erro visivel" style="margin-bottom: 1rem; text-align: center;">{{ mensagem }}</div>
+            {% endif %}
+
+            <form id="redefinirForm" action="/redefinir-senha" method="POST" class="form" novalidate>
+                <div class="campo">
+                    <label for="nova_senha">Nova senha <span class="required-indicator">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="password" id="nova_senha" name="nova_senha" placeholder="Mínimo 8 caracteres" required>
+                        <i class="fa-solid fa-eye toggle-password" id="eyeNova"></i>
+                    </div>
+                    <span class="campo-erro" id="erro-nova"></span>
+                </div>
+
+                <div class="campo">
+                    <label for="confirmar_senha">Confirmar nova senha <span class="required-indicator">*</span></label>
+                    <div class="input-wrapper">
+                        <input type="password" id="confirmar_senha" name="confirmar_senha" placeholder="Repita a senha" required>
+                        <i class="fa-solid fa-eye toggle-password" id="eyeConfirmar"></i>
+                    </div>
+                    <span class="campo-erro" id="erro-confirmar"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">Salvar nova senha</button>
+            </form>
+
+            <p class="link" style="margin-top: 1.2rem; text-align: center;">
+                <a href="/login">← Voltar ao login</a>
+            </p>
+        </div>
+
+        <p class="copy">© 2026 Grip Ballet Academy. Todos os direitos reservados.</p>
+    </main>
+
+    <script>
+    document.getElementById('redefinirForm').addEventListener('submit', function(e) {
+        const nova = document.getElementById('nova_senha');
+        const conf = document.getElementById('confirmar_senha');
+        const erroNova = document.getElementById('erro-nova');
+        const erroConf = document.getElementById('erro-confirmar');
+        let valido = true;
+
+        erroNova.textContent = ''; erroNova.classList.remove('visivel');
+        erroConf.textContent = ''; erroConf.classList.remove('visivel');
+
+        if (!nova.value || nova.value.length < 8 || !/[A-Za-z]/.test(nova.value) || !/\d/.test(nova.value)) {
+            erroNova.textContent = 'A senha deve ter pelo menos 8 caracteres, uma letra e um número.';
+            erroNova.classList.add('visivel'); valido = false;
+        }
+        if (nova.value !== conf.value) {
+            erroConf.textContent = 'As senhas não coincidem.';
+            erroConf.classList.add('visivel'); valido = false;
+        }
+        if (!valido) e.preventDefault();
+    });
+
+    function configurarOlho(idInput, idOlho) {
+        const input = document.getElementById(idInput);
+        const olho = document.getElementById(idOlho);
+        if (input && olho) {
+            olho.addEventListener('click', function() {
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    olho.classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    olho.classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            });
+        }
+    }
+    configurarOlho('nova_senha', 'eyeNova');
+    configurarOlho('confirmar_senha', 'eyeConfirmar');
+    </script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
