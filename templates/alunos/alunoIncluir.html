@@ -63,7 +63,7 @@
         </div>
 
         <div class="form-card">
-            <form id="alunoIncluirForm" action="/alunoIncluir" method="POST" class="admin-form">
+            <form id="alunoIncluirForm" action="/alunoIncluir" method="POST" class="admin-form" novalidate>
 
                 <div class="admin-campo">
                     <label>Nome</label>
@@ -150,6 +150,7 @@
     </footer>
     <script>
     document.getElementById('alunoIncluirForm').addEventListener('submit', function(e) {
+        e.preventDefault();
         let valido = true;
 
         function mostrarErro(id, msg) {
@@ -176,11 +177,13 @@
             mostrarErro('erro-nome', 'Nome deve conter apenas letras.'); valido = false;
         } else { limparErro('erro-nome'); }
 
-        if (!cpf || !/^\d{3}\.\d{3}\.\d{3}-\d{2}$/.test(cpf.value)) {
-            mostrarErro('erro-cpf', 'Informe um CPF válido: 000.000.000-00.'); valido = false;
+        const cpfDigits = cpf ? cpf.value.replace(/\D/g, '') : '';
+        if (!cpf || cpfDigits.length !== 11) {
+            mostrarErro('erro-cpf', 'CPF deve ter 11 dígitos. Use 000.000.000-00.'); valido = false;
         } else { limparErro('erro-cpf'); }
 
-        if (!telefone || !/^\(\d{2}\)\s\d{4,5}-\d{4}$/.test(telefone.value)) {
+        const telDigits = telefone ? telefone.value.replace(/\D/g, '') : '';
+        if (!telefone || telDigits.length < 10 || telDigits.length > 11) {
             mostrarErro('erro-telefone', 'Informe um telefone válido: (41) 99999-9999.'); valido = false;
         } else { limparErro('erro-telefone'); }
 
@@ -203,7 +206,7 @@
             mostrarErro('erro-senha', 'A senha deve ter pelo menos 8 caracteres, uma letra e um número.'); valido = false;
         } else { limparErro('erro-senha'); }
 
-        if (!valido) e.preventDefault();
+        if (valido) e.target.submit();
     });
     </script>
     <script src="/static/js/main.js"></script>

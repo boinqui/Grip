@@ -39,7 +39,7 @@ def validate_name(name: str) -> bool:
     letras = Either(
         AnyBetween('A', 'Z'), AnyBetween('a', 'z'),
         AnyBetween('À', 'Ö'), AnyBetween('Ø', 'ö'),
-        AnyBetween('ø', 'ÿ'), AnyWhitespace(), "'"
+        AnyBetween('ø', 'ÿ'), AnyWhitespace(), "'", "-"
     )
     return AtLeast(letras, 1).is_exact_match(name)
 

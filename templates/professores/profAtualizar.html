@@ -75,7 +75,7 @@
 
                 <div class="admin-campo">
                     <label>Registro DRT</label>
-                    <input type="text" value="{{ prof.registro_drt }}" disabled>
+                    <input type="text" value="{{ prof.registro_drt | replace('DRT-', '') if prof.registro_drt else '' }}" inputmode="numeric" maxlength="4" disabled>
                 </div>
 
                 <div class="admin-campo">

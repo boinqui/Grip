@@ -610,6 +610,7 @@ async def prof_perfil(request: Request, db=Depends(get_db), auth=Depends(verify_
         "nome_usuario": request.session.get("nome_usuario"),
         "perfil": request.session.get("perfil"),
         "professor": professor,
+        "foto_b64": foto_b64,
         "alunos": alunos,
         "professores": professores,
         "aulas": aulas,
@@ -778,9 +779,11 @@ async def listar_professores(request: Request, db=Depends(get_db), auth=Depends(
 
 @app.get("/profIncluir", response_class=HTMLResponse)
 async def prof_incluir(request: Request, auth=Depends(verify_admin)):
+    mensagem = request.session.pop("mensagem", None)
     return templates.TemplateResponse("professores/profIncluir.html", {
         "request": request,
-        "nome_usuario": request.session.get("nome_usuario")
+        "nome_usuario": request.session.get("nome_usuario"),
+        "mensagem": mensagem
     })
 
 
@@ -887,11 +890,11 @@ async def prof_atualizar_post(
 
         if not validate_name(nome):
             request.session["mensagem"] = "Nome inválido"
-            return RedirectResponse(url="/profAtualizar", status_code=303)
-        
+            return RedirectResponse(url=f"/profAtualizar?id={id}", status_code=303)
+
         if not validate_email(email):
             request.session["mensagem"] = "Email inválido"
-            return RedirectResponse(url="/profAtualizar", status_code=303)
+            return RedirectResponse(url=f"/profAtualizar?id={id}", status_code=303)
         
 
         with db.cursor() as cursor:
@@ -901,6 +904,8 @@ async def prof_atualizar_post(
                 (nome, email, id)
             )
             db.commit()
+        if id == request.session.get("usuario_id"):
+            request.session["nome_usuario"] = nome
         request.session["mensagem"] = "Cadastro do professor atualizado com sucesso!"
     except Exception as e:
         request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"

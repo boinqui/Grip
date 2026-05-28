@@ -88,7 +88,7 @@
                     <div class="perfil-meta">
                         <span>{{ professor.email if professor else '' }}</span>
                         {% if professor and professor.registro_drt %}
-                        <span>· DRT {{ professor.registro_drt }}</span>
+                        <span>· DRT {{ professor.registro_drt | replace('DRT-', '') }}</span>
                         {% endif %}
                     </div>
 
@@ -284,7 +284,7 @@
                             {% for prof in professores %}
                             <tr>
                                 <td class="nome-cell">{{ prof.nome }}</td>
-                                <td>{{ prof.registro_drt }}</td>
+                                <td>{{ prof.registro_drt | replace('DRT-', '') if prof.registro_drt else '' }}</td>
                                 <td>{{ prof.cpf }}</td>
                                 <td>{{ prof.email }}</td>
                                 <td class="center">
@@ -424,8 +424,8 @@
                             <div class="form-campo">
                                 <label for="drt">Registro DRT</label>
                                 <input type="text" id="drt"
-                                    value="{{ professor.registro_drt if professor else '' }}"
-                                    placeholder="Número DRT" disabled />
+                                    value="{{ professor.registro_drt | replace('DRT-', '') if professor and professor.registro_drt else '' }}"
+                                    inputmode="numeric" maxlength="4" placeholder="0000" disabled />
                             </div>
                             <div class="form-campo">
                                 <label for="cpf">CPF</label>

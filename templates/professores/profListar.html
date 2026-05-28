@@ -89,7 +89,7 @@
                     {% for prof in professores %}
                     <tr>
                         <td class="nome-cell">{{ prof.nome }}</td>
-                        <td>{{ prof.registro_drt }}</td>
+                        <td>{{ prof.registro_drt | replace('DRT-', '') if prof.registro_drt else '' }}</td>
                         <td>{{ prof.cpf }}</td>
                         <td>{{ prof.email }}</td>
                         {% if perfil == "admin" %}
