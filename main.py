@@ -8,13 +8,16 @@ from typing import Optional
 from mangum import Mangum
 
 from validators import validate_email, validate_cpf, validate_phone, validate_password, validate_drt, validate_name, validate_aula_nome, validate_birthday
-from fastapi import FastAPI, Request, Form, Depends
+from fastapi import FastAPI, Request, Form, Depends, HTTPException
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi import UploadFile, File
 from starlette.middleware.sessions import SessionMiddleware
 from datetime import datetime
+
+SESSION_IDLE_SECONDS = 3600
+SESSION_COOKIE_MAX_AGE = 86400
 
 app = FastAPI()
 
@@ -23,7 +26,7 @@ app.add_middleware(
     SessionMiddleware,
     secret_key="grip_secret",
     session_cookie="grip_session",
-    max_age=3600,
+    max_age=SESSION_COOKIE_MAX_AGE,
     same_site="lax",
     https_only=False
 )
@@ -42,7 +45,6 @@ DB_CONFIG = {
 
 PASSWORD_ALGORITHM = "pbkdf2_sha256"
 PASSWORD_ITERATIONS = 390000
-SESSION_IDLE_SECONDS = 3600
 
 REGEX_PATTERNS = {
     "regex_nome": r"[A-Za-zÀ-ÖØ-öø-ÿ\s']+",
@@ -58,9 +60,13 @@ def get_db():
     return pymysql.connect(**DB_CONFIG)
 
 
-def _enforce_session_activity(request: Request):
+def _auth_redirect(url: str) -> None:
+    raise HTTPException(status_code=303, headers={"Location": url})
+
+
+def _enforce_session_activity(request: Request) -> None:
     if not request.session.get("user_logged_in"):
-        return RedirectResponse(url="/login", status_code=303)
+        _auth_redirect("/login")
 
     now = datetime.now()
     last_raw = request.session.get("last_activity")
@@ -70,30 +76,21 @@ def _enforce_session_activity(request: Request):
             if (now - last_activity).total_seconds() > SESSION_IDLE_SECONDS:
                 request.session.clear()
                 request.session["mensagem"] = "Sessão expirada por inatividade"
-                return RedirectResponse(url="/login", status_code=303)
+                _auth_redirect("/login")
         except ValueError:
             pass
 
     request.session["last_activity"] = now.isoformat()
-    return None
 
 
 def verify_logged_in(request: Request):
-    redirect = _enforce_session_activity(request)
-    if redirect:
-        return redirect
-    if not request.session.get("user_logged_in"):
-        return RedirectResponse(url="/login", status_code=303)
+    _enforce_session_activity(request)
 
 
 def verify_admin(request: Request):
-    redirect = _enforce_session_activity(request)
-    if redirect:
-        return redirect
-    if not request.session.get("user_logged_in"):
-        return RedirectResponse(url="/login", status_code=303)
+    _enforce_session_activity(request)
     if request.session.get("perfil") != "admin":
-        return RedirectResponse(url="/", status_code=303)
+        _auth_redirect("/")
 
 def hash_password(password: str) -> str:
     salt = secrets.token_hex(16)
@@ -822,9 +819,29 @@ async def cadastrar_usuario(
             request.session["mensagem"] = "Erro: Informe nome e sobrenome."
             return RedirectResponse(url="/cadastro", status_code=303)
 
+        if not validate_name(nome):
+            stash_form()
+            request.session["mensagem"] = "Erro: Nome inválido."
+            return RedirectResponse(url="/cadastro", status_code=303)
+
+        if not validate_email(email):
+            stash_form()
+            request.session["mensagem"] = "Erro: E-mail inválido."
+            return RedirectResponse(url="/cadastro", status_code=303)
+
         if not validate_cpf(cpf):
             stash_form()
             request.session["mensagem"] = "Erro: CPF inválido."
+            return RedirectResponse(url="/cadastro", status_code=303)
+
+        if not validate_phone(telefone):
+            stash_form()
+            request.session["mensagem"] = "Erro: Telefone inválido."
+            return RedirectResponse(url="/cadastro", status_code=303)
+
+        if not validate_birthday(data_nascimento):
+            stash_form()
+            request.session["mensagem"] = "Erro: Data de nascimento inválida."
             return RedirectResponse(url="/cadastro", status_code=303)
 
         if not termos:
