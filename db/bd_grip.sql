@@ -100,3 +100,8 @@ INSERT INTO Agendamento_Aula (fk_Aluno_id, fk_Professor_id, tipo_aula, data_hora
 (1, 1, 'particular', '2026-04-10 14:00:00', 'Aula focada em postura e equilíbrio', 'agendada');
 
 SELECT * FROM Professor;
+
+-- Sprint 2: índices únicos (append-only)
+ALTER TABLE Aluno ADD UNIQUE INDEX uq_aluno_email (email);
+ALTER TABLE Aluno ADD UNIQUE INDEX uq_aluno_cpf (cpf);
+ALTER TABLE Professor ADD UNIQUE INDEX uq_professor_email (email);

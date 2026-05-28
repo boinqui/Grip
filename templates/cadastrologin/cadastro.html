@@ -117,8 +117,8 @@
                         <label for="senha">Senha <span class="required-indicator">*</span></label>
                         <div class="input-wrapper">
                             <input type="password" id="senha" name="senha" placeholder="••••••••"
-                                pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
-                                title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número." required>
+                                pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"
+                                title="A senha deve ter pelo menos 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial." required>
                             <i class="fa-solid fa-eye toggle-password" id="eyeIconSenha"></i>
                         </div>
                         <span class="campo-erro" id="erro-senha"></span>
@@ -193,6 +193,7 @@
 
     {% include 'modal.html' %}
     <script src="/static/js/sheet.js"></script>
+    <script src="/static/js/masks.js"></script>
     <script src="/static/js/scriptcadastro.js"></script>
     <script src="/static/js/main.js"></script>
     <script>

@@ -8,7 +8,7 @@ from typing import Optional
 from mangum import Mangum
 
 from validators import validate_email, validate_cpf, validate_phone, validate_password, validate_drt, validate_name, validate_aula_nome, validate_birthday
-from fastapi import FastAPI, Request, Form, Depends, HTTPException
+from fastapi import FastAPI, Request, Form, Depends
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -42,6 +42,7 @@ DB_CONFIG = {
 
 PASSWORD_ALGORITHM = "pbkdf2_sha256"
 PASSWORD_ITERATIONS = 390000
+SESSION_IDLE_SECONDS = 3600
 
 REGEX_PATTERNS = {
     "regex_nome": r"[A-Za-zÀ-ÖØ-öø-ÿ\s']+",
@@ -49,23 +50,50 @@ REGEX_PATTERNS = {
     "regex_telefone": r"\(?\d{2}\)?\s?9\d{4}-?\d{4}",
     "regex_email": r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}",
     "regex_data_nascimento": r"\d{4}-\d{2}-\d{2}",
+    "regex_senha": r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$",
 }
 
 
 def get_db():
     return pymysql.connect(**DB_CONFIG)
 
-def verify_logged_in(request: Request):
+
+def _enforce_session_activity(request: Request):
     if not request.session.get("user_logged_in"):
-        #se nao estiver logado, vai para /login
-        raise HTTPException(status_code=303, headers={"Location": "/login"})
+        return RedirectResponse(url="/login", status_code=303)
+
+    now = datetime.now()
+    last_raw = request.session.get("last_activity")
+    if last_raw:
+        try:
+            last_activity = datetime.fromisoformat(last_raw)
+            if (now - last_activity).total_seconds() > SESSION_IDLE_SECONDS:
+                request.session.clear()
+                request.session["mensagem"] = "Sessão expirada por inatividade"
+                return RedirectResponse(url="/login", status_code=303)
+        except ValueError:
+            pass
+
+    request.session["last_activity"] = now.isoformat()
+    return None
+
+
+def verify_logged_in(request: Request):
+    redirect = _enforce_session_activity(request)
+    if redirect:
+        return redirect
+    if not request.session.get("user_logged_in"):
+        return RedirectResponse(url="/login", status_code=303)
+
 
 def verify_admin(request: Request):
+    redirect = _enforce_session_activity(request)
+    if redirect:
+        return redirect
     if not request.session.get("user_logged_in"):
-        raise HTTPException(status_code=303, headers={"Location": "/login"})
+        return RedirectResponse(url="/login", status_code=303)
     if request.session.get("perfil") != "admin":
-        #se nao for admin, vai para /login
-        raise HTTPException(status_code=303, headers={"Location": "/"})
+        return RedirectResponse(url="/", status_code=303)
 
 def hash_password(password: str) -> str:
     salt = secrets.token_hex(16)
@@ -257,6 +285,7 @@ async def login(
                 request.session["usuario_id"] = professor["id"]
                 request.session["nome_usuario"] = professor["nome"]
                 request.session["perfil"] = "admin" # <-- Define Professor como Admin
+                request.session["last_activity"] = datetime.now().isoformat()
                 return RedirectResponse(url="/profPerfil", status_code=303)
 
             #Aluno = User
@@ -270,6 +299,7 @@ async def login(
                 request.session["nome_usuario"] = aluno["nome"]
                 request.session["email_usuario"] = Email
                 request.session["perfil"] = "user" # <-- Define Aluno como User
+                request.session["last_activity"] = datetime.now().isoformat()
                 return RedirectResponse(url="/alunoPerfil", status_code=303)
 
             if not professor and not aluno:
@@ -682,6 +712,11 @@ async def cadastrar_usuario(
             request.session["mensagem"] = "Erro: Você precisa aceitar os termos para continuar."
             return RedirectResponse(url="/cadastro", status_code=303)
 
+        if not validate_password(senha):
+            stash_form()
+            request.session["mensagem"] = "Erro: A senha não atende aos requisitos."
+            return RedirectResponse(url="/cadastro", status_code=303)
+
         with db.cursor() as cursor:
             cursor.execute("SELECT id FROM Aluno WHERE email = %s", (email,))
             if cursor.fetchone():
@@ -707,9 +742,14 @@ async def cadastrar_usuario(
             request.session["nome_usuario"] = nome
             request.session["email_usuario"] = email
             request.session["perfil"] = "user"
+            request.session["last_activity"] = datetime.now().isoformat()
             request.session["mensagem"] = "Aluno cadastrado com sucesso!"
             return RedirectResponse(url="/alunoPerfil", status_code=303)
 
+    except pymysql.err.IntegrityError:
+        stash_form()
+        request.session["mensagem"] = "Erro: E-mail ou CPF já cadastrado."
+        return RedirectResponse(url="/cadastro", status_code=303)
     except Exception as e:
         stash_form()
         request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
@@ -816,6 +856,11 @@ async def prof_incluir_post(
         
 
         with db.cursor() as cursor:
+            cursor.execute("SELECT id FROM Professor WHERE email = %s", (email,))
+            if cursor.fetchone():
+                request.session["mensagem"] = "Erro: Este e-mail já está em uso!"
+                return RedirectResponse(url="/profIncluir", status_code=303)
+
             senha_hash = hash_password(senha)
             cursor.execute(
                 "INSERT INTO Professor (nome, registro_drt, cpf, email, senha) VALUES (%s, %s, %s, %s, %s)",
@@ -823,6 +868,8 @@ async def prof_incluir_post(
             )
             db.commit()
         request.session["mensagem"] = "Professor cadastrado com sucesso!"
+    except pymysql.err.IntegrityError:
+        request.session["mensagem"] = "Erro: E-mail já cadastrado."
     except Exception as e:
         request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
     finally:
@@ -895,6 +942,14 @@ async def prof_atualizar_post(
         
 
         with db.cursor() as cursor:
+            cursor.execute(
+                "SELECT id FROM Professor WHERE email = %s AND id != %s",
+                (email, id)
+            )
+            if cursor.fetchone():
+                request.session["mensagem"] = "Erro: Este e-mail já está em uso!"
+                return RedirectResponse(url=f"/profAtualizar?id={id}", status_code=303)
+
             # Não atualizamos registro_drt, cpf e senha aqui
             cursor.execute(
                 "UPDATE Professor SET nome=%s, email=%s WHERE id=%s",
@@ -902,6 +957,8 @@ async def prof_atualizar_post(
             )
             db.commit()
         request.session["mensagem"] = "Cadastro do professor atualizado com sucesso!"
+    except pymysql.err.IntegrityError:
+        request.session["mensagem"] = "Erro: E-mail já cadastrado."
     except Exception as e:
         request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
     finally:
@@ -1034,6 +1091,16 @@ async def aluno_incluir_post(
 
         #banco
         with db.cursor() as cursor:
+            cursor.execute("SELECT id FROM Aluno WHERE email = %s", (email,))
+            if cursor.fetchone():
+                request.session["mensagem"] = "Erro: Este e-mail já está em uso!"
+                return RedirectResponse(url="/alunoIncluir", status_code=303)
+
+            cursor.execute("SELECT id FROM Aluno WHERE cpf = %s", (cpf,))
+            if cursor.fetchone():
+                request.session["mensagem"] = "Erro: Este CPF já está em uso!"
+                return RedirectResponse(url="/alunoIncluir", status_code=303)
+
             senha_hash = hash_password(senha)
             cursor.execute(
                 "INSERT INTO Aluno (nome, cpf, telefone, email, senha, data_nascimento) VALUES (%s, %s, %s, %s, %s, %s)",
@@ -1041,6 +1108,8 @@ async def aluno_incluir_post(
             )
             db.commit()
         request.session["mensagem"] = "Aluno cadastrado com sucesso!"
+    except pymysql.err.IntegrityError:
+        request.session["mensagem"] = "Erro: E-mail ou CPF já cadastrado."
     except Exception as e:
         request.session["mensagem"] = f"Erro ao cadastrar: {str(e)}"
     finally:
@@ -1124,6 +1193,14 @@ async def aluno_atualizar_post(
             return RedirectResponse(url="/alunoAtualizar", status_code=303)
 
         with db.cursor() as cursor:
+            cursor.execute(
+                "SELECT id FROM Aluno WHERE email = %s AND id != %s",
+                (email, id)
+            )
+            if cursor.fetchone():
+                request.session["mensagem"] = "Erro: Este e-mail já está em uso!"
+                return RedirectResponse(url=f"/alunoAtualizar?id={id}", status_code=303)
+
             #att cpf e senha nao é aqui
             cursor.execute(
                 "UPDATE Aluno SET nome=%s, telefone=%s, email=%s, data_nascimento=%s WHERE id=%s",
@@ -1131,6 +1208,8 @@ async def aluno_atualizar_post(
             )
             db.commit()
         request.session["mensagem"] = "Cadastro do aluno atualizado com sucesso!"
+    except pymysql.err.IntegrityError:
+        request.session["mensagem"] = "Erro: E-mail já cadastrado."
     except Exception as e:
         request.session["mensagem"] = f"Erro ao atualizar: {str(e)}"
     finally:

@@ -70,8 +70,8 @@
                 <div class="admin-campo">
                     <label for="nova_senha">Nova Senha</label>
                     <input type="password" name="nova_senha" id="nova_senha" required
-                        pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
-                        title="A senha deve ter pelo menos 8 caracteres, incluindo uma letra e um número.">
+                        pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$"
+                        title="A senha deve ter pelo menos 8 caracteres, incluindo maiúscula, minúscula, número e caractere especial.">
                     <span class="campo-erro" id="erro-senha"></span>
                 </div>
 
